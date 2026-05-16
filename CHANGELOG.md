@@ -4,6 +4,16 @@
 
 All notable changes to mq-hal are documented here.
 
+## [0.3.0] – 2026-05-16
+
+### Added
+
+- Added `mq-hal fix-doctor` for safe fix planning from HAL Doctor Summary.
+- Added command sanitization — blocks destructive tokens, allowlist-filters suggestions.
+- Added `prompts/fix-planner.txt` system prompt for the planner model.
+- Added `tests/fix-planner-smoke.sh` with syntax, JSON, and text output checks.
+- Updated CI to cover `fix_planner.py` syntax and fix-planner smoke test.
+
 ## [0.2.0] – 2026-05-16
 
 ### Added
@@ -19,6 +29,7 @@ All notable changes to mq-hal are documented here.
 ## [0.1.0] – 2026-05-16
 
 ### Added
+
 - Natural language command routing via Ollama (qwen3:4b-instruct)
 - Structured JSON intent schema with allowlist enforcement
 - Safe intent set: `help`, `list_repos`, `switch_repo`, `print_cd`, `pwd`, `repo_tree`, `git_status`, `git_log`, `run_mqlaunch`, `refuse`

@@ -3,7 +3,7 @@
 **Local HAL-style command router for macOS.**
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
-[![Version](https://img.shields.io/badge/version-0.2.0-orange)](VERSION)
+[![Version](https://img.shields.io/badge/version-0.3.0-orange)](VERSION)
 
 mq-hal lets you ask natural language questions locally through Ollama,
 then maps the answer to safe whitelisted terminal actions.
@@ -136,6 +136,43 @@ mq-hal doctor-summary
 → parse doctor JSON
 → summarize with Ollama when available
 → fall back to deterministic local summary when Ollama is unavailable
+```
+
+---
+
+## HAL Fix Planner
+
+Create a safe fix plan from HAL Doctor Summary:
+
+```bash
+mq-hal fix-doctor
+```
+
+Machine-readable output:
+
+```bash
+mq-hal fix-doctor --json
+```
+
+Without AI:
+
+```bash
+mq-hal fix-doctor --no-ai
+```
+
+Through MQLaunch after installing the bridge:
+
+```bash
+mqlaunch hal fix-doctor
+```
+
+```text
+mq-hal fix-doctor
+→ mq-hal doctor-summary --json --no-ai
+→ parse findings
+→ create safe fix plan
+→ print copy-paste commands
+→ execute nothing
 ```
 
 ---

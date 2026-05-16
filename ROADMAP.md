@@ -1,5 +1,12 @@
 # Roadmap
 
+## Completed in v0.3.0
+
+- HAL Fix Planner: create safe copy-paste fix plans from HAL Doctor Summary.
+- Planner command sanitization to block destructive suggestions.
+- JSON and text output modes for fix plans.
+- Smoke test coverage for fix planner.
+
 ## Completed in v0.2.0
 
 - HAL Doctor Summary: run `mqlaunch doctor --json`, parse the result, and summarize health status.

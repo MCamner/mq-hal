@@ -9,6 +9,10 @@ case "${1:-}" in
     shift || true
     exec python3 "$ROOT/scripts/doctor_summary.py" "$@"
     ;;
+  fix-doctor|doctor-fix|fix-planner|plan-fix)
+    shift || true
+    exec python3 "$ROOT/scripts/fix_planner.py" "$@"
+    ;;
 esac
 
 exec python3 "$ROOT/scripts/hal.py" "$@"
