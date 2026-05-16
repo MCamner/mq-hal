@@ -86,9 +86,13 @@ Add to `~/.zshrc`:
 
 ```bash
 mqhcd() {
+  if [ $# -ne 1 ]; then
+    echo "usage: mqhcd <repo-name>" >&2
+    return 2
+  fi
   local path
-  path="$(mq-hal --cd "$1")" || return 1
-  cd "$path"
+  path="$(mq-hal --cd "$1")" || return $?
+  cd "$path" || return $?
 }
 ```
 
