@@ -122,10 +122,12 @@ def prompt_text() -> str:
     return "Create a safe fix plan from a doctor summary. Do not execute commands."
 
 
-def run_doctor_summary(repo: str | None) -> dict[str, Any]:
+def run_doctor_summary(repo: str | None, sample: bool = False) -> dict[str, Any]:
     command = [sys.executable, str(DOCTOR_SUMMARY_SCRIPT), "--json", "--no-ai"]
     if repo:
         command.extend(["--repo", repo])
+    if sample:
+        command.append("--sample")
 
     try:
         completed = subprocess.run(
@@ -323,10 +325,11 @@ def main(argv: list[str]) -> int:
     parser.add_argument("--repo", help="Configured repo name")
     parser.add_argument("--json", action="store_true", help="Print machine-readable plan JSON")
     parser.add_argument("--no-ai", action="store_true", help="Use deterministic fallback only")
+    parser.add_argument("--sample", action="store_true", help="Use embedded sample doctor JSON (CI/smoke tests)")
 
     args = parser.parse_args(argv)
 
-    summary_envelope = run_doctor_summary(args.repo)
+    summary_envelope = run_doctor_summary(args.repo, sample=args.sample)
     ai_plan = None if args.no_ai else call_ollama_plan(summary_envelope)
     plan = ai_plan or fallback_plan(summary_envelope)
     used_ai = ai_plan is not None

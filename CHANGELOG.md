@@ -4,6 +4,12 @@
 
 All notable changes to mq-hal are documented here.
 
+## [0.3.1] – 2026-05-16
+
+### Fixed
+
+- Fixed CI failure in `fix-planner-smoke.sh` — added `--sample` flag to `fix_planner.py` so smoke tests run against embedded sample data instead of requiring a live `macos-scripts` repo on the runner.
+
 ## [0.3.0] – 2026-05-16
 
 ### Added
