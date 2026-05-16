@@ -1,0 +1,9 @@
+{
+  "default_repo": "macos-scripts",
+  "repos": {
+    "macos-scripts": "~/macos-scripts",
+    "repo-signal": "~/repo-signal",
+    "mq-mcp": "~/mq-mcp",
+    "mcamner-journal": "~/mcamner-journal"
+  }
+}
