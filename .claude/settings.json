@@ -10,7 +10,8 @@
       "Bash(./tests/smoke.sh)",
       "Bash(git commit -m ' *)",
       "Bash(git tag *)",
-      "Bash(gh release *)"
+      "Bash(gh release *)",
+      "Bash(gh run *)"
     ]
   }
 }
