@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+# Resolve symlinks so ROOT is always ~/mq-hal regardless of how this script is invoked
+_REAL="$(python3 -c "import os,sys; print(os.path.realpath(sys.argv[1]))" "${BASH_SOURCE[0]}")"
+ROOT="$(cd "$(dirname "$_REAL")/.." && pwd)"
 exec python3 "$ROOT/scripts/hal.py" "$@"
