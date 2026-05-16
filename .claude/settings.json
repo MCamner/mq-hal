@@ -5,7 +5,10 @@
       "Bash(ls /Users/mansys/.lmstudio/bin/ 2>/dev/null; which -a ollama 2>/dev/null; ls /opt/homebrew/bin/ollama 2>/dev/null)",
       "Read(//opt/homebrew/bin/**)",
       "Bash(export PATH=\"/opt/homebrew/opt/python@3.11/libexec/bin:/opt/homebrew/bin:/opt/homebrew/sbin:$HOME/bin:$HOME/macos-scripts/bin:$PATH\")",
-      "Bash(mq-hal --list-repos)"
+      "Bash(mq-hal --list-repos)",
+      "Bash(python3 -m py_compile scripts/hal.py)",
+      "Bash(./tests/smoke.sh)",
+      "Bash(git commit -m ' *)"
     ]
   }
 }

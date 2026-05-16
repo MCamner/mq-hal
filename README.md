@@ -92,7 +92,11 @@ mqhcd() {
 }
 ```
 
-Then: `mqhcd repo-signal`
+Then:
+
+```bash
+mqhcd repo-signal
+```
 
 ---
 
