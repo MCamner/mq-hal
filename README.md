@@ -1,35 +1,76 @@
 # mq-hal
 
-Local HAL-style command router for macOS.
+**Local HAL-style command router for macOS.**
+
+[![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
+[![Version](https://img.shields.io/badge/version-0.1.0-orange)](VERSION)
 
 mq-hal lets you ask natural language questions locally through Ollama,
 then maps the answer to safe whitelisted terminal actions.
 
-## Current design
+**[Live site → mcamner.github.io/mq-hal](https://mcamner.github.io/mq-hal/)**
 
-User prompt
-→ Ollama/Qwen
-→ JSON intent
-→ Safe Python router
-→ git / mqlaunch / repo helpers
+---
 
-## Safety rule
+## How it works
 
-The model never runs shell directly.
+```text
+User prompt → Ollama/Qwen → JSON intent → Safe Python router → git / mqlaunch / repo helpers
+```
 
-It can only return a JSON intent.
+The model **never runs shell directly**. It returns a JSON intent.
 The Python router decides what is allowed.
+
+---
+
+## Demo
+
+```console
+$ mq-hal "visa git status i macos-scripts"
+HAL: Visar git status.
+M  scripts/hal.py
+
+$ mq-hal --raw-intent "kör doctor"
+{
+  "intent": "run_mqlaunch",
+  "repo": null,
+  "command": "doctor",
+  "args": [],
+  "message": "Kör mqlaunch doctor."
+}
+
+$ mq-hal "visa senaste commits"
+HAL: Visar de senaste commit-loggarna.
+fe4704a update project files
+d306b68 fix: resolve symlinks in bin wrapper via python realpath
+5de240b feat: initial mq-hal v0.1
+```
+
+Screenshots: [docs/screenshots/](docs/screenshots/)
+
+---
 
 ## Quick start
 
 ```bash
+# 1. Install Ollama
+brew install ollama
+brew services start ollama
+
+# 2. Pull model
 ollama pull qwen3:4b-instruct
 
-~/mq-hal/bin/mq-hal "visa git status i macos-scripts"
-~/mq-hal/bin/mq-hal "kör doctor"
-~/mq-hal/bin/mq-hal "byt till repo-signal"
-~/mq-hal/bin/mq-hal "visa senaste commits"
+# 3. Clone and link binary
+git clone https://github.com/MCamner/mq-hal.git ~/mq-hal
+ln -s ~/mq-hal/bin/mq-hal ~/bin/mq-hal
+
+# 4. Edit config/repos.json with your repos, then:
+mq-hal "visa git status i macos-scripts"
+mq-hal "kör doctor"
+mq-hal "byt till repo-signal"
 ```
+
+---
 
 ## Optional model override
 
@@ -37,15 +78,11 @@ ollama pull qwen3:4b-instruct
 OLLAMA_MODEL=qwen3:4b ~/mq-hal/bin/mq-hal "visa git status"
 ```
 
+---
+
 ## Repo cd helper
 
-```bash
-mq-hal --cd repo-signal
-```
-
-Prints the repo path so your shell can cd into it.
-
-Example zsh function:
+Add to `~/.zshrc`:
 
 ```bash
 mqhcd() {
@@ -54,3 +91,25 @@ mqhcd() {
   cd "$path"
 }
 ```
+
+Then: `mqhcd repo-signal`
+
+---
+
+## Security
+
+The model only returns a JSON intent from a fixed schema.
+The router enforces an explicit allowlist — unknown or unsafe commands get `refuse`.
+No shell injection is possible.
+
+---
+
+## Roadmap
+
+See [ROADMAP.md](ROADMAP.md) for planned features.
+
+---
+
+## License
+
+[MIT](LICENSE)

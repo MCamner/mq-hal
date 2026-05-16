@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>mq-hal — local AI command router for macOS</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #0d1117;
+      color: #c9d1d9;
+      line-height: 1.6;
+    }
+    header {
+      padding: 64px 24px 32px;
+      text-align: center;
+      border-bottom: 1px solid #21262d;
+    }
+    header h1 {
+      font-size: 2.5rem;
+      color: #f0f6fc;
+      letter-spacing: -0.5px;
+    }
+    header p {
+      margin-top: 12px;
+      font-size: 1.1rem;
+      color: #8b949e;
+    }
+    .badges {
+      margin-top: 20px;
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .badges a img { height: 20px; }
+    main {
+      max-width: 780px;
+      margin: 0 auto;
+      padding: 48px 24px;
+    }
+    h2 {
+      font-size: 1.3rem;
+      color: #f0f6fc;
+      margin: 40px 0 12px;
+      border-bottom: 1px solid #21262d;
+      padding-bottom: 6px;
+    }
+    pre {
+      background: #161b22;
+      border: 1px solid #21262d;
+      border-radius: 6px;
+      padding: 16px;
+      overflow-x: auto;
+      font-size: 0.875rem;
+      line-height: 1.5;
+    }
+    code { font-family: "SF Mono", Menlo, monospace; }
+    .intent-box {
+      background: #161b22;
+      border: 1px solid #21262d;
+      border-left: 3px solid #58a6ff;
+      border-radius: 6px;
+      padding: 16px;
+      margin: 16px 0;
+      font-size: 0.875rem;
+    }
+    .intent-box .label {
+      color: #8b949e;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 6px;
+    }
+    .steps {
+      counter-reset: steps;
+      list-style: none;
+      padding: 0;
+    }
+    .steps li {
+      counter-increment: steps;
+      display: flex;
+      gap: 16px;
+      margin-bottom: 20px;
+      align-items: flex-start;
+    }
+    .steps li::before {
+      content: counter(steps);
+      flex-shrink: 0;
+      width: 28px;
+      height: 28px;
+      background: #1f6feb;
+      color: #fff;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+      font-weight: 600;
+      margin-top: 2px;
+    }
+    .cta {
+      text-align: center;
+      margin-top: 56px;
+      padding: 32px;
+      background: #161b22;
+      border: 1px solid #21262d;
+      border-radius: 8px;
+    }
+    .cta a {
+      display: inline-block;
+      background: #238636;
+      color: #fff;
+      text-decoration: none;
+      padding: 10px 24px;
+      border-radius: 6px;
+      font-weight: 600;
+      margin-top: 12px;
+    }
+    .cta a:hover { background: #2ea043; }
+    footer {
+      text-align: center;
+      padding: 32px;
+      color: #484f58;
+      font-size: 0.8rem;
+      border-top: 1px solid #21262d;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>mq-hal</h1>
+  <p>Natural language command router for macOS — runs fully local via Ollama.</p>
+  <div class="badges">
+    <a href="https://github.com/MCamner/mq-hal"><img src="https://img.shields.io/badge/GitHub-MCamner%2Fmq--hal-blue?logo=github" alt="GitHub"></a>
+    <a href="https://github.com/MCamner/mq-hal/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-MIT-green" alt="MIT License"></a>
+    <a href="https://github.com/MCamner/mq-hal/blob/main/VERSION"><img src="https://img.shields.io/badge/version-0.1.0-orange" alt="Version"></a>
+  </div>
+</header>
+
+<main>
+
+  <h2>What it does</h2>
+  <p>
+    You type a natural language command. mq-hal sends it to a local Ollama model,
+    gets back a structured JSON intent, and routes it to a safe allowlisted action —
+    <code>git status</code>, <code>git log</code>, repo switching, or <code>mqlaunch</code> subcommands.
+    The model never runs shell directly.
+  </p>
+
+  <h2>Demo</h2>
+
+  <div class="intent-box">
+    <div class="label">Input</div>
+    <code>$ mq-hal "visa git status i macos-scripts"</code>
+  </div>
+  <div class="intent-box">
+    <div class="label">Model intent (JSON)</div>
+    <pre><code>{
+  "intent": "git_status",
+  "repo": "macos-scripts",
+  "command": null,
+  "args": [],
+  "message": "Visar git status."
+}</code></pre>
+  </div>
+  <div class="intent-box">
+    <div class="label">Output</div>
+    <pre><code>HAL: Visar git status.
+M  scripts/hal.py</code></pre>
+  </div>
+
+  <h2>Quick start</h2>
+  <ol class="steps">
+    <li>
+      <div>
+        <strong>Install Ollama</strong><br>
+        <code>brew install ollama &amp;&amp; brew services start ollama</code>
+      </div>
+    </li>
+    <li>
+      <div>
+        <strong>Pull the model</strong><br>
+        <code>ollama pull qwen3:4b-instruct</code>
+      </div>
+    </li>
+    <li>
+      <div>
+        <strong>Clone and link</strong><br>
+        <pre><code>git clone https://github.com/MCamner/mq-hal.git ~/mq-hal
+ln -s ~/mq-hal/bin/mq-hal ~/bin/mq-hal</code></pre>
+      </div>
+    </li>
+    <li>
+      <div>
+        <strong>Configure your repos</strong><br>
+        Edit <code>config/repos.json</code> with your local repo paths.
+      </div>
+    </li>
+    <li>
+      <div>
+        <strong>Run</strong><br>
+        <code>mq-hal "visa senaste commits"</code>
+      </div>
+    </li>
+  </ol>
+
+  <h2>Safety model</h2>
+  <p>
+    The LLM only returns JSON. The Python router enforces an explicit allowlist of
+    intents and <code>mqlaunch</code> subcommands. Unknown or dangerous requests
+    get the <code>refuse</code> intent — no shell injection possible.
+  </p>
+
+  <div class="cta">
+    <p>Ready to try it?</p>
+    <a href="https://github.com/MCamner/mq-hal">View on GitHub →</a>
+  </div>
+
+</main>
+
+<footer>
+  MIT License · <a href="https://github.com/MCamner/mq-hal">MCamner/mq-hal</a>
+</footer>
+
+</body>
+</html>
