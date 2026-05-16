@@ -4,6 +4,19 @@
 
 All notable changes to mq-hal are documented here.
 
+## [0.5.0] – 2026-05-16
+
+### Added
+
+- Added `mq-hal timeline` — compact terminal table view over HAL Session Memory.
+- Added `--details` flag to show one-line summary under each timeline row.
+- Added `--repo`, `--type`, `--limit`, and `--json` filters for timeline.
+- Added `tests/timeline-smoke.sh` and CI coverage for `timeline.py`.
+
+### Fixed
+
+- Rewrote README markdown for clean GitHub rendering — each code block separated by blank lines.
+
 ## [0.4.0] – 2026-05-16
 
 ### Added

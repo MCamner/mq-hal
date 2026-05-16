@@ -1,5 +1,12 @@
 # Roadmap
 
+## Completed in v0.5.0
+
+- HAL Timeline UI: compact terminal table view over local session memory.
+- Timeline filters: repo, event type, limit, details.
+- Output modes: table, details, JSON.
+- README markdown rendering cleanup.
+
 ## Completed in v0.4.0
 
 - HAL Session Memory: local JSONL history for doctor summaries, fix plans, and manual notes.

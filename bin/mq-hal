@@ -41,6 +41,11 @@ case "${1:-}" in
     exec python3 "$ROOT/scripts/session_memory.py" remember "$@"
     ;;
 
+  timeline)
+    shift || true
+    exec python3 "$ROOT/scripts/timeline.py" "$@"
+    ;;
+
   memory-path|session-path)
     shift || true
     exec python3 "$ROOT/scripts/session_memory.py" path "$@"

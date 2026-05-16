@@ -1,52 +1,27 @@
 # mq-hal
 
-**Local HAL-style command router for macOS.**
+Local HAL-style command router for macOS.
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
-[![Version](https://img.shields.io/badge/version-0.4.0-orange)](VERSION)
+[![Version](https://img.shields.io/badge/version-0.5.0-orange)](VERSION)
 
-mq-hal lets you ask natural language questions locally through Ollama,
-then maps the answer to safe whitelisted terminal actions.
+`mq-hal` lets you ask natural language questions locally through Ollama, then maps the answer to safe whitelisted terminal actions.
 
-**[Live site → mcamner.github.io/mq-hal](https://mcamner.github.io/mq-hal/)**
+Live site: <https://mcamner.github.io/mq-hal/>
 
 ---
 
 ## How it works
 
 ```text
-User prompt → Ollama/Qwen → JSON intent → Safe Python router → git / mqlaunch / repo helpers
+User prompt
+→ Ollama/Qwen
+→ JSON intent
+→ Safe Python router
+→ git / mqlaunch / repo helpers
 ```
 
-The model **never runs shell directly**. It returns a JSON intent.
-The Python router decides what is allowed.
-
----
-
-## Demo
-
-```console
-$ mq-hal "visa git status i macos-scripts"
-HAL: Visar git status.
-M  scripts/hal.py
-
-$ mq-hal --raw-intent "kör doctor"
-{
-  "intent": "run_mqlaunch",
-  "repo": null,
-  "command": "doctor",
-  "args": [],
-  "message": "Kör mqlaunch doctor."
-}
-
-$ mq-hal "visa senaste commits"
-HAL: Visar de senaste commit-loggarna.
-fe4704a update project files
-d306b68 fix: resolve symlinks in bin wrapper via python realpath
-5de240b feat: initial mq-hal v0.1
-```
-
-Screenshots: [docs/screenshots/](docs/screenshots/)
+The model never runs shell directly. It returns a JSON intent. The Python router decides what is allowed.
 
 ---
 
@@ -62,12 +37,63 @@ ollama pull qwen3:4b-instruct
 
 # 3. Clone and link binary
 git clone https://github.com/MCamner/mq-hal.git ~/mq-hal
-ln -s ~/mq-hal/bin/mq-hal ~/bin/mq-hal
+mkdir -p ~/bin
+ln -sf ~/mq-hal/bin/mq-hal ~/bin/mq-hal
 
 # 4. Edit config/repos.json with your repos, then:
 mq-hal "visa git status i macos-scripts"
 mq-hal "kör doctor"
 mq-hal "byt till repo-signal"
+```
+
+---
+
+## Demo
+
+```bash
+mq-hal "visa git status i macos-scripts"
+```
+
+Example output:
+
+```text
+HAL: Visar git status.
+ M scripts/hal.py
+```
+
+```bash
+mq-hal --raw-intent "kör doctor"
+```
+
+Example output:
+
+```json
+{
+  "intent": "run_mqlaunch",
+  "repo": null,
+  "command": "doctor",
+  "args": [],
+  "message": "Kör mqlaunch doctor."
+}
+```
+
+---
+
+## Common commands
+
+```bash
+mq-hal "visa git status i macos-scripts"
+mq-hal --raw-intent "kör doctor"
+mq-hal doctor-summary
+mq-hal doctor-summary --no-ai
+mq-hal fix-doctor
+mq-hal fix-doctor --no-ai
+mq-hal session
+mq-hal last
+mq-hal timeline
+mq-hal timeline --details
+mq-hal remember "release looked good"
+mq-hal memory-path
 ```
 
 ---
@@ -90,6 +116,7 @@ mqhcd() {
     echo "usage: mqhcd <repo-name>" >&2
     return 2
   fi
+
   local path
   path="$(mq-hal --cd "$1")" || return $?
   cd "$path" || return $?
@@ -118,7 +145,7 @@ Machine-readable output:
 mq-hal doctor-summary --json
 ```
 
-Without AI (deterministic fallback):
+Without AI:
 
 ```bash
 mq-hal doctor-summary --no-ai
@@ -129,6 +156,8 @@ Through MQLaunch after installing the bridge:
 ```bash
 mqlaunch hal doctor
 ```
+
+Flow:
 
 ```text
 mq-hal doctor-summary
@@ -166,6 +195,8 @@ Through MQLaunch after installing the bridge:
 mqlaunch hal fix-doctor
 ```
 
+Flow:
+
 ```text
 mq-hal fix-doctor
 → mq-hal doctor-summary --json --no-ai
@@ -199,7 +230,7 @@ Save a manual note:
 mq-hal remember "doctor looked clean after release"
 ```
 
-Machine-readable output:
+Show memory as JSON:
 
 ```bash
 mq-hal session --json
@@ -214,13 +245,7 @@ mqlaunch hal last
 mqlaunch hal remember "release looked good"
 ```
 
-What gets saved automatically:
-
-- `doctor_summary` — every `mq-hal doctor-summary` run
-- `fix_plan` — every `mq-hal fix-doctor` run
-- manual `note` — via `mq-hal remember`
-
-Opt out for one command:
+Disable memory for one command:
 
 ```bash
 mq-hal doctor-summary --no-memory
@@ -235,11 +260,58 @@ MQ_HAL_DISABLE_MEMORY=1 mq-hal doctor-summary
 
 ---
 
+## HAL Timeline UI
+
+Show HAL Session Memory as a compact timeline:
+
+```bash
+mq-hal timeline
+```
+
+Show more context:
+
+```bash
+mq-hal timeline --details
+```
+
+Filter by repo:
+
+```bash
+mq-hal timeline --repo macos-scripts
+```
+
+Filter by type:
+
+```bash
+mq-hal timeline --type doctor_summary
+mq-hal timeline --type fix_plan
+mq-hal timeline --type note
+```
+
+Machine-readable output:
+
+```bash
+mq-hal timeline --json
+```
+
+Through MQLaunch:
+
+```bash
+mqlaunch hal timeline
+mqlaunch hal timeline --details
+```
+
+---
+
 ## Security
 
 The model only returns a JSON intent from a fixed schema.
-The router enforces an explicit allowlist — unknown or unsafe commands get `refuse`.
-No shell injection is possible.
+
+The router enforces an explicit allowlist. Unknown or unsafe commands are refused.
+
+`HAL Fix Planner` does not execute repairs. It only prints commands for manual review.
+
+Session Memory stays local in `~/.mq-hal/session.jsonl`.
 
 ---
 
