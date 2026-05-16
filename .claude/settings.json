@@ -8,7 +8,9 @@
       "Bash(mq-hal --list-repos)",
       "Bash(python3 -m py_compile scripts/hal.py)",
       "Bash(./tests/smoke.sh)",
-      "Bash(git commit -m ' *)"
+      "Bash(git commit -m ' *)",
+      "Bash(git tag *)",
+      "Bash(gh release *)"
     ]
   }
 }
