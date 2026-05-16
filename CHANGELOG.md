@@ -4,6 +4,18 @@
 
 All notable changes to mq-hal are documented here.
 
+## [0.4.0] – 2026-05-16
+
+### Added
+
+- Added HAL Session Memory backed by local JSONL storage in `~/.mq-hal/session.jsonl`.
+- Added `mq-hal session`, `mq-hal last`, `mq-hal remember`, and `mq-hal memory-path` commands.
+- Added automatic memory capture for `doctor-summary` and `fix-doctor` results.
+- Added `--no-memory` flag to `doctor-summary` and `fix-doctor` to suppress memory writes.
+- Added `MQ_HAL_DISABLE_MEMORY=1` environment variable to disable memory globally.
+- Added `tests/session-memory-smoke.sh` and CI coverage for `session_memory.py`.
+- Fixed double-save: `fix-doctor` subprocess call to `doctor_summary.py` now uses `--no-memory`.
+
 ## [0.3.1] – 2026-05-16
 
 ### Fixed

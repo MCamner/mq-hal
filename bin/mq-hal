@@ -1,17 +1,49 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-_REAL="$(python3 -c "import os,sys; print(os.path.realpath(sys.argv[1]))" "${BASH_SOURCE[0]}")"
-ROOT="$(cd "$(dirname "$_REAL")/.." && pwd)"
+SOURCE="${BASH_SOURCE[0]}"
+
+while [ -L "$SOURCE" ]; do
+  DIR="$(cd -P "$(dirname "$SOURCE")" >/dev/null 2>&1 && pwd)"
+  TARGET="$(readlink "$SOURCE")"
+  if [[ "$TARGET" == /* ]]; then
+    SOURCE="$TARGET"
+  else
+    SOURCE="$DIR/$TARGET"
+  fi
+done
+
+ROOT="$(cd -P "$(dirname "$SOURCE")/.." >/dev/null 2>&1 && pwd)"
 
 case "${1:-}" in
   doctor|doctor-summary|--doctor-summary)
     shift || true
     exec python3 "$ROOT/scripts/doctor_summary.py" "$@"
     ;;
+
   fix-doctor|doctor-fix|fix-planner|plan-fix)
     shift || true
     exec python3 "$ROOT/scripts/fix_planner.py" "$@"
+    ;;
+
+  session|memory)
+    shift || true
+    exec python3 "$ROOT/scripts/session_memory.py" session "$@"
+    ;;
+
+  last)
+    shift || true
+    exec python3 "$ROOT/scripts/session_memory.py" last "$@"
+    ;;
+
+  remember)
+    shift || true
+    exec python3 "$ROOT/scripts/session_memory.py" remember "$@"
+    ;;
+
+  memory-path|session-path)
+    shift || true
+    exec python3 "$ROOT/scripts/session_memory.py" path "$@"
     ;;
 esac
 

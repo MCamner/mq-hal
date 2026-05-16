@@ -12,6 +12,9 @@ from json import JSONDecoder
 from pathlib import Path
 from typing import Any
 
+sys.path.insert(0, str(Path(__file__).parent))
+from session_memory import append_event  # noqa: E402
+
 BASE_DIR = Path(__file__).resolve().parents[1]
 CONFIG_PATH = BASE_DIR / "config" / "repos.json"
 PROMPT_PATH = BASE_DIR / "prompts" / "doctor-summary.txt"
@@ -365,6 +368,7 @@ def main(argv: list[str]) -> int:
     parser.add_argument("--json", action="store_true", help="Print machine-readable summary JSON.")
     parser.add_argument("--no-ai", action="store_true", help="Skip Ollama and use deterministic fallback.")
     parser.add_argument("--sample", action="store_true", help="Use embedded sample doctor JSON for smoke tests.")
+    parser.add_argument("--no-memory", action="store_true", help="Do not save result to HAL Session Memory.")
 
     args = parser.parse_args(argv)
 
@@ -382,11 +386,23 @@ def main(argv: list[str]) -> int:
     summary = ai_summary or fallback
     used_ai = ai_summary is not None
 
+    envelope = {
+        "repo": repo_name,
+        "command": command,
+        "used_ai": used_ai,
+        "summary": summary,
+    }
+
+    if not args.sample and not args.no_memory and os.environ.get("MQ_HAL_DISABLE_MEMORY") != "1":
+        append_event(
+            "doctor_summary",
+            payload=envelope,
+            repo=repo_name,
+            source="ollama" if used_ai else "deterministic",
+        )
+
     if args.json:
-        print(json.dumps(
-            {"repo": repo_name, "command": command, "used_ai": used_ai, "summary": summary},
-            indent=2, ensure_ascii=False,
-        ))
+        print(json.dumps(envelope, indent=2, ensure_ascii=False))
         return 0
 
     render(summary, repo_name, repo_path, command, used_ai)

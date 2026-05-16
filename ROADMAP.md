@@ -1,5 +1,13 @@
 # Roadmap
 
+## Completed in v0.4.0
+
+- HAL Session Memory: local JSONL history for doctor summaries, fix plans, and manual notes.
+- Commands: `session`, `last`, `remember`, and `memory-path`.
+- Automatic memory capture for `doctor-summary` and `fix-doctor`.
+- Memory opt-out with `--no-memory` and `MQ_HAL_DISABLE_MEMORY=1`.
+- Smoke test coverage for session memory.
+
 ## Completed in v0.3.0
 
 - HAL Fix Planner: create safe copy-paste fix plans from HAL Doctor Summary.

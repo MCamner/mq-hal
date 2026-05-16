@@ -11,6 +11,9 @@ import urllib.request
 from pathlib import Path
 from typing import Any
 
+sys.path.insert(0, str(Path(__file__).parent))
+from session_memory import append_event  # noqa: E402
+
 BASE_DIR = Path(__file__).resolve().parents[1]
 DOCTOR_SUMMARY_SCRIPT = BASE_DIR / "scripts" / "doctor_summary.py"
 PROMPT_PATH = BASE_DIR / "prompts" / "fix-planner.txt"
@@ -123,7 +126,7 @@ def prompt_text() -> str:
 
 
 def run_doctor_summary(repo: str | None, sample: bool = False) -> dict[str, Any]:
-    command = [sys.executable, str(DOCTOR_SUMMARY_SCRIPT), "--json", "--no-ai"]
+    command = [sys.executable, str(DOCTOR_SUMMARY_SCRIPT), "--json", "--no-ai", "--no-memory"]
     if repo:
         command.extend(["--repo", repo])
     if sample:
@@ -326,6 +329,7 @@ def main(argv: list[str]) -> int:
     parser.add_argument("--json", action="store_true", help="Print machine-readable plan JSON")
     parser.add_argument("--no-ai", action="store_true", help="Use deterministic fallback only")
     parser.add_argument("--sample", action="store_true", help="Use embedded sample doctor JSON (CI/smoke tests)")
+    parser.add_argument("--no-memory", action="store_true", help="Do not save result to HAL Session Memory.")
 
     args = parser.parse_args(argv)
 
@@ -334,11 +338,28 @@ def main(argv: list[str]) -> int:
     plan = ai_plan or fallback_plan(summary_envelope)
     used_ai = ai_plan is not None
 
+    envelope = {
+        "used_ai": used_ai,
+        "summary": summary_envelope,
+        "plan": plan,
+    }
+
+    repo_name: str | None = None
+    if isinstance(summary_envelope, dict):
+        repo_value = summary_envelope.get("repo")
+        if isinstance(repo_value, str):
+            repo_name = repo_value
+
+    if not args.sample and not args.no_memory and os.environ.get("MQ_HAL_DISABLE_MEMORY") != "1":
+        append_event(
+            "fix_plan",
+            payload=envelope,
+            repo=repo_name,
+            source="ollama" if used_ai else "deterministic",
+        )
+
     if args.json:
-        print(json.dumps(
-            {"used_ai": used_ai, "summary": summary_envelope, "plan": plan},
-            indent=2, ensure_ascii=False,
-        ))
+        print(json.dumps(envelope, indent=2, ensure_ascii=False))
         return 0
 
     render_plan(plan, used_ai, summary_envelope)

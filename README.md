@@ -3,7 +3,7 @@
 **Local HAL-style command router for macOS.**
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
-[![Version](https://img.shields.io/badge/version-0.3.1-orange)](VERSION)
+[![Version](https://img.shields.io/badge/version-0.4.0-orange)](VERSION)
 
 mq-hal lets you ask natural language questions locally through Ollama,
 then maps the answer to safe whitelisted terminal actions.
@@ -173,6 +173,64 @@ mq-hal fix-doctor
 → create safe fix plan
 → print copy-paste commands
 → execute nothing
+```
+
+---
+
+## HAL Session Memory
+
+Store local HAL events in `~/.mq-hal/session.jsonl`.
+
+Show recent memory:
+
+```bash
+mq-hal session
+```
+
+Show latest memory item:
+
+```bash
+mq-hal last
+```
+
+Save a manual note:
+
+```bash
+mq-hal remember "doctor looked clean after release"
+```
+
+Machine-readable output:
+
+```bash
+mq-hal session --json
+mq-hal last --json
+```
+
+Through MQLaunch:
+
+```bash
+mqlaunch hal session
+mqlaunch hal last
+mqlaunch hal remember "release looked good"
+```
+
+What gets saved automatically:
+
+- `doctor_summary` — every `mq-hal doctor-summary` run
+- `fix_plan` — every `mq-hal fix-doctor` run
+- manual `note` — via `mq-hal remember`
+
+Opt out for one command:
+
+```bash
+mq-hal doctor-summary --no-memory
+mq-hal fix-doctor --no-memory
+```
+
+Or disable via environment:
+
+```bash
+MQ_HAL_DISABLE_MEMORY=1 mq-hal doctor-summary
 ```
 
 ---

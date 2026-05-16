@@ -20,9 +20,11 @@ jobs:
           python3 -m py_compile scripts/hal.py
           python3 -m py_compile scripts/doctor_summary.py
           python3 -m py_compile scripts/fix_planner.py
+          python3 -m py_compile scripts/session_memory.py
 
       - name: Run smoke tests
         run: |
           ./tests/smoke.sh
           ./tests/doctor-summary-smoke.sh
           ./tests/fix-planner-smoke.sh
+          ./tests/session-memory-smoke.sh
