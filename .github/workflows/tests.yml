@@ -15,8 +15,12 @@ jobs:
       - name: Show Python version
         run: python3 --version
 
-      - name: Run smoke test
-        run: ./tests/smoke.sh
-
       - name: Python syntax check
-        run: python3 -m py_compile scripts/hal.py
+        run: |
+          python3 -m py_compile scripts/hal.py
+          python3 -m py_compile scripts/doctor_summary.py
+
+      - name: Run smoke tests
+        run: |
+          ./tests/smoke.sh
+          ./tests/doctor-summary-smoke.sh

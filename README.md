@@ -104,6 +104,42 @@ mqhcd repo-signal
 
 ---
 
+## HAL Doctor Summary
+
+Run a local health check and summarize it:
+
+```bash
+mq-hal doctor-summary
+```
+
+Machine-readable output:
+
+```bash
+mq-hal doctor-summary --json
+```
+
+Without AI (deterministic fallback):
+
+```bash
+mq-hal doctor-summary --no-ai
+```
+
+Through MQLaunch after installing the bridge:
+
+```bash
+mqlaunch hal doctor
+```
+
+```text
+mq-hal doctor-summary
+→ mqlaunch doctor --json
+→ parse doctor JSON
+→ summarize with Ollama when available
+→ fall back to deterministic local summary when Ollama is unavailable
+```
+
+---
+
 ## Security
 
 The model only returns a JSON intent from a fixed schema.
