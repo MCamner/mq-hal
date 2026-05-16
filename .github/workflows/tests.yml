@@ -30,3 +30,4 @@ jobs:
           ./tests/fix-planner-smoke.sh
           ./tests/session-memory-smoke.sh
           ./tests/timeline-smoke.sh
+          ./tests/docs-smoke.sh

@@ -1,5 +1,11 @@
 # Roadmap
 
+## Completed in v0.5.1
+
+- HAL Integration Contract in `docs/INTEGRATION.md`.
+- Docs smoke test and CI coverage.
+- README rendering cleanup.
+
 ## Completed in v0.5.0
 
 - HAL Timeline UI: compact terminal table view over local session memory.

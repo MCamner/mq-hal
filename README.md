@@ -3,9 +3,9 @@
 Local HAL-style command router for macOS.
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
-[![Version](https://img.shields.io/badge/version-0.5.0-orange)](VERSION)
+[![Version](https://img.shields.io/badge/version-0.5.1-orange)](VERSION)
 
-`mq-hal` lets you ask natural language questions locally through Ollama, then maps the answer to safe whitelisted terminal actions.
+`mq-hal` lets you ask natural-language questions locally through Ollama, then maps the answer to safe whitelisted terminal actions.
 
 Live site: <https://mcamner.github.io/mq-hal/>
 
@@ -21,7 +21,9 @@ User prompt
 → git / mqlaunch / repo helpers
 ```
 
-The model never runs shell directly. It returns a JSON intent. The Python router decides what is allowed.
+The model never runs shell directly.
+
+It returns a JSON intent. The Python router decides what is allowed.
 
 ---
 
@@ -245,6 +247,12 @@ mqlaunch hal last
 mqlaunch hal remember "release looked good"
 ```
 
+What gets saved automatically:
+
+- `doctor_summary` — every `mq-hal doctor-summary` run
+- `fix_plan` — every `mq-hal fix-doctor` run
+- manual `note` — via `mq-hal remember`
+
 Disable memory for one command:
 
 ```bash
@@ -300,6 +308,21 @@ Through MQLaunch:
 mqlaunch hal timeline
 mqlaunch hal timeline --details
 ```
+
+---
+
+## Integration contract
+
+New HAL features follow the integration contract:
+
+```text
+mq-hal owns feature logic
+mqlaunch owns command surface
+hal-bridge.sh delegates only
+tests and docs required before release
+```
+
+See [docs/INTEGRATION.md](docs/INTEGRATION.md).
 
 ---
 

@@ -4,6 +4,18 @@
 
 All notable changes to mq-hal are documented here.
 
+## [0.5.1] – 2026-05-16
+
+### Added
+
+- Added `docs/INTEGRATION.md` — HAL Integration Contract covering architecture, feature contract, bridge contract, tool policy, safety rules, memory policy, and versioning strategy.
+- Added `tests/docs-smoke.sh` — verifies README, integration contract, and key structural markers.
+- Added docs smoke test to CI.
+
+### Fixed
+
+- Rewrote README with consistent `---` separators so GitHub renders all code blocks correctly.
+
 ## [0.5.0] – 2026-05-16
 
 ### Added
