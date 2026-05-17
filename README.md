@@ -3,13 +3,11 @@
 Local HAL-style command router for macOS.
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
-[![Version](https://img.shields.io/badge/version-0.5.1-orange)](VERSION)
+[![Version](https://img.shields.io/badge/version-0.5.2-orange)](VERSION)
 
 `mq-hal` lets you ask natural-language questions locally through Ollama, then maps the answer to safe whitelisted terminal actions.
 
 Live site: <https://mcamner.github.io/mq-hal/>
-
----
 
 ## How it works
 
@@ -24,8 +22,6 @@ User prompt
 The model never runs shell directly.
 
 It returns a JSON intent. The Python router decides what is allowed.
-
----
 
 ## Quick start
 
@@ -47,8 +43,6 @@ mq-hal "visa git status i macos-scripts"
 mq-hal "kör doctor"
 mq-hal "byt till repo-signal"
 ```
-
----
 
 ## Demo
 
@@ -79,8 +73,6 @@ Example output:
 }
 ```
 
----
-
 ## Common commands
 
 ```bash
@@ -98,15 +90,11 @@ mq-hal remember "release looked good"
 mq-hal memory-path
 ```
 
----
-
 ## Optional model override
 
 ```bash
 OLLAMA_MODEL=qwen3:4b ~/mq-hal/bin/mq-hal "visa git status"
 ```
-
----
 
 ## Repo cd helper
 
@@ -130,8 +118,6 @@ Then:
 ```bash
 mqhcd repo-signal
 ```
-
----
 
 ## HAL Doctor Summary
 
@@ -168,8 +154,6 @@ mq-hal doctor-summary
 → summarize with Ollama when available
 → fall back to deterministic local summary when Ollama is unavailable
 ```
-
----
 
 ## HAL Fix Planner
 
@@ -208,11 +192,13 @@ mq-hal fix-doctor
 → execute nothing
 ```
 
----
-
 ## HAL Session Memory
 
-Store local HAL events in `~/.mq-hal/session.jsonl`.
+Store local HAL events in:
+
+```text
+~/.mq-hal/session.jsonl
+```
 
 Show recent memory:
 
@@ -249,9 +235,9 @@ mqlaunch hal remember "release looked good"
 
 What gets saved automatically:
 
-- `doctor_summary` — every `mq-hal doctor-summary` run
-- `fix_plan` — every `mq-hal fix-doctor` run
-- manual `note` — via `mq-hal remember`
+- `doctor_summary`
+- `fix_plan`
+- manual `note`
 
 Disable memory for one command:
 
@@ -265,8 +251,6 @@ Or disable via environment:
 ```bash
 MQ_HAL_DISABLE_MEMORY=1 mq-hal doctor-summary
 ```
-
----
 
 ## HAL Timeline UI
 
@@ -309,8 +293,6 @@ mqlaunch hal timeline
 mqlaunch hal timeline --details
 ```
 
----
-
 ## Integration contract
 
 New HAL features follow the integration contract:
@@ -324,8 +306,6 @@ tests and docs required before release
 
 See [docs/INTEGRATION.md](docs/INTEGRATION.md).
 
----
-
 ## Security
 
 The model only returns a JSON intent from a fixed schema.
@@ -336,13 +316,9 @@ The router enforces an explicit allowlist. Unknown or unsafe commands are refuse
 
 Session Memory stays local in `~/.mq-hal/session.jsonl`.
 
----
-
 ## Roadmap
 
 See [ROADMAP.md](ROADMAP.md) for planned features.
-
----
 
 ## License
 

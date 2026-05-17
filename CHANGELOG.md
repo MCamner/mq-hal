@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.5.2] - 2026-05-17
+
+### Fixed
+- Rewrote README using generated fenced code blocks to fix GitHub rendering.
+- Strengthened docs smoke test to check balanced markdown fences and multiline helper examples.
+
+
 <!-- markdownlint-disable MD024 -->
 
 All notable changes to mq-hal are documented here.
