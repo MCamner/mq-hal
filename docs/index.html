@@ -1,229 +1,596 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>mq-hal — local AI command router for macOS</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <title>mq-hal — Local HAL-style command router</title>
+  <meta
+    name="description"
+    content="mq-hal is a local HAL-style command router for macOS: natural language to Ollama/Qwen3, JSON intent, and whitelisted git/mqlaunch actions."
+  />
+
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #07090d;
+      --panel: #0d1117;
+      --panel-2: #111827;
+      --text: #e5e7eb;
+      --muted: #9ca3af;
+      --line: #243244;
+      --green: #7dd3a7;
+      --cyan: #67e8f9;
+      --blue: #93c5fd;
+      --orange: #fdba74;
+      --red: #fca5a5;
+      --shadow: 0 24px 80px rgba(0, 0, 0, 0.45);
+      --radius: 22px;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      --sans: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background: #0d1117;
-      color: #c9d1d9;
-      line-height: 1.6;
+      margin: 0;
+      min-height: 100vh;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(103, 232, 249, 0.12), transparent 32rem),
+        radial-gradient(circle at top right, rgba(125, 211, 167, 0.10), transparent 30rem),
+        linear-gradient(180deg, #05070a 0%, var(--bg) 45%, #05070a 100%);
+      font-family: var(--sans);
+      line-height: 1.55;
     }
-    header {
-      padding: 64px 24px 32px;
-      text-align: center;
-      border-bottom: 1px solid #21262d;
+
+    a {
+      color: var(--cyan);
+      text-decoration: none;
     }
-    header h1 {
-      font-size: 2.5rem;
-      color: #f0f6fc;
-      letter-spacing: -0.5px;
+
+    a:hover {
+      text-decoration: underline;
     }
-    header p {
-      margin-top: 12px;
-      font-size: 1.1rem;
-      color: #8b949e;
-    }
-    .badges {
-      margin-top: 20px;
-      display: flex;
-      gap: 8px;
-      justify-content: center;
-      flex-wrap: wrap;
-    }
-    .badges a img { height: 20px; }
-    main {
-      max-width: 780px;
+
+    .wrap {
+      width: min(1120px, calc(100% - 32px));
       margin: 0 auto;
-      padding: 48px 24px;
     }
-    h2 {
-      font-size: 1.3rem;
-      color: #f0f6fc;
-      margin: 40px 0 12px;
-      border-bottom: 1px solid #21262d;
-      padding-bottom: 6px;
+
+    header {
+      padding: 28px 0 16px;
     }
-    pre {
-      background: #161b22;
-      border: 1px solid #21262d;
-      border-radius: 6px;
-      padding: 16px;
-      overflow-x: auto;
-      font-size: 0.875rem;
-      line-height: 1.5;
-    }
-    code { font-family: "SF Mono", Menlo, monospace; }
-    .intent-box {
-      background: #161b22;
-      border: 1px solid #21262d;
-      border-left: 3px solid #58a6ff;
-      border-radius: 6px;
-      padding: 16px;
-      margin: 16px 0;
-      font-size: 0.875rem;
-    }
-    .intent-box .label {
-      color: #8b949e;
-      font-size: 0.75rem;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      margin-bottom: 6px;
-    }
-    .steps {
-      counter-reset: steps;
-      list-style: none;
-      padding: 0;
-    }
-    .steps li {
-      counter-increment: steps;
-      display: flex;
-      gap: 16px;
-      margin-bottom: 20px;
-      align-items: flex-start;
-    }
-    .steps li::before {
-      content: counter(steps);
-      flex-shrink: 0;
-      width: 28px;
-      height: 28px;
-      background: #1f6feb;
-      color: #fff;
-      border-radius: 50%;
+
+    .nav {
       display: flex;
       align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 13px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--text);
+      font-weight: 700;
+      letter-spacing: 0.04em;
+    }
+
+    .dot {
+      width: 11px;
+      height: 11px;
+      border-radius: 999px;
+      background: var(--green);
+      box-shadow: 0 0 18px rgba(125, 211, 167, 0.9);
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 1.05fr 0.95fr;
+      gap: 32px;
+      align-items: center;
+      padding: 64px 0 44px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 7px 11px;
+      border: 1px solid rgba(103, 232, 249, 0.28);
+      border-radius: 999px;
+      color: var(--cyan);
+      background: rgba(103, 232, 249, 0.06);
+      font-family: var(--mono);
+      font-size: 12px;
+    }
+
+    h1 {
+      margin: 20px 0 16px;
+      font-size: clamp(42px, 7vw, 78px);
+      line-height: 0.95;
+      letter-spacing: -0.06em;
+    }
+
+    .lead {
+      max-width: 680px;
+      color: #cbd5e1;
+      font-size: clamp(17px, 2vw, 21px);
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 28px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
       justify-content: center;
-      font-size: 0.8rem;
-      font-weight: 600;
-      margin-top: 2px;
+      min-height: 44px;
+      padding: 0 18px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      color: var(--text);
+      background: rgba(255, 255, 255, 0.04);
+      font-weight: 700;
     }
-    .cta {
-      text-align: center;
-      margin-top: 56px;
-      padding: 32px;
-      background: #161b22;
-      border: 1px solid #21262d;
-      border-radius: 8px;
+
+    .btn.primary {
+      color: #04100a;
+      background: var(--green);
+      border-color: var(--green);
     }
-    .cta a {
-      display: inline-block;
-      background: #238636;
-      color: #fff;
-      text-decoration: none;
-      padding: 10px 24px;
-      border-radius: 6px;
-      font-weight: 600;
-      margin-top: 12px;
+
+    .terminal {
+      border: 1px solid rgba(148, 163, 184, 0.22);
+      border-radius: var(--radius);
+      background:
+        linear-gradient(180deg, rgba(17, 24, 39, 0.98), rgba(6, 9, 14, 0.98));
+      box-shadow: var(--shadow);
+      overflow: hidden;
     }
-    .cta a:hover { background: #2ea043; }
-    footer {
-      text-align: center;
-      padding: 32px;
-      color: #484f58;
-      font-size: 0.8rem;
-      border-top: 1px solid #21262d;
+
+    .term-top {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 16px;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.18);
+      background: rgba(255, 255, 255, 0.035);
+    }
+
+    .lamp {
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      background: var(--muted);
+    }
+
+    .lamp:nth-child(1) { background: #fb7185; }
+    .lamp:nth-child(2) { background: #fbbf24; }
+    .lamp:nth-child(3) { background: #34d399; }
+
+    pre {
+      margin: 0;
+      padding: 20px;
+      overflow: auto;
+      color: #d1fae5;
+      font-family: var(--mono);
+      font-size: 13px;
+      line-height: 1.65;
+      white-space: pre;
+    }
+
+    .prompt { color: var(--cyan); }
+    .ok     { color: var(--green); }
+    .warn   { color: var(--orange); }
+    .muted  { color: var(--muted); }
+
+    section {
+      padding: 44px 0;
+    }
+
+    .section-head {
+      max-width: 760px;
+      margin-bottom: 22px;
+    }
+
+    h2 {
+      margin: 0 0 10px;
+      font-size: clamp(28px, 4vw, 44px);
+      line-height: 1.05;
+      letter-spacing: -0.035em;
+    }
+
+    .section-head p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 17px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+
+    .card {
+      border: 1px solid rgba(148, 163, 184, 0.18);
+      border-radius: 18px;
+      padding: 18px;
+      background: rgba(17, 24, 39, 0.68);
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.24);
+    }
+
+    .card h3 {
+      margin: 0 0 8px;
+      font-size: 18px;
+    }
+
+    .card p {
+      margin: 0;
+      color: var(--muted);
+    }
+
+    .tag {
+      display: inline-flex;
+      margin-bottom: 12px;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: rgba(103, 232, 249, 0.08);
+      color: var(--cyan);
+      font-family: var(--mono);
+      font-size: 12px;
+    }
+
+    .flow {
+      display: grid;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .flow-row {
+      display: grid;
+      grid-template-columns: 180px 1fr;
+      gap: 16px;
+      align-items: start;
+      padding: 14px 16px;
+      border: 1px solid rgba(148, 163, 184, 0.16);
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.035);
+    }
+
+    .flow-row strong {
+      font-family: var(--mono);
+      color: var(--green);
+    }
+
+    .flow-row span {
+      color: var(--muted);
+    }
+
+    .commands {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .command-box {
+      border: 1px solid rgba(148, 163, 184, 0.18);
+      border-radius: 18px;
+      background: rgba(13, 17, 23, 0.88);
+      overflow: hidden;
+    }
+
+    .command-title {
+      padding: 12px 16px;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.15);
+      color: var(--blue);
+      font-family: var(--mono);
+      font-size: 13px;
+      background: rgba(147, 197, 253, 0.06);
+    }
+
+    .split {
+      display: grid;
+      grid-template-columns: 0.9fr 1.1fr;
+      gap: 16px;
+      align-items: start;
+    }
+
+    .footer {
+      padding: 42px 0 54px;
+      color: var(--muted);
+      border-top: 1px solid rgba(148, 163, 184, 0.16);
+      font-family: var(--mono);
+      font-size: 13px;
+    }
+
+    @media (max-width: 920px) {
+      .hero,
+      .split,
+      .commands {
+        grid-template-columns: 1fr;
+      }
+
+      .grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      .flow-row {
+        grid-template-columns: 1fr;
+      }
+
+      .nav {
+        align-items: flex-start;
+        flex-direction: column;
+      }
     }
   </style>
 </head>
+
 <body>
-
-<header>
-  <h1>mq-hal</h1>
-  <p>Natural language command router for macOS — runs fully local via Ollama.</p>
-  <div class="badges">
-    <a href="https://github.com/MCamner/mq-hal"><img src="https://img.shields.io/badge/GitHub-MCamner%2Fmq--hal-blue?logo=github" alt="GitHub"></a>
-    <a href="https://github.com/MCamner/mq-hal/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-MIT-green" alt="MIT License"></a>
-    <a href="https://github.com/MCamner/mq-hal/blob/main/VERSION"><img src="https://img.shields.io/badge/version-0.1.0-orange" alt="Version"></a>
-  </div>
-</header>
-
-<main>
-
-  <h2>What it does</h2>
-  <p>
-    You type a natural language command. mq-hal sends it to a local Ollama model,
-    gets back a structured JSON intent, and routes it to a safe allowlisted action —
-    <code>git status</code>, <code>git log</code>, repo switching, or <code>mqlaunch</code> subcommands.
-    The model never runs shell directly.
-  </p>
-
-  <h2>Demo</h2>
-
-  <div class="intent-box">
-    <div class="label">Input</div>
-    <code>$ mq-hal "visa git status i macos-scripts"</code>
-  </div>
-  <div class="intent-box">
-    <div class="label">Model intent (JSON)</div>
-    <pre><code>{
-  "intent": "git_status",
-  "repo": "macos-scripts",
-  "command": null,
-  "args": [],
-  "message": "Visar git status."
-}</code></pre>
-  </div>
-  <div class="intent-box">
-    <div class="label">Output</div>
-    <pre><code>HAL: Visar git status.
-M  scripts/hal.py</code></pre>
-  </div>
-
-  <h2>Quick start</h2>
-  <ol class="steps">
-    <li>
-      <div>
-        <strong>Install Ollama</strong><br>
-        <code>brew install ollama &amp;&amp; brew services start ollama</code>
+  <header>
+    <div class="wrap nav">
+      <div class="brand">
+        <span class="dot"></span>
+        <span>mq-hal</span>
       </div>
-    </li>
-    <li>
+
+      <nav class="nav-links" aria-label="Main navigation">
+        <a href="https://github.com/MCamner/mq-hal">GitHub</a>
+        <a href="https://github.com/MCamner/mq-hal/blob/main/docs/INTEGRATION.md">Integration</a>
+        <a href="https://github.com/MCamner/mq-hal/releases">Releases</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero wrap">
       <div>
-        <strong>Pull the model</strong><br>
-        <code>ollama pull qwen3:4b-instruct</code>
+        <div class="eyebrow">
+          <span class="dot"></span>
+          <span>v0.5.1 · local HAL command surface</span>
+        </div>
+
+        <h1>Local command intelligence for MQLaunch.</h1>
+
+        <p class="lead">
+          mq-hal turns natural language into safe JSON intents, then routes them to
+          whitelisted local actions for git, mqlaunch, doctor summaries, fix planning,
+          session memory, and timeline views.
+        </p>
+
+        <div class="hero-actions">
+          <a class="btn primary" href="https://github.com/MCamner/mq-hal">View on GitHub</a>
+          <a class="btn" href="https://github.com/MCamner/mq-hal/blob/main/docs/INTEGRATION.md">Read integration contract</a>
+        </div>
       </div>
-    </li>
-    <li>
-      <div>
-        <strong>Clone and link</strong><br>
-        <pre><code>git clone https://github.com/MCamner/mq-hal.git ~/mq-hal
-ln -s ~/mq-hal/bin/mq-hal ~/bin/mq-hal</code></pre>
+
+      <div class="terminal" aria-label="Terminal demo">
+        <div class="term-top">
+          <span class="lamp"></span>
+          <span class="lamp"></span>
+          <span class="lamp"></span>
+        </div>
+<pre><span class="prompt">mansys · Zephyr ~/mq-hal ❯</span> mq-hal timeline --details
+
+HAL Timeline
+============
+
+TIME              TYPE              REPO             STATUS
+----------------  ----------------  ---------------  ----------------
+2026-05-16 23:10  doctor_summary    macos-scripts    <span class="ok">Healthy</span>
+                                                  ↳ Detected 0 serious issues.
+2026-05-16 23:12  fix_plan          macos-scripts    <span class="ok">Fix plan ready</span>
+                                                  ↳ Safe copy-paste plan created.
+2026-05-16 23:14  note              mq-hal           release looked good
+
+<span class="prompt">mansys · Zephyr ~/macos-scripts ❯</span> mqlaunch hal doctor
+<span class="ok">HAL Doctor Summary — macos-scripts</span>
+<span class="muted">All checks passed. No action needed.</span></pre>
       </div>
-    </li>
-    <li>
-      <div>
-        <strong>Configure your repos</strong><br>
-        Edit <code>config/repos.json</code> with your local repo paths.
+    </section>
+
+    <section class="wrap">
+      <div class="section-head">
+        <h2>What it does</h2>
+        <p>
+          mq-hal is the local HAL brain. mqlaunch is the command surface.
+          The bridge stays thin, and Python validates everything before shell actions happen.
+        </p>
       </div>
-    </li>
-    <li>
-      <div>
-        <strong>Run</strong><br>
-        <code>mq-hal "visa senaste commits"</code>
+
+      <div class="grid">
+        <article class="card">
+          <span class="tag">Intent Router</span>
+          <h3>Natural language to JSON</h3>
+          <p>Ollama/Qwen3 returns structured JSON intents. The router refuses unknown or unsafe actions.</p>
+        </article>
+
+        <article class="card">
+          <span class="tag">Doctor Summary</span>
+          <h3>System health summaries</h3>
+          <p>Runs mqlaunch doctor --json, parses the output, and summarizes health status with safe next steps.</p>
+        </article>
+
+        <article class="card">
+          <span class="tag">Fix Planner</span>
+          <h3>Safe repair plans</h3>
+          <p>Creates copy-paste inspection and verification commands. It never executes repairs automatically.</p>
+        </article>
+
+        <article class="card">
+          <span class="tag">Session Memory</span>
+          <h3>Local JSONL memory</h3>
+          <p>Stores doctor summaries, fix plans, and notes locally in ~/.mq-hal/session.jsonl.</p>
+        </article>
+
+        <article class="card">
+          <span class="tag">Timeline UI</span>
+          <h3>Compact history view</h3>
+          <p>Shows recent HAL events as a terminal-friendly timeline with filters and JSON output.</p>
+        </article>
+
+        <article class="card">
+          <span class="tag">Integration Contract</span>
+          <h3>Clear build rules</h3>
+          <p>Defines how new HAL features are built, tested, released, and exposed through MQLaunch.</p>
+        </article>
       </div>
-    </li>
-  </ol>
+    </section>
 
-  <h2>Safety model</h2>
-  <p>
-    The LLM only returns JSON. The Python router enforces an explicit allowlist of
-    intents and <code>mqlaunch</code> subcommands. Unknown or dangerous requests
-    get the <code>refuse</code> intent — no shell injection possible.
-  </p>
+    <section class="wrap">
+      <div class="section-head">
+        <h2>Architecture</h2>
+        <p>HAL logic belongs in mq-hal. MQLaunch owns the menu and command surface.</p>
+      </div>
 
-  <div class="cta">
-    <p>Ready to try it?</p>
-    <a href="https://github.com/MCamner/mq-hal">View on GitHub →</a>
-  </div>
+      <div class="flow">
+        <div class="flow-row">
+          <strong>User</strong>
+          <span>Runs mqlaunch hal doctor, mqlaunch hal fix-doctor, or a free HAL prompt.</span>
+        </div>
 
-</main>
+        <div class="flow-row">
+          <strong>mqlaunch</strong>
+          <span>Displays the terminal UI and delegates through terminal/bridges/hal-bridge.sh.</span>
+        </div>
 
-<footer>
-  MIT License · <a href="https://github.com/MCamner/mq-hal">MCamner/mq-hal</a>
-</footer>
+        <div class="flow-row">
+          <strong>mq-hal</strong>
+          <span>Parses commands, calls Ollama when needed, validates intents, and runs allowlisted tools.</span>
+        </div>
 
+        <div class="flow-row">
+          <strong>Local tools</strong>
+          <span>Uses git, GitHub CLI, mqlaunch doctor, selftest, release-check, and local memory.</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="wrap">
+      <div class="section-head">
+        <h2>Common commands</h2>
+        <p>Run directly through mq-hal, or through mqlaunch hal after the bridge is installed.</p>
+      </div>
+
+      <div class="commands">
+        <div class="command-box">
+          <div class="command-title">mq-hal</div>
+<pre>mq-hal "visa git status i macos-scripts"
+mq-hal --raw-intent "kör doctor"
+mq-hal doctor-summary
+mq-hal doctor-summary --no-ai
+mq-hal fix-doctor
+mq-hal fix-doctor --no-ai
+mq-hal session
+mq-hal last
+mq-hal timeline
+mq-hal timeline --details
+mq-hal remember "release looked good"
+mq-hal memory-path</pre>
+        </div>
+
+        <div class="command-box">
+          <div class="command-title">mqlaunch bridge</div>
+<pre>mqlaunch hal
+mqlaunch hal doctor
+mqlaunch hal fix-doctor
+mqlaunch hal session
+mqlaunch hal last
+mqlaunch hal timeline
+mqlaunch hal timeline --details
+mqlaunch hal remember "release looked good"
+mqlaunch hal raw "kör doctor"
+mqlaunch hal repos</pre>
+        </div>
+      </div>
+    </section>
+
+    <section class="wrap">
+      <div class="section-head">
+        <h2>Install</h2>
+        <p>Designed for local macOS workflows with Ollama and MQLaunch.</p>
+      </div>
+
+      <div class="terminal">
+        <div class="term-top">
+          <span class="lamp"></span>
+          <span class="lamp"></span>
+          <span class="lamp"></span>
+        </div>
+<pre># Install Ollama
+brew install ollama
+brew services start ollama
+
+# Pull model
+ollama pull qwen3:4b-instruct
+
+# Clone mq-hal
+git clone https://github.com/MCamner/mq-hal.git ~/mq-hal
+
+# Link command
+mkdir -p ~/bin
+ln -sf ~/mq-hal/bin/mq-hal ~/bin/mq-hal
+
+# Test
+mq-hal --help
+mq-hal doctor-summary --sample --no-ai</pre>
+      </div>
+    </section>
+
+    <section class="wrap">
+      <div class="split">
+        <div class="card">
+          <span class="tag">Safety model</span>
+          <h3>Model proposes. Router decides.</h3>
+          <p>
+            The model never runs shell directly. It returns structured JSON.
+            Python validates the intent and only allowlisted local actions can run.
+          </p>
+        </div>
+
+        <div class="card">
+          <span class="tag">Local first</span>
+          <h3>No cloud memory.</h3>
+          <p>
+            Session Memory stays local in ~/.mq-hal/session.jsonl.
+            Disable memory per command with --no-memory or by setting
+            MQ_HAL_DISABLE_MEMORY=1.
+          </p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="wrap">
+      mq-hal · MIT · Built for local macOS command workflows ·
+      <a href="https://github.com/MCamner/mq-hal">GitHub</a>
+    </div>
+  </footer>
 </body>
 </html>
