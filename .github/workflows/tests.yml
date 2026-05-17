@@ -22,6 +22,8 @@ jobs:
           python3 -m py_compile scripts/fix_planner.py
           python3 -m py_compile scripts/session_memory.py
           python3 -m py_compile scripts/timeline.py
+          python3 -m py_compile scripts/repo_status.py
+          python3 -m py_compile scripts/ci_status.py
 
       - name: Run smoke tests
         run: |
@@ -30,4 +32,6 @@ jobs:
           ./tests/fix-planner-smoke.sh
           ./tests/session-memory-smoke.sh
           ./tests/timeline-smoke.sh
+          ./tests/repo-status-smoke.sh
+          ./tests/ci-status-smoke.sh
           ./tests/docs-smoke.sh

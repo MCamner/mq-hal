@@ -1,5 +1,17 @@
 # Changelog
 
+<!-- markdownlint-disable MD024 -->
+
+## [0.7.0] - 2026-05-17
+
+### Added
+
+- Added `mq-hal repo-status` — read-only git repo status with branch, dirty state, recent commits, and tags.
+- Added `mq-hal ci` — read-only GitHub Actions status via `gh run list`.
+- Both commands support `--json`, `--sample`, and `--repo` flags.
+- Added `tests/repo-status-smoke.sh` and `tests/ci-status-smoke.sh`.
+- Added CI syntax and smoke coverage for both new scripts.
+
 ## [0.6.0] - 2026-05-17
 
 ### Added

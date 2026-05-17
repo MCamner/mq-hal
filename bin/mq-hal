@@ -21,6 +21,16 @@ case "${1:-}" in
     exec python3 "$ROOT/scripts/brief.py" "$@"
     ;;
 
+  repo-status|repo)
+    shift || true
+    exec python3 "$ROOT/scripts/repo_status.py" "$@"
+    ;;
+
+  ci|ci-status)
+    shift || true
+    exec python3 "$ROOT/scripts/ci_status.py" "$@"
+    ;;
+
   doctor|doctor-summary|--doctor-summary)
     shift || true
     exec python3 "$ROOT/scripts/doctor_summary.py" "$@"
