@@ -2,6 +2,15 @@
 
 <!-- markdownlint-disable MD024 -->
 
+## [0.7.1] - 2026-05-17
+
+### Fixed
+
+- Regenerated README with balanced fenced code blocks for clean GitHub rendering.
+- Added HAL Repo Ops section to README documenting `repo-status` and `ci`.
+- Strengthened docs smoke test to 10 checks including Repo Ops coverage.
+- Synced GitHub Pages with v0.7.1 command set.
+
 ## [0.7.0] - 2026-05-17
 
 ### Added

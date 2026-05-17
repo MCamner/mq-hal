@@ -3,7 +3,7 @@
 Local HAL-style command router for macOS.
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
-[![Version](https://img.shields.io/badge/version-0.7.0-orange)](VERSION)
+[![Version](https://img.shields.io/badge/version-0.7.1-orange)](VERSION)
 
 `mq-hal` lets you ask natural-language questions locally through Ollama, then maps the answer to safe whitelisted terminal actions.
 
@@ -39,9 +39,10 @@ mkdir -p ~/bin
 ln -sf ~/mq-hal/bin/mq-hal ~/bin/mq-hal
 
 # 4. Edit config/repos.json with your repos, then:
+mq-hal brief
+mq-hal repo-status
+mq-hal ci
 mq-hal "visa git status i macos-scripts"
-mq-hal "kör doctor"
-mq-hal "byt till repo-signal"
 ```
 
 ## Demo
@@ -73,6 +74,38 @@ Example output:
 }
 ```
 
+## Common commands
+
+```bash
+mq-hal brief
+mq-hal brief --json
+mq-hal repo-status
+mq-hal repo-status --json
+mq-hal ci
+mq-hal ci --json
+mq-hal doctor-summary
+mq-hal fix-doctor
+mq-hal session
+mq-hal last
+mq-hal timeline
+mq-hal timeline --details
+mq-hal remember "release looked good"
+mq-hal memory-path
+```
+
+Through MQLaunch:
+
+```bash
+mqlaunch hal
+mqlaunch hal brief
+mqlaunch hal repo-status
+mqlaunch hal ci
+mqlaunch hal doctor
+mqlaunch hal fix-doctor
+mqlaunch hal timeline
+mqlaunch hal session
+```
+
 ## HAL Brief
 
 Get a quick status snapshot of a repo:
@@ -87,6 +120,12 @@ Machine-readable output:
 mq-hal brief --json
 ```
 
+Skip GitHub CLI checks:
+
+```bash
+mq-hal brief --no-gh
+```
+
 Through MQLaunch:
 
 ```bash
@@ -95,61 +134,57 @@ mqlaunch hal brief
 
 Output includes:
 
-```text
-Repo, version, git branch, dirty/clean, changed files
-Doctor health (ok/warn/fail counts)
-CI runs (latest 5 via gh)
-Latest release tag
-Last session note
-Next step recommendation
-```
+- repo path
+- git branch
+- dirty/clean state
+- changed files
+- latest commit
+- CI status
+- latest release
+- latest doctor summary
+- latest fix plan
+- latest session note
+- next-step recommendation
 
-## Common commands
+## HAL Repo Ops
 
-```bash
-mq-hal brief
-mq-hal "visa git status i macos-scripts"
-mq-hal --raw-intent "kör doctor"
-mq-hal doctor-summary
-mq-hal doctor-summary --no-ai
-mq-hal fix-doctor
-mq-hal fix-doctor --no-ai
-mq-hal session
-mq-hal last
-mq-hal timeline
-mq-hal timeline --details
-mq-hal remember "release looked good"
-mq-hal memory-path
-```
-
-## Optional model override
+Read-only repository status:
 
 ```bash
-OLLAMA_MODEL=qwen3:4b ~/mq-hal/bin/mq-hal "visa git status"
+mq-hal repo-status
+mq-hal repo-status --json
+mq-hal repo-status --repo macos-scripts
 ```
 
-## Repo cd helper
-
-Add to `~/.zshrc`:
+GitHub Actions status:
 
 ```bash
-mqhcd() {
-  if [ $# -ne 1 ]; then
-    echo "usage: mqhcd <repo-name>" >&2
-    return 2
-  fi
-
-  local path
-  path="$(mq-hal --cd "$1")" || return $?
-  cd "$path" || return $?
-}
+mq-hal ci
+mq-hal ci --json
+mq-hal ci --repo macos-scripts
 ```
 
-Then:
+Through MQLaunch:
 
 ```bash
-mqhcd repo-signal
+mqlaunch hal repo-status
+mqlaunch hal ci
 ```
+
+`repo-status` summarizes:
+
+- branch
+- dirty/clean state
+- changed files
+- recent commits
+- latest tags
+- safe recommendation
+
+`ci` summarizes:
+
+- recent GitHub Actions runs
+- overall CI status
+- safe next step
 
 ## HAL Doctor Summary
 
@@ -171,7 +206,7 @@ Without AI:
 mq-hal doctor-summary --no-ai
 ```
 
-Through MQLaunch after installing the bridge:
+Through MQLaunch:
 
 ```bash
 mqlaunch hal doctor
@@ -207,7 +242,7 @@ Without AI:
 mq-hal fix-doctor --no-ai
 ```
 
-Through MQLaunch after installing the bridge:
+Through MQLaunch:
 
 ```bash
 mqlaunch hal fix-doctor
@@ -323,6 +358,35 @@ Through MQLaunch:
 ```bash
 mqlaunch hal timeline
 mqlaunch hal timeline --details
+```
+
+## Optional model override
+
+```bash
+OLLAMA_MODEL=qwen3:4b ~/mq-hal/bin/mq-hal "visa git status"
+```
+
+## Repo cd helper
+
+Add to `~/.zshrc`:
+
+```bash
+mqhcd() {
+  if [ $# -ne 1 ]; then
+    echo "usage: mqhcd <repo-name>" >&2
+    return 2
+  fi
+
+  local path
+  path="$(mq-hal --cd "$1")" || return $?
+  cd "$path" || return $?
+}
+```
+
+Then:
+
+```bash
+mqhcd repo-signal
 ```
 
 ## Integration contract
