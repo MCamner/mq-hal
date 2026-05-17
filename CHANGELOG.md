@@ -7,6 +7,8 @@
 ### Fixed
 
 - Fixed `release-brief` opening ChatGPT browser tabs when called via `mq-hal`. The `run()` helper in `release_brief.py` now passes `stdin=subprocess.DEVNULL` so subprocesses cannot block on terminal input or trigger `pause_enter` reads.
+- Synced `docs/index.html` version badge from v0.9.0 to v0.9.1.
+- Strengthened `docs-smoke.sh` from 12 to 15 checks: command surface file existence, README links to command surface, and clean fence info string validation.
 
 ## [0.9.0] - 2026-05-17
 

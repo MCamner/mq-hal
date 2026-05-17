@@ -4,25 +4,32 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 README="$ROOT/README.md"
 INTEGRATION="$ROOT/docs/INTEGRATION.md"
+SURFACE="$ROOT/docs/hal-command-surface.md"
 
 echo "SMOKE: docs"
 
-echo "[1/11] README exists"
+echo "[1/15] README exists"
 test -f "$README"
 
-echo "[2/11] integration contract exists"
+echo "[2/15] integration contract exists"
 test -f "$INTEGRATION"
 
-echo "[3/11] README links integration contract"
+echo "[3/15] command surface reference exists"
+test -f "$SURFACE"
+
+echo "[4/15] README links integration contract"
 grep -q "docs/INTEGRATION.md" "$README"
 
-echo "[4/11] integration contract has bridge contract"
+echo "[5/15] README links command surface"
+grep -q "docs/hal-command-surface.md" "$README"
+
+echo "[6/15] integration contract has bridge contract"
 grep -q "Bridge contract" "$INTEGRATION"
 
-echo "[5/11] integration contract has safety rules"
+echo "[7/15] integration contract has safety rules"
 grep -q "Safety rules" "$INTEGRATION"
 
-echo "[6/11] README contains fenced bash blocks"
+echo "[8/15] README contains fenced bash blocks"
 python3 - "$README" <<'PY'
 from pathlib import Path
 import sys
@@ -31,7 +38,7 @@ needle = chr(96) * 3 + "bash"
 raise SystemExit(0 if needle in s else 1)
 PY
 
-echo "[7/11] README contains fenced text blocks"
+echo "[9/15] README contains fenced text blocks"
 python3 - "$README" <<'PY'
 from pathlib import Path
 import sys
@@ -40,7 +47,7 @@ needle = chr(96) * 3 + "text"
 raise SystemExit(0 if needle in s else 1)
 PY
 
-echo "[8/11] README code fences are balanced"
+echo "[10/15] README code fences are balanced"
 python3 - "$README" <<'PY'
 from pathlib import Path
 import sys
@@ -52,21 +59,36 @@ if count % 2 != 0:
 print(f"Balanced markdown fences: {count}")
 PY
 
-echo "[9/11] README documents Repo Ops"
-grep -q "HAL Repo Ops" "$README"
+echo "[11/15] README code fences have clean info strings"
+python3 - "$README" <<'PY'
+from pathlib import Path
+import sys
+bad = []
+for i, line in enumerate(Path(sys.argv[1]).read_text().splitlines(), start=1):
+    if line.startswith(chr(96) * 3) and " id=" in line:
+        bad.append((i, line))
+if bad:
+    for line_no, line in bad:
+        print(f"Bad fence at {line_no}: {line}", file=sys.stderr)
+    raise SystemExit(1)
+PY
+
+echo "[12/15] README documents current HAL commands"
+grep -q "mq-hal release-brief" "$README"
+grep -q "mq-hal audit" "$README"
 grep -q "mq-hal repo-status" "$README"
 grep -q "mq-hal ci" "$README"
+grep -q "mq-hal fix-doctor" "$README"
 
-echo "[10/11] README documents Release Brief"
-grep -q "HAL Release Brief" "$README"
-grep -q "mq-hal release-brief" "$README"
+echo "[13/15] README documents Repo Ops"
+grep -q "HAL Repo Ops" "$README"
 
-echo "[11/12] README documents Audit"
-grep -q "HAL Audit" "$README"
-grep -q "mq-hal audit" "$README"
-
-echo "[12/12] repo cd helper is multiline"
+echo "[14/15] repo cd helper is multiline"
 grep -q 'mqhcd()' "$README"
 grep -q 'cd "$path" || return $?' "$README"
+
+echo "[15/15] command surface references audit and release-brief"
+grep -q "audit" "$SURFACE"
+grep -q "release-brief" "$SURFACE"
 
 echo "OK: docs smoke test passed"
