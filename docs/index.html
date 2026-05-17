@@ -372,7 +372,7 @@
       <div>
         <div class="eyebrow">
           <span class="dot"></span>
-          <span>v0.5.1 · local HAL command surface</span>
+          <span>v0.6.0 · local HAL command surface</span>
         </div>
 
         <h1>Local command intelligence for MQLaunch.</h1>
@@ -424,6 +424,12 @@ TIME              TYPE              REPO             STATUS
       </div>
 
       <div class="grid">
+        <article class="card">
+          <span class="tag">Brief</span>
+          <h3>Quick status snapshot</h3>
+          <p>Git state, doctor health, CI runs, release tag, and last session note — one fast deterministic command.</p>
+        </article>
+
         <article class="card">
           <span class="tag">Intent Router</span>
           <h3>Natural language to JSON</h3>
@@ -500,7 +506,8 @@ TIME              TYPE              REPO             STATUS
       <div class="commands">
         <div class="command-box">
           <div class="command-title">mq-hal</div>
-<pre>mq-hal "visa git status i macos-scripts"
+<pre>mq-hal brief
+mq-hal "visa git status i macos-scripts"
 mq-hal --raw-intent "kör doctor"
 mq-hal doctor-summary
 mq-hal doctor-summary --no-ai
@@ -517,6 +524,7 @@ mq-hal memory-path</pre>
         <div class="command-box">
           <div class="command-title">mqlaunch bridge</div>
 <pre>mqlaunch hal
+mqlaunch hal brief
 mqlaunch hal doctor
 mqlaunch hal fix-doctor
 mqlaunch hal session

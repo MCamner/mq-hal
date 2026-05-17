@@ -3,7 +3,7 @@
 Local HAL-style command router for macOS.
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
-[![Version](https://img.shields.io/badge/version-0.5.2-orange)](VERSION)
+[![Version](https://img.shields.io/badge/version-0.6.0-orange)](VERSION)
 
 `mq-hal` lets you ask natural-language questions locally through Ollama, then maps the answer to safe whitelisted terminal actions.
 
@@ -73,9 +73,41 @@ Example output:
 }
 ```
 
+## HAL Brief
+
+Get a quick status snapshot of a repo:
+
+```bash
+mq-hal brief
+```
+
+Machine-readable output:
+
+```bash
+mq-hal brief --json
+```
+
+Through MQLaunch:
+
+```bash
+mqlaunch hal brief
+```
+
+Output includes:
+
+```text
+Repo, version, git branch, dirty/clean, changed files
+Doctor health (ok/warn/fail counts)
+CI runs (latest 5 via gh)
+Latest release tag
+Last session note
+Next step recommendation
+```
+
 ## Common commands
 
 ```bash
+mq-hal brief
 mq-hal "visa git status i macos-scripts"
 mq-hal --raw-intent "kör doctor"
 mq-hal doctor-summary
