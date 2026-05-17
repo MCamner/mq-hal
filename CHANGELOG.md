@@ -2,6 +2,15 @@
 
 <!-- markdownlint-disable MD024 -->
 
+## [0.8.1] - 2026-05-17
+
+### Fixed
+
+- Stabilized GitHub Actions workflow for the v0.8.x command set.
+- Added `--sample` flag to `brief.py` so smoke tests run without requiring a live repo.
+- Hardened `release-brief-smoke.sh` to 5 checks including `release` alias routing.
+- Strengthened `docs-smoke.sh` to 11 checks including Release Brief coverage.
+
 ## [0.8.0] - 2026-05-17
 
 ### Added

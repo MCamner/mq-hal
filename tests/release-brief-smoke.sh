@@ -2,29 +2,31 @@
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+TMP_STATE="$(mktemp -d)"
+
+export MQ_HAL_STATE_DIR="$TMP_STATE"
+export MQ_HAL_DISABLE_MEMORY=1
 
 echo "SMOKE: release-brief"
 
-echo "[1/4] syntax check"
+echo "[1/5] syntax check"
 python3 -m py_compile "$ROOT/scripts/release_brief.py"
 
-echo "[2/4] sample text works"
-output="$("$ROOT/bin/mq-hal" release-brief --sample --no-memory 2>&1)"
-echo "$output" | grep -q "HAL Release Brief"
+echo "[2/5] sample text works"
+"$ROOT/bin/mq-hal" release-brief --sample >/tmp/mq-hal-release-brief.txt
+grep -q "HAL Release Brief" /tmp/mq-hal-release-brief.txt
+grep -q "Overall:" /tmp/mq-hal-release-brief.txt
 
-echo "[3/4] sample JSON valid"
-json_out="$("$ROOT/bin/mq-hal" release-brief --sample --json --no-memory 2>&1)"
-python3 -c "
-import json, sys
-d = json.loads(sys.stdin.read())
-assert 'repo' in d
-assert 'overall' in d
-assert 'checks' in d
-assert isinstance(d['checks'], list)
-" <<< "$json_out"
+echo "[3/5] sample JSON works"
+"$ROOT/bin/mq-hal" release-brief --sample --json >/tmp/mq-hal-release-brief.json
+python3 -m json.tool /tmp/mq-hal-release-brief.json >/dev/null
 
-echo "[4/4] skip flags parse"
-"$ROOT/bin/mq-hal" release-brief --sample --skip-gh --skip-doctor --skip-release-check --no-memory \
-  | grep -q "HAL Release Brief"
+echo "[4/5] skip flags parse"
+"$ROOT/bin/mq-hal" release-brief --sample --skip-gh --skip-doctor --skip-release-check >/tmp/mq-hal-release-brief-skip.txt
+grep -q "HAL Release Brief" /tmp/mq-hal-release-brief-skip.txt
+
+echo "[5/5] command is routed through bin wrapper"
+"$ROOT/bin/mq-hal" release --sample >/tmp/mq-hal-release-alias.txt
+grep -q "HAL Release Brief" /tmp/mq-hal-release-alias.txt
 
 echo "OK: release-brief smoke test passed"

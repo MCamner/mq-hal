@@ -16,6 +16,28 @@ from session_memory import filter_events, read_events  # noqa: E402
 BASE_DIR = Path(__file__).resolve().parents[1]
 CONFIG_PATH = BASE_DIR / "config" / "repos.json"
 
+SAMPLE: dict[str, Any] = {
+    "repo": "macos-scripts",
+    "version": "0.3.9",
+    "git": {
+        "branch": "main",
+        "dirty": False,
+        "changed_files": [],
+        "recent_commits": ["abc1234 feat: add HAL Release Brief bridge"],
+        "latest_tag": "v0.3.9",
+    },
+    "doctor": {"health": "Healthy", "ok": 12, "warn": 0, "fail": 0},
+    "ci": {
+        "available": True,
+        "runs": [
+            {"name": "Tests", "conclusion": "success"},
+        ],
+    },
+    "release": {"available": True, "tag": "v0.3.9", "name": "Release 0.3.9", "published_at": "2026-05-17"},
+    "last_note": "Ready for v0.3.9 release.",
+    "last_doctor_status": "Healthy",
+}
+
 
 # ---------------------------------------------------------------------------
 # Config helpers (same pattern as doctor_summary.py)
@@ -285,21 +307,24 @@ def main(argv: list[str]) -> int:
     )
     parser.add_argument("--repo", help="Configured repo name. Defaults to config default_repo.")
     parser.add_argument("--json", action="store_true", help="Print machine-readable JSON.")
+    parser.add_argument("--sample", action="store_true", help="Print sample output without touching the repo.")
     parser.add_argument("--no-memory", action="store_true", help="Do not save to session memory.")
     args = parser.parse_args(argv)
 
-    repo_name, repo_path = resolve_repo(args.repo)
-
-    data: dict[str, Any] = {
-        "repo": repo_name,
-        "version": collect_version(repo_path),
-        "git": collect_git(repo_path),
-        "doctor": collect_doctor(repo_path),
-        "ci": collect_ci(repo_path),
-        "release": collect_release(repo_path),
-        "last_note": collect_last_note(repo_name),
-        "last_doctor_status": collect_last_doctor_status(repo_name),
-    }
+    if args.sample:
+        data: dict[str, Any] = SAMPLE
+    else:
+        repo_name, repo_path = resolve_repo(args.repo)
+        data = {
+            "repo": repo_name,
+            "version": collect_version(repo_path),
+            "git": collect_git(repo_path),
+            "doctor": collect_doctor(repo_path),
+            "ci": collect_ci(repo_path),
+            "release": collect_release(repo_path),
+            "last_note": collect_last_note(repo_name),
+            "last_doctor_status": collect_last_doctor_status(repo_name),
+        }
 
     if args.json:
         print(json.dumps(data, indent=2, ensure_ascii=False))
@@ -307,7 +332,7 @@ def main(argv: list[str]) -> int:
 
     render_text(data)
 
-    if not args.no_memory and os.environ.get("MQ_HAL_DISABLE_MEMORY") != "1":
+    if not args.sample and not args.no_memory and os.environ.get("MQ_HAL_DISABLE_MEMORY") != "1":
         from session_memory import append_event
         append_event(
             "brief",
