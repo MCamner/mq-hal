@@ -2,6 +2,16 @@
 
 <!-- markdownlint-disable MD024 -->
 
+## [0.8.0] - 2026-05-17
+
+### Added
+
+- Added `mq-hal release-brief` for read-only release readiness summaries.
+- Checks VERSION, CHANGELOG, README version reference, git state, CI status, latest release, doctor summary, and release-check.
+- Supports `--json`, `--sample`, `--skip-gh`, `--skip-doctor`, `--skip-release-check`, `--no-memory`.
+- Added `tests/release-brief-smoke.sh` and CI workflow coverage.
+- Added `brief-smoke.sh` to CI workflow (was missing).
+
 ## [0.7.1] - 2026-05-17
 
 ### Fixed
@@ -24,15 +34,16 @@
 ## [0.6.0] - 2026-05-17
 
 ### Added
+
 - Added `mq-hal brief` — quick status snapshot combining git, doctor, CI, release, and last session note.
 - Added `mqlaunch hal brief` bridge command.
 - Updated HAL menu with Observe / Plan / Memory / Debug sections; Brief is now item 1.
 - Added `tests/brief-smoke.sh`.
 
-
 ## [0.5.2] - 2026-05-17
 
 ### Fixed
+
 - Rewrote README using generated fenced code blocks to fix GitHub rendering.
 - Strengthened docs smoke test to check balanced markdown fences and multiline helper examples.
 

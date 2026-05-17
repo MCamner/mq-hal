@@ -3,7 +3,7 @@
 Local HAL-style command router for macOS.
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
-[![Version](https://img.shields.io/badge/version-0.7.1-orange)](VERSION)
+[![Version](https://img.shields.io/badge/version-0.8.0-orange)](VERSION)
 
 `mq-hal` lets you ask natural-language questions locally through Ollama, then maps the answer to safe whitelisted terminal actions.
 
@@ -79,6 +79,8 @@ Example output:
 ```bash
 mq-hal brief
 mq-hal brief --json
+mq-hal release-brief
+mq-hal release-brief --json
 mq-hal repo-status
 mq-hal repo-status --json
 mq-hal ci
@@ -98,6 +100,7 @@ Through MQLaunch:
 ```bash
 mqlaunch hal
 mqlaunch hal brief
+mqlaunch hal release-brief
 mqlaunch hal repo-status
 mqlaunch hal ci
 mqlaunch hal doctor
@@ -105,6 +108,41 @@ mqlaunch hal fix-doctor
 mqlaunch hal timeline
 mqlaunch hal session
 ```
+
+## HAL Release Brief
+
+Check whether a repo appears ready for release:
+
+```bash
+mq-hal release-brief
+mq-hal release-brief --json
+mq-hal release-brief --repo macos-scripts
+```
+
+Skip expensive or external checks:
+
+```bash
+mq-hal release-brief --skip-gh
+mq-hal release-brief --skip-doctor
+mq-hal release-brief --skip-release-check
+```
+
+Through MQLaunch:
+
+```bash
+mqlaunch hal release-brief
+```
+
+The release brief checks:
+
+- VERSION
+- CHANGELOG entry
+- README badge/reference
+- git clean/dirty state
+- recent CI status
+- latest GitHub release
+- doctor summary
+- release-check status
 
 ## HAL Brief
 
