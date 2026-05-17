@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.6.0] - 2026-05-17
+
+### Added
+- Added `mq-hal brief` — quick status snapshot combining git, doctor, CI, release, and last session note.
+- Added `mqlaunch hal brief` bridge command.
+- Updated HAL menu with Observe / Plan / Memory / Debug sections; Brief is now item 1.
+- Added `tests/brief-smoke.sh`.
+
+
 ## [0.5.2] - 2026-05-17
 
 ### Fixed
