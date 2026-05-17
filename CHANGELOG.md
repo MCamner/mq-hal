@@ -2,6 +2,12 @@
 
 <!-- markdownlint-disable MD024 -->
 
+## [0.9.1] - 2026-05-17
+
+### Fixed
+
+- Fixed `release-brief` opening ChatGPT browser tabs when called via `mq-hal`. The `run()` helper in `release_brief.py` now passes `stdin=subprocess.DEVNULL` so subprocesses cannot block on terminal input or trigger `pause_enter` reads.
+
 ## [0.9.0] - 2026-05-17
 
 ### Added

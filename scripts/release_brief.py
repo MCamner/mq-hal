@@ -89,7 +89,8 @@ def resolve_repo(repo: str | None) -> tuple[str, Path]:
 def run(command: list[str], cwd: Path, timeout: int = 60) -> tuple[int, str, str]:
     try:
         completed = subprocess.run(
-            command, cwd=str(cwd), text=True, capture_output=True, timeout=timeout,
+            command, cwd=str(cwd), text=True, capture_output=True,
+            stdin=subprocess.DEVNULL, timeout=timeout,
         )
     except FileNotFoundError:
         return 127, "", f"command not found: {command[0]}"
