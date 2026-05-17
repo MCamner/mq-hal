@@ -372,15 +372,15 @@
       <div>
         <div class="eyebrow">
           <span class="dot"></span>
-          <span>v0.7.1 · local HAL command surface</span>
+          <span>v0.9.0 · local HAL command surface</span>
         </div>
 
         <h1>Local command intelligence for MQLaunch.</h1>
 
         <p class="lead">
           mq-hal turns natural language into safe JSON intents, then routes them to
-          whitelisted local actions for git, mqlaunch, doctor summaries, fix planning,
-          session memory, and timeline views.
+          whitelisted local actions — git state, CI status, release readiness,
+          publish quality, doctor summaries, fix planning, session memory, and timelines.
         </p>
 
         <div class="hero-actions">
@@ -395,22 +395,24 @@
           <span class="lamp"></span>
           <span class="lamp"></span>
         </div>
-<pre><span class="prompt">mansys · Zephyr ~/mq-hal ❯</span> mq-hal timeline --details
+<pre><span class="prompt">mansys · Zephyr ~/macos-scripts ❯</span> mq-hal audit
 
-HAL Timeline
-============
+HAL Audit
+=========
 
-TIME              TYPE              REPO             STATUS
-----------------  ----------------  ---------------  ----------------
-2026-05-16 23:10  doctor_summary    macos-scripts    <span class="ok">Healthy</span>
-                                                  ↳ Detected 0 serious issues.
-2026-05-16 23:12  fix_plan          macos-scripts    <span class="ok">Fix plan ready</span>
-                                                  ↳ Safe copy-paste plan created.
-2026-05-16 23:14  note              mq-hal           release looked good
+Repo:    macos-scripts
+Version: 0.3.9
+Overall: <span class="warn">needs_review</span>
 
-<span class="prompt">mansys · Zephyr ~/macos-scripts ❯</span> mqlaunch hal doctor
-<span class="ok">HAL Doctor Summary — macos-scripts</span>
-<span class="muted">All checks passed. No action needed.</span></pre>
+Publish readiness: 16/16
+<span class="muted">
+README score:      50/100
+  Missing: install section, usage section, examples, roadmap</span>
+
+Recommendation
+--------------
+<span class="ok">Add README sections: install section, usage section,
+examples, roadmap. Then rerun mqlaunch hal audit.</span></pre>
       </div>
     </section>
 
@@ -428,6 +430,24 @@ TIME              TYPE              REPO             STATUS
           <span class="tag">Brief</span>
           <h3>Quick status snapshot</h3>
           <p>Git state, doctor health, CI runs, release tag, and last session note — one fast deterministic command.</p>
+        </article>
+
+        <article class="card">
+          <span class="tag">Release Brief</span>
+          <h3>Release readiness</h3>
+          <p>Checks VERSION, CHANGELOG, README badge, git cleanliness, CI status, and latest GitHub release before you tag.</p>
+        </article>
+
+        <article class="card">
+          <span class="tag">Audit</span>
+          <h3>Publish &amp; README quality</h3>
+          <p>Runs repo-signal publish-checklist and readme-score. Derives ready / needs_review / not_ready with actionable recommendations.</p>
+        </article>
+
+        <article class="card">
+          <span class="tag">Repo Ops</span>
+          <h3>Git and CI status</h3>
+          <p>Read-only repo-status (branch, dirty state, commits, tags) and ci (GitHub Actions run list) — no side effects.</p>
         </article>
 
         <article class="card">
@@ -455,15 +475,9 @@ TIME              TYPE              REPO             STATUS
         </article>
 
         <article class="card">
-          <span class="tag">Timeline UI</span>
+          <span class="tag">Timeline</span>
           <h3>Compact history view</h3>
           <p>Shows recent HAL events as a terminal-friendly timeline with filters and JSON output.</p>
-        </article>
-
-        <article class="card">
-          <span class="tag">Integration Contract</span>
-          <h3>Clear build rules</h3>
-          <p>Defines how new HAL features are built, tested, released, and exposed through MQLaunch.</p>
         </article>
       </div>
     </section>
@@ -477,7 +491,7 @@ TIME              TYPE              REPO             STATUS
       <div class="flow">
         <div class="flow-row">
           <strong>User</strong>
-          <span>Runs mqlaunch hal doctor, mqlaunch hal fix-doctor, or a free HAL prompt.</span>
+          <span>Runs mqlaunch hal audit, mqlaunch hal release-brief, mqlaunch hal doctor, or a free HAL prompt.</span>
         </div>
 
         <div class="flow-row">
@@ -492,7 +506,7 @@ TIME              TYPE              REPO             STATUS
 
         <div class="flow-row">
           <strong>Local tools</strong>
-          <span>Uses git, GitHub CLI, mqlaunch doctor, selftest, release-check, and local memory.</span>
+          <span>Uses git, GitHub CLI, repo-signal, mqlaunch doctor, selftest, release-check, and local memory.</span>
         </div>
       </div>
     </section>
@@ -507,14 +521,12 @@ TIME              TYPE              REPO             STATUS
         <div class="command-box">
           <div class="command-title">mq-hal</div>
 <pre>mq-hal brief
+mq-hal release-brief
+mq-hal audit
 mq-hal repo-status
 mq-hal ci
-mq-hal "visa git status i macos-scripts"
-mq-hal --raw-intent "kör doctor"
 mq-hal doctor-summary
-mq-hal doctor-summary --no-ai
 mq-hal fix-doctor
-mq-hal fix-doctor --no-ai
 mq-hal session
 mq-hal last
 mq-hal timeline
@@ -527,15 +539,17 @@ mq-hal memory-path</pre>
           <div class="command-title">mqlaunch bridge</div>
 <pre>mqlaunch hal
 mqlaunch hal brief
+mqlaunch hal release-brief
+mqlaunch hal audit
+mqlaunch hal repo-status
+mqlaunch hal ci
 mqlaunch hal doctor
 mqlaunch hal fix-doctor
 mqlaunch hal session
 mqlaunch hal last
 mqlaunch hal timeline
 mqlaunch hal timeline --details
-mqlaunch hal remember "release looked good"
-mqlaunch hal raw "kör doctor"
-mqlaunch hal repos</pre>
+mqlaunch hal remember "release looked good"</pre>
         </div>
       </div>
     </section>
@@ -568,7 +582,8 @@ ln -sf ~/mq-hal/bin/mq-hal ~/bin/mq-hal
 
 # Test
 mq-hal --help
-mq-hal doctor-summary --sample --no-ai</pre>
+mq-hal audit --sample
+mq-hal release-brief --sample</pre>
       </div>
     </section>
 
