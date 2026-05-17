@@ -468,6 +468,12 @@ tests and docs required before release
 
 See [docs/INTEGRATION.md](docs/INTEGRATION.md).
 
+## HAL command surface
+
+Full reference — every command, its backend, read-only status, and memory behaviour:
+
+See [docs/hal-command-surface.md](docs/hal-command-surface.md).
+
 ## Security
 
 The model only returns a JSON intent from a fixed schema.
