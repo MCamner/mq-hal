@@ -61,7 +61,11 @@ echo "[10/11] README documents Release Brief"
 grep -q "HAL Release Brief" "$README"
 grep -q "mq-hal release-brief" "$README"
 
-echo "[11/11] repo cd helper is multiline"
+echo "[11/12] README documents Audit"
+grep -q "HAL Audit" "$README"
+grep -q "mq-hal audit" "$README"
+
+echo "[12/12] repo cd helper is multiline"
 grep -q 'mqhcd()' "$README"
 grep -q 'cd "$path" || return $?' "$README"
 

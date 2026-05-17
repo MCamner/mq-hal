@@ -3,7 +3,7 @@
 Local HAL-style command router for macOS.
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
-[![Version](https://img.shields.io/badge/version-0.8.1-orange)](VERSION)
+[![Version](https://img.shields.io/badge/version-0.9.0-orange)](VERSION)
 
 `mq-hal` lets you ask natural-language questions locally through Ollama, then maps the answer to safe whitelisted terminal actions.
 
@@ -81,6 +81,8 @@ mq-hal brief
 mq-hal brief --json
 mq-hal release-brief
 mq-hal release-brief --json
+mq-hal audit
+mq-hal audit --json
 mq-hal repo-status
 mq-hal repo-status --json
 mq-hal ci
@@ -101,6 +103,7 @@ Through MQLaunch:
 mqlaunch hal
 mqlaunch hal brief
 mqlaunch hal release-brief
+mqlaunch hal audit
 mqlaunch hal repo-status
 mqlaunch hal ci
 mqlaunch hal doctor
@@ -143,6 +146,31 @@ The release brief checks:
 - latest GitHub release
 - doctor summary
 - release-check status
+
+## HAL Audit
+
+Check publish quality and README quality via `repo-signal`:
+
+```bash
+mq-hal audit
+mq-hal audit --json
+mq-hal audit --repo macos-scripts
+```
+
+Through MQLaunch:
+
+```bash
+mqlaunch hal audit
+```
+
+`audit` checks:
+
+- publish-checklist score (front door, public quality, GitHub Pages)
+- README score (title, usage, examples, roadmap, contributing)
+- overall status: `ready` / `needs_review` / `not_ready`
+- actionable recommendation
+
+Requires `repo-signal` to be installed. Falls back gracefully if unavailable.
 
 ## HAL Brief
 

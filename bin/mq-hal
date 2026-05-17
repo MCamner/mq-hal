@@ -16,6 +16,11 @@ done
 ROOT="$(cd -P "$(dirname "$SOURCE")/.." >/dev/null 2>&1 && pwd)"
 
 case "${1:-}" in
+  audit)
+    shift || true
+    exec python3 "$ROOT/scripts/audit.py" "$@"
+    ;;
+
   brief)
     shift || true
     exec python3 "$ROOT/scripts/brief.py" "$@"

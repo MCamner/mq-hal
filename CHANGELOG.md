@@ -2,6 +2,17 @@
 
 <!-- markdownlint-disable MD024 -->
 
+## [0.9.0] - 2026-05-17
+
+### Added
+
+- Added `mq-hal audit` — publish quality and README quality audit via `repo-signal`.
+- Runs `repo-signal publish-checklist` and `repo-signal readme-score`, derives overall status (`ready` / `needs_review` / `not_ready`).
+- Supports `--json`, `--sample`, `--repo`, `--no-memory`.
+- Added `tests/audit-smoke.sh` (4 checks).
+- Extended `docs-smoke.sh` to 12 checks including Audit coverage.
+- Documented HAL Audit in README.
+
 ## [0.8.1] - 2026-05-17
 
 ### Fixed
@@ -55,7 +66,6 @@
 
 - Rewrote README using generated fenced code blocks to fix GitHub rendering.
 - Strengthened docs smoke test to check balanced markdown fences and multiline helper examples.
-
 
 <!-- markdownlint-disable MD024 -->
 

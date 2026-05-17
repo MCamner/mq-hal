@@ -26,6 +26,7 @@ jobs:
           python3 -m py_compile scripts/ci_status.py
           python3 -m py_compile scripts/brief.py
           python3 -m py_compile scripts/release_brief.py
+          python3 -m py_compile scripts/audit.py
 
       - name: Run smoke tests
         run: |
@@ -38,4 +39,5 @@ jobs:
           ./tests/repo-status-smoke.sh
           ./tests/ci-status-smoke.sh
           ./tests/release-brief-smoke.sh
+          ./tests/audit-smoke.sh
           ./tests/docs-smoke.sh
