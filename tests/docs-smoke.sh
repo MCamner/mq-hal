@@ -91,4 +91,7 @@ echo "[15/15] command surface references audit and release-brief"
 grep -q "audit" "$SURFACE"
 grep -q "release-brief" "$SURFACE"
 
+echo "[guard] README markdown guard"
+python3 "$ROOT/tools/markdown_guard.py" "$README"
+
 echo "OK: docs smoke test passed"

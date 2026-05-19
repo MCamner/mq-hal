@@ -27,6 +27,8 @@ jobs:
           python3 -m py_compile scripts/brief.py
           python3 -m py_compile scripts/release_brief.py
           python3 -m py_compile scripts/audit.py
+          python3 -m py_compile tools/write_readme.py
+          python3 -m py_compile tools/markdown_guard.py
 
       - name: Run smoke tests
         run: |

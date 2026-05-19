@@ -1,4 +1,9 @@
-# mq-hal
+#!/usr/bin/env python3
+from pathlib import Path
+
+F = chr(96) * 3
+
+readme = f"""# mq-hal
 
 Local HAL-style command router for macOS.
 
@@ -11,13 +16,13 @@ Live site: <https://mcamner.github.io/mq-hal/>
 
 ## How it works
 
-```text
+{F}text
 User prompt
 → Ollama/Qwen
 → JSON intent
 → Safe Python router
 → git / mqlaunch / repo helpers
-```
+{F}
 
 The model never runs shell directly.
 
@@ -25,7 +30,7 @@ It returns a JSON intent. The Python router decides what is allowed.
 
 ## Quick start
 
-```bash
+{F}bash
 # 1. Install Ollama
 brew install ollama
 brew services start ollama
@@ -45,11 +50,11 @@ mq-hal audit
 mq-hal repo-status
 mq-hal ci
 mq-hal "visa git status i macos-scripts"
-```
+{F}
 
 ## Common commands
 
-```bash
+{F}bash
 mq-hal brief
 mq-hal release-brief
 mq-hal audit
@@ -62,11 +67,11 @@ mq-hal last
 mq-hal timeline
 mq-hal remember "release looked good"
 mq-hal memory-path
-```
+{F}
 
 Through MQLaunch:
 
-```bash
+{F}bash
 mqlaunch hal
 mqlaunch hal brief
 mqlaunch hal release-brief
@@ -77,18 +82,18 @@ mqlaunch hal doctor
 mqlaunch hal fix-doctor
 mqlaunch hal timeline
 mqlaunch hal session
-```
+{F}
 
 ## HAL Brief
 
 Get a quick status snapshot of a repo:
 
-```bash
+{F}bash
 mq-hal brief
 mq-hal brief --json
 mq-hal brief --no-gh
 mq-hal brief --repo macos-scripts
-```
+{F}
 
 The brief combines git status, CI status, latest release, HAL memory, and a next-step recommendation.
 
@@ -96,25 +101,25 @@ The brief combines git status, CI status, latest release, HAL memory, and a next
 
 Check whether a repo appears ready for release:
 
-```bash
+{F}bash
 mq-hal release-brief
 mq-hal release-brief --json
 mq-hal release-brief --repo macos-scripts
-```
+{F}
 
 Skip external or expensive checks:
 
-```bash
+{F}bash
 mq-hal release-brief --skip-gh
 mq-hal release-brief --skip-doctor
 mq-hal release-brief --skip-release-check
-```
+{F}
 
 Through MQLaunch:
 
-```bash
+{F}bash
 mqlaunch hal release-brief
-```
+{F}
 
 The release brief checks:
 
@@ -131,17 +136,17 @@ The release brief checks:
 
 Check publish quality and README quality via `repo-signal`:
 
-```bash
+{F}bash
 mq-hal audit
 mq-hal audit --json
 mq-hal audit --repo macos-scripts
-```
+{F}
 
 Through MQLaunch:
 
-```bash
+{F}bash
 mqlaunch hal audit
-```
+{F}
 
 Audit checks:
 
@@ -157,129 +162,129 @@ Requires `repo-signal` locally. Falls back gracefully if unavailable.
 
 Read-only repository status:
 
-```bash
+{F}bash
 mq-hal repo-status
 mq-hal repo-status --json
 mq-hal repo-status --repo macos-scripts
-```
+{F}
 
 GitHub Actions status:
 
-```bash
+{F}bash
 mq-hal ci
 mq-hal ci --json
 mq-hal ci --repo macos-scripts
-```
+{F}
 
 Through MQLaunch:
 
-```bash
+{F}bash
 mqlaunch hal repo-status
 mqlaunch hal ci
-```
+{F}
 
 ## HAL Doctor Summary
 
 Run a local health check and summarize it:
 
-```bash
+{F}bash
 mq-hal doctor-summary
 mq-hal doctor-summary --json
 mq-hal doctor-summary --no-ai
-```
+{F}
 
 Through MQLaunch:
 
-```bash
+{F}bash
 mqlaunch hal doctor
-```
+{F}
 
 Flow:
 
-```text
+{F}text
 mq-hal doctor-summary
 → mqlaunch doctor --json
 → parse doctor JSON
 → summarize with Ollama when available
 → fall back to deterministic local summary when Ollama is unavailable
-```
+{F}
 
 ## HAL Fix Planner
 
 Create a safe fix plan from HAL Doctor Summary:
 
-```bash
+{F}bash
 mq-hal fix-doctor
 mq-hal fix-doctor --json
 mq-hal fix-doctor --no-ai
-```
+{F}
 
 Through MQLaunch:
 
-```bash
+{F}bash
 mqlaunch hal fix-doctor
-```
+{F}
 
 Flow:
 
-```text
+{F}text
 mq-hal fix-doctor
 → mq-hal doctor-summary --json --no-ai
 → parse findings
 → create safe fix plan
 → print copy-paste commands
 → execute nothing
-```
+{F}
 
 ## HAL Session Memory
 
 Store local HAL events in:
 
-```text
+{F}text
 ~/.mq-hal/session.jsonl
-```
+{F}
 
 Show memory:
 
-```bash
+{F}bash
 mq-hal session
 mq-hal last
 mq-hal session --json
 mq-hal last --json
-```
+{F}
 
 Save a manual note:
 
-```bash
+{F}bash
 mq-hal remember "doctor looked clean after release"
-```
+{F}
 
 Through MQLaunch:
 
-```bash
+{F}bash
 mqlaunch hal session
 mqlaunch hal last
 mqlaunch hal remember "release looked good"
-```
+{F}
 
 Disable memory for one command:
 
-```bash
+{F}bash
 mq-hal doctor-summary --no-memory
 mq-hal fix-doctor --no-memory
-```
+{F}
 
 Or disable via environment:
 
-```bash
+{F}bash
 MQ_HAL_DISABLE_MEMORY=1 mq-hal doctor-summary
-```
+{F}
 
 ## HAL Timeline UI
 
 Show HAL Session Memory as a compact timeline:
 
-```bash
+{F}bash
 mq-hal timeline
 mq-hal timeline --details
 mq-hal timeline --repo macos-scripts
@@ -287,27 +292,27 @@ mq-hal timeline --type doctor_summary
 mq-hal timeline --type fix_plan
 mq-hal timeline --type note
 mq-hal timeline --json
-```
+{F}
 
 Through MQLaunch:
 
-```bash
+{F}bash
 mqlaunch hal timeline
 mqlaunch hal timeline --details
-```
+{F}
 
 ## Optional model override
 
-```bash
+{F}bash
 OLLAMA_MODEL=qwen3:4b ~/mq-hal/bin/mq-hal "visa git status"
-```
+{F}
 
 ## Repo cd helper
 
 Add to `~/.zshrc`:
 
-```bash
-mqhcd() {
+{F}bash
+mqhcd() {{
   if [ $# -ne 1 ]; then
     echo "usage: mqhcd <repo-name>" >&2
     return 2
@@ -316,25 +321,25 @@ mqhcd() {
   local path
   path="$(mq-hal --cd "$1")" || return $?
   cd "$path" || return $?
-}
-```
+}}
+{F}
 
 Then:
 
-```bash
+{F}bash
 mqhcd repo-signal
-```
+{F}
 
 ## Integration contract
 
 New HAL features follow the integration contract:
 
-```text
+{F}text
 mq-hal owns feature logic
 mqlaunch owns command surface
 hal-bridge.sh delegates only
 tests and docs required before release
-```
+{F}
 
 See [docs/INTEGRATION.md](docs/INTEGRATION.md).
 
@@ -361,3 +366,7 @@ See [ROADMAP.md](ROADMAP.md) for planned features.
 ## License
 
 [MIT](LICENSE)
+"""
+
+Path("README.md").write_text(readme, encoding="utf-8")
+print("README.md written")

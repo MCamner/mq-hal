@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.9.2] - 2026-05-19
+
+### Fixed
+- Added `tools/write_readme.py` to regenerate README with clean fenced code blocks.
+- Added `tools/markdown_guard.py` to prevent flattened README rendering regressions.
+- Strengthened docs smoke coverage to run the README markdown guard.
+- Regenerated README for the v0.9.x HAL command surface.
+
+
 <!-- markdownlint-disable MD024 -->
 
 ## [0.9.1] - 2026-05-17
