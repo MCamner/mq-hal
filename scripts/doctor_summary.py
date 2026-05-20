@@ -160,6 +160,8 @@ def doctor_commands(repo_path: Path) -> list[list[str]]:
     if doctor.exists():
         commands.append([str(doctor), "--json"])
 
+    commands.append(["repo-signal", "doctor", "--json"])
+
     return commands
 
 

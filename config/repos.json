@@ -4,6 +4,7 @@
     "macos-scripts": "~/macos-scripts",
     "repo-signal": "~/repo-signal",
     "mq-mcp": "~/mq-mcp",
-    "mcamner-journal": "~/mcamner-journal"
+    "mcamner-journal": "~/mcamner-journal",
+    "mq-hal": "~/mq-hal"
   }
 }
