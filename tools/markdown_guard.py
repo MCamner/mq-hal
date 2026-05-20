@@ -27,10 +27,11 @@ bad_fences = [
 require(not bad_fences, f"Bad fence info strings: {bad_fences[:5]}")
 
 required_strings = [
-    "version-0.9.2",
+    "version-0.10.0",
     "## HAL Brief",
     "## HAL Release Brief",
     "## HAL Audit",
+    "## HAL Stack Status",
     "## HAL Repo Ops",
     "## HAL Doctor Summary",
     "## HAL Fix Planner",
@@ -40,6 +41,7 @@ required_strings = [
     "docs/hal-command-surface.md",
     "mq-hal release-brief",
     "mq-hal audit",
+    "mq-hal stack-status",
     "mq-hal repo-status",
     "mq-hal ci",
     "mqlaunch hal audit",

@@ -76,6 +76,7 @@ PY
 echo "[12/15] README documents current HAL commands"
 grep -q "mq-hal release-brief" "$README"
 grep -q "mq-hal audit" "$README"
+grep -q "mq-hal stack-status" "$README"
 grep -q "mq-hal repo-status" "$README"
 grep -q "mq-hal ci" "$README"
 grep -q "mq-hal fix-doctor" "$README"
@@ -89,6 +90,7 @@ grep -q 'cd "$path" || return $?' "$README"
 
 echo "[15/15] command surface references audit and release-brief"
 grep -q "audit" "$SURFACE"
+grep -q "stack-status" "$SURFACE"
 grep -q "release-brief" "$SURFACE"
 
 echo "[guard] README markdown guard"

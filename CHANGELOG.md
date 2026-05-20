@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.10.0] - 2026-05-20
+
+### Added
+
+- Added `mq-hal stack-status` for a read-only local stack overview.
+- Shows `mq-hal`, `mqlaunch`, `repo-signal`, optional `bridget`, configured repos, git state, VERSION, and repo-signal publish status.
+- Added `tests/stack-status-smoke.sh`.
+- Documented Stack Status in README and command surface docs.
+
 ## [0.9.2] - 2026-05-19
 
 ### Fixed

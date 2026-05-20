@@ -43,6 +43,25 @@ Runs `repo-signal publish-checklist --format json` and `repo-signal readme-score
 
 ---
 
+### `stack-status`
+
+Local stack overview for `mq-hal`, `repo-signal`, `mq-mcp`, `mqlaunch`, and configured repos.
+
+| Property | Value |
+|---|---|
+| `mq-hal` | `mq-hal stack-status` |
+| Alias | `mq-hal stack` / `mq-hal status-stack` |
+| Backend | `scripts/stack_status.py` |
+| Read-only | Yes |
+| Memory write | No |
+| Flags | `--json`, `--sample` |
+
+Checks: local `mq-hal` wrapper, `mqlaunch`, `repo-signal`, optional `bridget`, configured repo paths, git branch and dirty state, VERSION file, and repo-signal publish checklist when available.
+
+This command does not execute repairs and does not write session memory.
+
+---
+
 ### `release-brief`
 
 Release readiness summary before tagging.
@@ -260,6 +279,7 @@ List all configured repos.
 |---|---|
 | `brief` | Yes — `brief` event |
 | `audit` | Yes — `audit` event |
+| `stack-status` | No |
 | `release-brief` | Yes — `release_brief` event |
 | `repo-status` | No |
 | `ci` | No |

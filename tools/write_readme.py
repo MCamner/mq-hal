@@ -8,7 +8,7 @@ readme = f"""# mq-hal
 Local HAL-style command router for macOS.
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
-[![Version](https://img.shields.io/badge/version-0.9.2-orange)](VERSION)
+[![Version](https://img.shields.io/badge/version-0.10.0-orange)](VERSION)
 
 `mq-hal` lets you ask natural-language questions locally through Ollama, then maps the answer to safe whitelisted terminal actions.
 
@@ -47,6 +47,7 @@ ln -sf ~/mq-hal/bin/mq-hal ~/bin/mq-hal
 mq-hal brief
 mq-hal release-brief
 mq-hal audit
+mq-hal stack-status
 mq-hal repo-status
 mq-hal ci
 mq-hal "visa git status i macos-scripts"
@@ -58,6 +59,7 @@ mq-hal "visa git status i macos-scripts"
 mq-hal brief
 mq-hal release-brief
 mq-hal audit
+mq-hal stack-status
 mq-hal repo-status
 mq-hal ci
 mq-hal doctor-summary
@@ -157,6 +159,29 @@ Audit checks:
 - safe next-step recommendation
 
 Requires `repo-signal` locally. Falls back gracefully if unavailable.
+
+## HAL Stack Status
+
+Show the local AI/repo tooling stack:
+
+{F}bash
+mq-hal stack-status
+mq-hal stack-status --json
+mq-hal stack-status --sample
+{F}
+
+Stack Status checks:
+
+- mq-hal wrapper
+- mqlaunch availability
+- repo-signal availability
+- optional bridget availability
+- configured repo paths
+- git branch and dirty state
+- VERSION file
+- repo-signal publish checklist when available
+
+This command is read-only and does not write session memory.
 
 ## HAL Repo Ops
 
