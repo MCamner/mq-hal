@@ -5,6 +5,10 @@
 - HAL Integration Contract in `docs/INTEGRATION.md`.
 - Docs smoke test and CI coverage.
 - README rendering cleanup.
+- Expanded natural-language router: `grep_repo`, `run_test`, `open_editor`, and `create_branch`.
+- Intent schema versioning with `mq-hal.intent.v1`.
+- `--confirm`, `--no-ai`, and `--explain-intent` router modes.
+- Latest prompt/intent context is passed to Ollama for short follow-ups.
 
 ## Completed in v0.5.0
 
@@ -36,10 +40,10 @@
 
 ## v0.3 — Expanded intent set
 
-- `open_editor` — open a file in $EDITOR
-- `run_test` — run the test suite for the active repo
-- `grep_repo` — search for a pattern in the repo
-- `create_branch` — git checkout -b via natural language
+- [x] `open_editor` — open a file in $EDITOR
+- [x] `run_test` — run the test suite for the active repo
+- [x] `grep_repo` — search for a pattern in the repo
+- [x] `create_branch` — git checkout -b via natural language
 
 ## v0.4 — HAL Fix Planner
 
@@ -47,8 +51,8 @@
 
 ## v0.5 — Multi-turn context
 
-- Conversation history passed to Ollama across invocations
-- Follow-up commands without repeating the repo name
+- [x] Latest prompt/intent passed to Ollama across invocations
+- [x] Follow-up commands can use the active repo without repeating the repo name
 
 ## v0.6 — Notifications
 

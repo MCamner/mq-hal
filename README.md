@@ -46,6 +46,9 @@ mq-hal stack-status
 mq-hal repo-status
 mq-hal ci
 mq-hal "visa git status i macos-scripts"
+mq-hal "hitta OLLAMA_MODEL i mq-hal"
+mq-hal "kör tester i mq-hal"
+mq-hal --confirm "kör doctor"
 ```
 
 ## Common commands
@@ -64,6 +67,8 @@ mq-hal last
 mq-hal timeline
 mq-hal remember "release looked good"
 mq-hal memory-path
+mq-hal --raw-intent "kör doctor"
+mq-hal --explain-intent "visa git status i repo-signal"
 ```
 
 Through MQLaunch:
@@ -326,6 +331,25 @@ mqlaunch hal timeline --details
 ```bash
 OLLAMA_MODEL=qwen3:4b ~/mq-hal/bin/mq-hal "visa git status"
 ```
+
+## Natural-language routing
+
+`mq-hal "prompt"` routes through Ollama by default. The router now supports:
+
+- repo status and recent log
+- repo tree preview
+- safe `rg` search in configured repos
+- safe test command detection
+- opening files under the selected repo in `$EDITOR`
+- creating a git branch after preview confirmation
+- allowlisted `mqlaunch` commands
+
+Use `--raw-intent` to inspect only the JSON intent, `--explain-intent` to show
+the resolved repo/path, and `--confirm` to preview routed commands before they
+run.
+
+If Ollama is unavailable, simple prompts can fall back to deterministic local
+routing. Use `--no-ai` to force that path for smoke tests or debugging.
 
 ## Repo cd helper
 

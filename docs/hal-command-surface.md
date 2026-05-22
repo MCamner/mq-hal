@@ -259,6 +259,110 @@ Print the parsed JSON intent without executing it.
 
 ---
 
+### `--explain-intent`
+
+Print the parsed JSON intent plus the resolved repo/path without executing it.
+
+| Property | Value |
+|---|---|
+| `mq-hal` | `mq-hal --explain-intent "visa git status i repo-signal"` |
+| Alias | `mq-hal --why "visa git status i repo-signal"` |
+| Backend | `scripts/hal.py` |
+| Read-only | Yes |
+| Memory write | No |
+
+---
+
+### `--confirm`
+
+Preview the resolved command and ask before running it.
+
+| Property | Value |
+|---|---|
+| `mq-hal` | `mq-hal --confirm "kör doctor"` |
+| Backend | `scripts/hal.py` |
+| Read-only | Depends on confirmed action |
+| Memory write | Yes (stores last prompt/intent before execution) |
+
+---
+
+### `--no-ai`
+
+Use deterministic local routing without calling Ollama.
+
+| Property | Value |
+|---|---|
+| `mq-hal` | `mq-hal --no-ai --raw-intent "visa git status i mq-hal"` |
+| Backend | `scripts/hal.py` |
+| Read-only | Depends on routed action |
+| Memory write | Depends on routed action |
+
+Used by smoke tests and as a fallback when Ollama is unavailable for simple prompts.
+
+---
+
+### `grep_repo`
+
+Search a configured repository with safe `rg` arguments.
+
+| Property | Value |
+|---|---|
+| Prompt | `mq-hal "hitta OLLAMA_MODEL i mq-hal"` |
+| Routed command | `rg -n -- <query>` |
+| Backend | `scripts/hal.py` |
+| Read-only | Yes |
+| Memory write | Yes (stores last prompt/intent) |
+
+The router passes the query as an argument list, not a shell string.
+
+---
+
+### `run_test`
+
+Run a detected safe test command for the selected repo.
+
+| Property | Value |
+|---|---|
+| Prompt | `mq-hal "kör tester i mq-hal"` |
+| Backend | `scripts/hal.py` |
+| Read-only | No |
+| Memory write | Yes (stores last prompt/intent) |
+
+Detection order: `tests/smoke.sh`, `scripts/validate.sh`, `python3 -m pytest`, then `npm test`.
+
+---
+
+### `open_editor`
+
+Open a file or directory under the selected repo in `$VISUAL`, `$EDITOR`, `code`, `open`, or `nano`.
+
+| Property | Value |
+|---|---|
+| Prompt | `mq-hal "öppna README.md i mq-hal"` |
+| Backend | `scripts/hal.py` |
+| Read-only | No |
+| Memory write | Yes (stores last prompt/intent) |
+
+Paths are resolved under the selected repo and paths outside the repo are refused.
+
+---
+
+### `create_branch`
+
+Create a new git branch in the selected repo after preview confirmation.
+
+| Property | Value |
+|---|---|
+| Prompt | `mq-hal "skapa branch feature/demo i mq-hal"` |
+| Routed command | `git checkout -b <branch>` |
+| Backend | `scripts/hal.py` |
+| Read-only | No |
+| Memory write | Yes (stores last prompt/intent) |
+
+Branch names are validated and the command always asks before running, even without `--confirm`.
+
+---
+
 ### `--list-repos`
 
 List all configured repos.
@@ -292,5 +396,12 @@ List all configured repos.
 | `memory-path` | No |
 | Free prompt | Depends on action |
 | `--raw-intent` | No |
+| `--explain-intent` | No |
+| `grep_repo` | Yes — last prompt/intent |
+| `run_test` | Yes — last prompt/intent |
+| `open_editor` | Yes — last prompt/intent |
+| `create_branch` | Yes — last prompt/intent |
 
-All memory writes respect `--no-memory` and `MQ_HAL_DISABLE_MEMORY=1`.
+Feature event writes respect `--no-memory` and `MQ_HAL_DISABLE_MEMORY=1` where those flags exist.
+The natural-language router also keeps the latest prompt/intent in `~/.mq-hal/state.json`
+so short follow-ups can be routed with context.
