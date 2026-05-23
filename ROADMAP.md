@@ -1,58 +1,37 @@
 # Roadmap
 
-## Completed in v0.5.1
+## v0.10.1 — Source readability + version sync
 
-- HAL Integration Contract in `docs/INTEGRATION.md`.
-- Docs smoke test and CI coverage.
-- README rendering cleanup.
-- Expanded natural-language router: `grep_repo`, `run_test`, `open_editor`, and `create_branch`.
-- Intent schema versioning with `mq-hal.intent.v1`.
-- `--confirm`, `--no-ai`, and `--explain-intent` router modes.
-- Latest prompt/intent context is passed to Ollama for short follow-ups.
+Status: done.
 
-## Completed in v0.5.0
+- [x] Fixed `docs/index.html` Pages version from v0.9.1 to v0.10.0
+- [x] Added `tests/hal-router-smoke.sh` to CI workflow (was missing)
+- [x] Added Proof section to README
+- [x] Added `release-check.sh` — pre-release gate covering Python syntax, markdown guard, version sync, and all smoke tests
+- [x] Extended `docs-smoke.sh` to verify `docs/index.html` version matches VERSION file
 
-- HAL Timeline UI: compact terminal table view over local session memory.
-- Timeline filters: repo, event type, limit, details.
-- Output modes: table, details, JSON.
-- README markdown rendering cleanup.
+## v0.10.0 — HAL Stack Status
 
-## Completed in v0.4.0
+Status: done.
 
-- HAL Session Memory: local JSONL history for doctor summaries, fix plans, and manual notes.
-- Commands: `session`, `last`, `remember`, and `memory-path`.
-- Automatic memory capture for `doctor-summary` and `fix-doctor`.
-- Memory opt-out with `--no-memory` and `MQ_HAL_DISABLE_MEMORY=1`.
-- Smoke test coverage for session memory.
+- [x] Added `mq-hal stack-status` — read-only local stack overview
+- [x] Shows mq-hal, mqlaunch, repo-signal, optional bridget, configured repos, git state, VERSION, and repo-signal publish status
+- [x] Added `tests/stack-status-smoke.sh`
+- [x] Documented Stack Status in README and command surface docs
 
-## Completed in v0.3.0
+## v0.9.x — HAL Audit + Release Brief + Repo Ops + Session + Timeline
 
-- HAL Fix Planner: create safe copy-paste fix plans from HAL Doctor Summary.
-- Planner command sanitization to block destructive suggestions.
-- JSON and text output modes for fix plans.
-- Smoke test coverage for fix planner.
+Status: done.
 
-## Completed in v0.2.0
-
-- HAL Doctor Summary: run `mqlaunch doctor --json`, parse the result, and summarize health status.
-- Deterministic fallback summary when Ollama is unavailable.
-- Smoke test for doctor-summary output and JSON mode.
-
-## v0.3 — Expanded intent set
-
-- [x] `open_editor` — open a file in $EDITOR
-- [x] `run_test` — run the test suite for the active repo
-- [x] `grep_repo` — search for a pattern in the repo
-- [x] `create_branch` — git checkout -b via natural language
-
-## v0.4 — HAL Fix Planner
-
-- `mq-hal fix-doctor` — read doctor summary, propose copy-paste fixes, run nothing automatically
-
-## v0.5 — Multi-turn context
-
-- [x] Latest prompt/intent passed to Ollama across invocations
-- [x] Follow-up commands can use the active repo without repeating the repo name
+- [x] `mq-hal audit` — publish quality and README score via repo-signal
+- [x] `mq-hal release-brief` — release readiness check
+- [x] `mq-hal repo-status` — read-only git status
+- [x] `mq-hal ci` — GitHub Actions status
+- [x] `mq-hal doctor-summary` + `mq-hal fix-doctor`
+- [x] `mq-hal session` / `last` / `remember` / `timeline`
+- [x] `mq-hal stack-status`
+- [x] README markdown guard (`tools/markdown_guard.py`)
+- [x] 13 smoke test suites covering all commands
 
 ## v0.6 — Notifications
 

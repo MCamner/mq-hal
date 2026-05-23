@@ -44,4 +44,5 @@ jobs:
           ./tests/release-brief-smoke.sh
           ./tests/audit-smoke.sh
           ./tests/stack-status-smoke.sh
+          ./tests/hal-router-smoke.sh
           ./tests/docs-smoke.sh

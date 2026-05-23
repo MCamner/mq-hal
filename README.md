@@ -3,7 +3,7 @@
 Local HAL-style command router for macOS.
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
-[![Version](https://img.shields.io/badge/version-0.10.0-orange)](VERSION)
+[![Version](https://img.shields.io/badge/version-0.10.1-orange)](VERSION)
 
 `mq-hal` lets you ask natural-language questions locally through Ollama, then maps the answer to safe whitelisted terminal actions.
 
@@ -392,6 +392,16 @@ See [docs/INTEGRATION.md](docs/INTEGRATION.md).
 Full command reference:
 
 See [docs/hal-command-surface.md](docs/hal-command-surface.md).
+
+## Proof
+
+- Model returns a JSON intent only — the Python router decides what is allowed
+- Router enforces an explicit allowlist — unknown or unsafe commands are refused
+- HAL Fix Planner prints copy-paste repair plans but executes nothing
+- Session Memory stays local in `~/.mq-hal/session.jsonl` — nothing is sent externally
+- Smoke tests cover: doctor summary, fix planner, session memory, timeline, repo ops, CI status, release brief, audit, stack status, hal router, and docs
+- README markdown guard (`tools/markdown_guard.py`) blocks flattened rendering regressions on every push
+- CI runs on `macos-latest` — all smoke tests verified natively on macOS
 
 ## Security
 

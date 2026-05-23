@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.10.1] - 2026-05-23
+
+### Fixed
+
+- Fixed `docs/index.html` Pages version badge from v0.9.1 to v0.10.1 (was two releases behind).
+- Added `tests/hal-router-smoke.sh` to CI workflow — it existed but was never run in CI.
+
+### Added
+
+- `release-check.sh` — pre-release gate covering Python syntax check for all scripts, README markdown guard, version sync across README/CHANGELOG/docs/index.html, and all 13 smoke tests.
+- `Proof` section in README listing what is verified: JSON-only model output, router allowlist enforcement, fix planner no-execute guarantee, local session memory, and smoke test coverage.
+- `docs-smoke.sh` now checks that `docs/index.html` version matches `VERSION` file.
+- `tools/markdown_guard.py` now requires `## Proof` section in README.
+
 ## [0.10.0] - 2026-05-20
 
 ### Added
@@ -12,11 +26,11 @@
 ## [0.9.2] - 2026-05-19
 
 ### Fixed
+
 - Added `tools/write_readme.py` to regenerate README with clean fenced code blocks.
 - Added `tools/markdown_guard.py` to prevent flattened README rendering regressions.
 - Strengthened docs smoke coverage to run the README markdown guard.
 - Regenerated README for the v0.9.x HAL command surface.
-
 
 <!-- markdownlint-disable MD024 -->
 

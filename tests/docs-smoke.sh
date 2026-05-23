@@ -96,4 +96,14 @@ grep -q "release-brief" "$SURFACE"
 echo "[guard] README markdown guard"
 python3 "$ROOT/tools/markdown_guard.py" "$README"
 
+echo "[version-sync] docs/index.html matches VERSION"
+VERSION="$(cat "$ROOT/VERSION")"
+PAGES="$ROOT/docs/index.html"
+if [[ -f "$PAGES" ]]; then
+  grep -q "v${VERSION}" "$PAGES" || {
+    echo "FAIL: docs/index.html does not reference v${VERSION}" >&2
+    exit 1
+  }
+fi
+
 echo "OK: docs smoke test passed"
