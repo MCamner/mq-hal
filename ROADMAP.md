@@ -22,6 +22,10 @@ allowlisted git / repo / mqlaunch / helper actions
 mq-hal should feel like a local HAL assistant, but behave like a controlled
 command router.
 
+In the mq ecosystem, mq-hal is the operator/status layer. It summarizes local
+state, diagnostics and readiness. It should not orchestrate mq-agent or own
+mq-mcp execution/review logic.
+
 It should be:
 
 - local-first
@@ -58,6 +62,7 @@ Completed foundation:
 - HAL release brief
 - HAL audit through repo-signal
 - HAL stack status
+- operator summaries for mqlaunch, repo-signal and mq-mcp-adjacent workflows
 - doctor summary
 - fix planner
 - session memory
@@ -336,6 +341,14 @@ Goal:
 Make mq-hal a stronger reasoning/status layer for mq-agent and semantic repo
 memory workflows.
 
+Boundary:
+
+```text
+mq-hal summarizes status.
+mq-agent orchestrates.
+mq-mcp executes, reviews and owns memory/reasoning runtime.
+```
+
 ### Planned scope
 
 - [ ] Add `mq-hal memory-status`
@@ -351,6 +364,13 @@ memory workflows.
 - [ ] Add smoke test for mq-hal → mq-agent
 - [ ] Add smoke test for mqlaunch → mq-hal → mq-agent
 - [ ] Add fallback behavior if mq-agent is missing
+
+### Boundary rules
+
+- mq-hal may display mq-agent availability and mq-mcp health in summaries
+- mq-hal may call read-only status/report commands
+- mq-hal must not route review execution around mq-agent
+- mq-hal must not implement mq-mcp review, risk or semantic-memory logic
 
 ### Possible commands
 
@@ -531,6 +551,9 @@ Goal:
 
 Keep mq-hal focused on runtime health, diagnostics and operator summaries for
 the mq ecosystem.
+
+This layer should make the stack easier to inspect without becoming the
+orchestrator.
 
 ### Planned scope
 
