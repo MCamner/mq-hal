@@ -346,6 +346,7 @@ memory workflows.
 - [ ] Include semantic memory state in `mq-hal brief`
 - [ ] Include semantic memory state in `mq-hal release-brief`
 - [ ] Add mq-agent status to `mq-hal stack-status`
+- [ ] Add mq-mcp runtime health, vector health and model health to stack summaries
 - [ ] Add docs for mq-agent integration
 - [ ] Add smoke test for mq-hal → mq-agent
 - [ ] Add smoke test for mqlaunch → mq-hal → mq-agent
@@ -521,6 +522,31 @@ ecosystem.
 - [ ] GitHub release
 - [ ] GitHub Pages documentation
 - [ ] No known critical safety gaps
+
+---
+
+## Future: Runtime observability layer
+
+Goal:
+
+Keep mq-hal focused on runtime health, diagnostics and operator summaries for
+the mq ecosystem.
+
+### Planned scope
+
+- [ ] Add mq-mcp runtime health summary
+- [ ] Add vector-store health summary
+- [ ] Add model availability and latency summary
+- [ ] Add tool availability diagnostics across mqlaunch, mq-agent, mq-mcp and
+  repo-signal
+- [ ] Add environment-state report with secret redaction
+- [ ] Add degraded-mode recommendations without executing fixes automatically
+
+### Non-goals
+
+- No cognition engine
+- No review logic
+- No direct shell execution from model output
 
 ---
 
