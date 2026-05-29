@@ -58,6 +58,8 @@ Local stack overview for `mq-hal`, `repo-signal`, `mq-mcp`, `mqlaunch`, and conf
 
 Checks: local `mq-hal` wrapper, `mqlaunch`, `repo-signal`, optional `bridget`, configured repo paths, git branch and dirty state, VERSION file, and repo-signal publish checklist when available.
 
+Planned mq ecosystem extension: include mq-agent availability and mq-mcp runtime/tool health as read-only status signals. `stack-status` must remain an operator summary; it must not orchestrate mq-agent or execute mq-mcp review flows.
+
 This command does not execute repairs and does not write session memory.
 
 ---

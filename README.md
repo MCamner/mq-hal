@@ -175,11 +175,16 @@ Stack Status checks:
 - mq-hal wrapper
 - mqlaunch availability
 - repo-signal availability
+- mq-mcp-adjacent runtime visibility as the integration matures
 - optional bridget availability
 - configured repo paths
 - git branch and dirty state
 - VERSION file
 - repo-signal publish checklist when available
+
+`mq-hal` summarizes stack state only. Review execution and semantic-memory
+runtime stay in `mq-mcp`, routed through `mq-agent` where orchestration is
+needed.
 
 This command is read-only and does not write session memory.
 
