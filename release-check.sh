@@ -13,6 +13,27 @@ step() { printf "\033[1;34m[----]\033[0m %s\n" "$*"; }
 FAILED=0
 VERSION="$(cat VERSION)"
 
+step "Intent contract"
+test -f "schemas/intent.schema.json" \
+  || { fail "schemas/intent.schema.json missing"; }
+test -f "docs/INTENT_CONTRACT.md" \
+  || { fail "docs/INTENT_CONTRACT.md missing"; }
+test -f "docs/COMMAND_SURFACE.md" \
+  || { fail "docs/COMMAND_SURFACE.md missing"; }
+python3 - <<'EOF' || { fail "intent schema version or enum mismatch"; }
+import sys, json
+sys.path.insert(0, "scripts")
+import hal
+schema = json.load(open("schemas/intent.schema.json"))
+const = schema["properties"]["schema"]["const"]
+assert const == hal.INTENT_SCHEMA_VERSION, \
+    f"schema const {const!r} != INTENT_SCHEMA_VERSION {hal.INTENT_SCHEMA_VERSION!r}"
+enum = set(schema["properties"]["intent"]["enum"])
+assert enum == hal.ALLOWED_INTENTS, \
+    f"schema enum differs from ALLOWED_INTENTS: {enum ^ hal.ALLOWED_INTENTS}"
+EOF
+pass "intent contract consistent"
+
 step "Python syntax check"
 python3 -m py_compile scripts/hal.py
 python3 -m py_compile scripts/doctor_summary.py

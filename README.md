@@ -3,7 +3,7 @@
 Local HAL-style command router for macOS.
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
-[![Version](https://img.shields.io/badge/version-0.10.1-orange)](VERSION)
+[![Version](https://img.shields.io/badge/version-0.11.0-orange)](VERSION)
 
 `mq-hal` lets you ask natural-language questions locally through Ollama, then maps the answer to safe whitelisted terminal actions.
 
@@ -394,9 +394,13 @@ See [docs/INTEGRATION.md](docs/INTEGRATION.md).
 
 ## HAL command surface
 
-Full command reference:
+Full command reference: [docs/hal-command-surface.md](docs/hal-command-surface.md).
 
-See [docs/hal-command-surface.md](docs/hal-command-surface.md).
+Command registry: [docs/COMMAND_SURFACE.md](docs/COMMAND_SURFACE.md).
+
+Intent contract: [docs/INTENT_CONTRACT.md](docs/INTENT_CONTRACT.md).
+
+Formal JSON Schema: [schemas/intent.schema.json](schemas/intent.schema.json).
 
 ## Proof
 
@@ -404,7 +408,13 @@ See [docs/hal-command-surface.md](docs/hal-command-surface.md).
 - Router enforces an explicit allowlist — unknown or unsafe commands are refused
 - HAL Fix Planner prints copy-paste repair plans but executes nothing
 - Session Memory stays local in `~/.mq-hal/session.jsonl` — nothing is sent externally
-- Smoke tests cover: doctor summary, fix planner, session memory, timeline, repo ops, CI status, release brief, audit, stack status, hal router, and docs
+- Intent contract is machine-validated: `schemas/intent.schema.json` enum
+  must match `ALLOWED_INTENTS` in the router on every smoke run
+- Command surface is checked: `tools/check-command-docs.sh` fails if any
+  command is added without documentation
+- Smoke tests cover: doctor summary, fix planner, session memory, timeline,
+  repo ops, CI status, release brief, audit, stack status, hal router,
+  intent schema contract, router safety, and docs
 - README markdown guard (`tools/markdown_guard.py`) blocks flattened rendering regressions on every push
 - CI runs on `macos-latest` — all smoke tests verified natively on macOS
 

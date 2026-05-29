@@ -45,7 +45,7 @@ It should be:
 Latest stable release:
 
 ```text
-v0.10.1 — version sync + CI coverage + release-check
+v0.11.0 — intent contract and command-surface hardening
 ```
 
 Completed foundation:
@@ -76,7 +76,7 @@ Completed foundation:
 Current recommended next step:
 
 ```text
-v0.11.0 — intent contract and command-surface hardening
+v0.12.0 — mq-agent and semantic memory integration
 ```
 
 ---
@@ -91,8 +91,8 @@ v0.11.0 — intent contract and command-surface hardening
 | v0.9.x  | Audit, release brief, repo ops, session and timeline | Done    |
 | v0.10.0 | HAL Stack Status                                     | Done    |
 | v0.10.1 | Version sync, CI coverage and release-check          | Done    |
-| v0.11.0 | Intent contract and command-surface hardening        | Next    |
-| v0.12.0 | mq-agent and semantic memory integration             | Planned |
+| v0.11.0 | Intent contract and command-surface hardening        | Done    |
+| v0.12.0 | mq-agent and semantic memory integration             | Next    |
 | v0.13.0 | Bridget/HAL interaction polish                       | Planned |
 | v0.14.0 | Advanced Ollama Runtime                              | Planned |
 | v0.14.5 | Visual HAL                                           | Planned |
@@ -269,9 +269,9 @@ docs should describe it. The tests should prove it.
 - [x] Add intent-schema smoke test
 - [x] Add router allowlist smoke test
 - [x] Add docs consistency check for command surface
-- [ ] Add release-check section for intent contract
-- [ ] Update README with intent contract proof
-- [ ] Update GitHub Pages with v0.11.0 status
+- [x] Add release-check section for intent contract
+- [x] Update README with intent contract proof
+- [x] Update GitHub Pages with v0.11.0 status
 
 ### Proposed intent schema
 
@@ -348,17 +348,17 @@ mq-hal --model critic critic plan.json
 
 ### Definition of done
 
-- [ ] Intent schema is documented
-- [ ] Intent schema has a version field
-- [ ] Unknown intents are refused
-- [ ] Unsafe intents are refused
-- [ ] All allowed actions are documented
-- [ ] All mqlaunch delegated commands are documented
-- [ ] Command-surface docs match README
-- [ ] Intent examples are tested
-- [ ] Router smoke tests pass
-- [ ] Docs smoke tests pass
-- [ ] `release-check.sh` passes
+- [x] Intent schema is documented
+- [x] Intent schema has a version field
+- [x] Unknown intents are refused
+- [x] Unsafe intents are refused
+- [x] All allowed actions are documented
+- [x] All mqlaunch delegated commands are documented
+- [x] Command-surface docs match README
+- [x] Intent examples are tested
+- [x] Router smoke tests pass
+- [x] Docs smoke tests pass
+- [x] `release-check.sh` passes
 - [ ] GitHub Actions pass
 - [ ] GitHub release `v0.11.0` exists
 
@@ -760,11 +760,11 @@ Every powerful feature must have:
 Work on:
 
 ```text
-v0.11.0 — intent contract and command-surface hardening
+v0.12.0 — mq-agent and semantic memory integration
 ```
 
-This release should make mq-hal easier for mqlaunch, mq-agent and future HAL
-features to trust.
+This release should make mq-hal useful as a status layer for mq-agent and
+semantic repo memory workflows.
 
 ---
 
