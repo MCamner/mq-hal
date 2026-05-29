@@ -254,7 +254,7 @@ docs should describe it. The tests should prove it.
 ### Scope
 
 - [x] Add `docs/INTENT_CONTRACT.md`
-- [ ] Add `docs/COMMAND_SURFACE.md` or refresh existing command surface docs
+- [x] Add `docs/COMMAND_SURFACE.md` or refresh existing command surface docs
 - [x] Define canonical intent schema version
 - [x] Add intent version field
 - [x] Document every intent type
@@ -262,13 +262,13 @@ docs should describe it. The tests should prove it.
 - [x] Document required fields per intent
 - [x] Document optional fields per intent
 - [x] Document rejected/unknown intent behavior
-- [ ] Document no-AI deterministic fallback behavior
+- [x] Document no-AI deterministic fallback behavior
 - [x] Add examples of valid intents
 - [x] Add examples of rejected intents
-- [ ] Add command-count guard
+- [x] Add command-count guard
 - [x] Add intent-schema smoke test
-- [ ] Add router allowlist smoke test
-- [ ] Add docs consistency check for command surface
+- [x] Add router allowlist smoke test
+- [x] Add docs consistency check for command surface
 - [ ] Add release-check section for intent contract
 - [ ] Update README with intent contract proof
 - [ ] Update GitHub Pages with v0.11.0 status
@@ -861,9 +861,9 @@ Each command must declare:
 
 ### Definition of done
 
-- [ ] All HAL commands are in the registry.
-- [ ] README command list can be validated against the registry.
-- [ ] `check-command-docs.sh` fails if a command is undocumented.
+- [x] All HAL commands are in the registry.
+- [x] README command list can be validated against the registry.
+- [x] `check-command-docs.sh` fails if a command is undocumented.
 
 ---
 
@@ -875,17 +875,17 @@ Goal: make the allowlist boundary testable and regression-proof.
 
 ### Required tests
 
-- [ ] Unknown intent is rejected.
-- [ ] Unsafe shell command is not executed.
-- [ ] Repo path escape (e.g. `../../etc/passwd`) is blocked.
-- [ ] `--confirm` flag is respected for write actions.
-- [ ] `--no-ai` flag bypasses the model but still hits the router.
-- [ ] Empty intent payload is rejected.
-- [ ] Valid intent for each command type is accepted.
+- [x] Unknown intent is rejected.
+- [x] Unsafe shell command is not executed.
+- [x] Repo path escape (e.g. `../../etc/passwd`) is blocked.
+- [x] `--confirm` flag is respected for write actions.
+- [x] `--no-ai` flag bypasses the model but still hits the router.
+- [x] Empty intent payload is rejected.
+- [x] Valid intent for each command type is accepted.
 
 ### Definition of done
 
-- [ ] All router safety tests pass in CI.
+- [x] All router safety tests pass in CI.
 - [ ] No new command can be added without a corresponding test.
 
 ---

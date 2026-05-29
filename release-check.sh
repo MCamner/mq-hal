@@ -54,8 +54,14 @@ step "Smoke tests"
 ./tests/audit-smoke.sh
 ./tests/stack-status-smoke.sh
 ./tests/hal-router-smoke.sh
+./tests/intent-schema-smoke.sh
+./tests/router-safety-smoke.sh
 ./tests/docs-smoke.sh
 pass "all smoke tests passed"
+
+step "Command surface consistency"
+./tools/check-command-docs.sh
+pass "command surface consistent"
 
 printf '\n'
 if [[ "$FAILED" -eq 0 ]]; then

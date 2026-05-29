@@ -88,10 +88,13 @@ echo "[14/15] repo cd helper is multiline"
 grep -q 'mqhcd()' "$README"
 grep -q 'cd "$path" || return $?' "$README"
 
-echo "[15/15] command surface references audit and release-brief"
+echo "[15/16] command surface references audit and release-brief"
 grep -q "audit" "$SURFACE"
 grep -q "stack-status" "$SURFACE"
 grep -q "release-brief" "$SURFACE"
+
+echo "[16/16] docs/COMMAND_SURFACE.md exists"
+test -f "$ROOT/docs/COMMAND_SURFACE.md"
 
 echo "[guard] README markdown guard"
 python3 "$ROOT/tools/markdown_guard.py" "$README"

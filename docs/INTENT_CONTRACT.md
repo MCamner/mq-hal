@@ -156,6 +156,33 @@ are rejected.
 
 ---
 
+## No-AI deterministic fallback
+
+When Ollama is unavailable or `--no-ai` is passed, the router uses a
+deterministic local matcher instead of the model. The matcher recognizes
+common Swedish and English prompt patterns:
+
+| Trigger | Routed intent |
+| --------------------------------------- | ------------- |
+| `help`, `hjälp`, `--help` | `help` |
+| `lista repo`, `list repos`, `vilka repo` | `list_repos` |
+| Starts with `hitta`, `sök`, `search`, `grep` | `grep_repo` |
+| Starts with `öppna`, `open` | `open_editor` |
+| `skapa branch`, `ny branch`, `create branch` | `create_branch` |
+| `repo-status-json`, `inspect json` | `repo_status_json` |
+| `git status`, `status` | `git_status` |
+| `git log`, `senaste commit`, `commits` | `git_log` |
+| `träd`, `tree`, `filer` | `repo_tree` |
+| `kör tester`, `run tests`, `testerna` | `run_test` |
+| Any `ALLOWED_MQLAUNCH` key substring | `run_mqlaunch` |
+
+If no pattern matches, the router dies with an error. It does not guess.
+The intent contract is identical for both paths — the schema version,
+field structure, and safety rules are the same regardless of whether
+Ollama or the deterministic matcher produced the intent.
+
+---
+
 ## Valid intent examples
 
 ```json
