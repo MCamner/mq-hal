@@ -1,5 +1,33 @@
 # Changelog
 
+## [0.11.0] - 2026-05-29
+
+### Added
+
+- `schemas/intent.schema.json` — formal JSON Schema for the mq-hal intent
+  contract, extracted from the inline dict in `scripts/hal.py`.
+- `docs/INTENT_CONTRACT.md` — complete contract covering all 15 intent
+  types, field reference, rejection behavior table, no-AI deterministic
+  fallback patterns, and valid/rejected examples.
+- `docs/COMMAND_SURFACE.md` — compact canonical command registry: 13
+  named commands with AI/memory/confirm flags and mqlaunch aliases, plus
+  the full router intent allowlist with safety classes.
+- `tests/intent-schema-smoke.sh` — 7-check smoke test verifying schema
+  file integrity, schema/code enum parity, unknown intent → refuse,
+  malformed JSON → refuse, path escape rejection, and branch name
+  validation.
+- `tests/router-safety-smoke.sh` — 6-check smoke test verifying handler
+  coverage via AST analysis, refuse exit 2, unknown mqlaunch exit 2,
+  `--confirm` cancel exit 130, empty prompt help, and mqlaunch allowlist
+  structure.
+- `tools/check-command-docs.sh` — fails if any canonical command is
+  missing from `docs/COMMAND_SURFACE.md` or `bin/mq-hal` dispatch.
+- Intent contract verification step in `release-check.sh`: checks file
+  presence and validates schema const and enum match `hal.py` at release
+  time.
+- Intent contract smoke tests and command surface check added to
+  `tests/smoke.sh` and `release-check.sh`.
+
 ## [0.10.1] - 2026-05-23
 
 ### Fixed
