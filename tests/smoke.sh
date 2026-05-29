@@ -20,7 +20,10 @@ test -f "$ROOT/prompts/system.txt"
 echo "[5/6] help works"
 "$ROOT/bin/mq-hal" --help >/dev/null
 
-echo "[6/6] router smoke works"
+echo "[6/7] router smoke works"
 "$ROOT/tests/hal-router-smoke.sh" >/dev/null
+
+echo "[7/7] intent schema contract smoke works"
+"$ROOT/tests/intent-schema-smoke.sh" >/dev/null
 
 echo "OK: smoke test passed"

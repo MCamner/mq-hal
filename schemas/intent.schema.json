@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "mq-hal intent",
+  "description": "Structured intent produced by the Ollama model and validated by the safe Python router before any command is executed.",
+  "type": "object",
+  "properties": {
+    "schema": {
+      "type": "string",
+      "const": "mq-hal.intent.v1",
+      "description": "Intent schema version. Must always be mq-hal.intent.v1."
+    },
+    "intent": {
+      "type": "string",
+      "enum": [
+        "create_branch",
+        "git_log",
+        "git_status",
+        "grep_repo",
+        "help",
+        "list_repos",
+        "open_editor",
+        "print_cd",
+        "pwd",
+        "refuse",
+        "repo_status_json",
+        "repo_tree",
+        "run_mqlaunch",
+        "run_test",
+        "switch_repo"
+      ],
+      "description": "The routed action. Any value not in this enum is mapped to refuse by the router before execution."
+    },
+    "repo": {
+      "type": ["string", "null"],
+      "description": "Target repo key from config/repos.json, or null to use the active repo from state."
+    },
+    "command": {
+      "type": ["string", "null"],
+      "description": "Subcommand for run_mqlaunch. Must be an allowed mqlaunch command. Null for all other intents."
+    },
+    "args": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Arguments passed to the routed command. For grep_repo: the search query. For create_branch: the branch name. For open_editor: the file path."
+    },
+    "message": {
+      "type": "string",
+      "description": "Human-readable description of the resolved action. Use the same language as the user prompt."
+    }
+  },
+  "required": ["schema", "intent", "repo", "command", "args", "message"],
+  "additionalProperties": false
+}

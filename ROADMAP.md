@@ -253,20 +253,20 @@ docs should describe it. The tests should prove it.
 
 ### Scope
 
-- [ ] Add `docs/INTENT_CONTRACT.md`
+- [x] Add `docs/INTENT_CONTRACT.md`
 - [ ] Add `docs/COMMAND_SURFACE.md` or refresh existing command surface docs
-- [ ] Define canonical intent schema version
-- [ ] Add intent version field
-- [ ] Document every intent type
-- [ ] Document every allowed action
-- [ ] Document required fields per intent
-- [ ] Document optional fields per intent
-- [ ] Document rejected/unknown intent behavior
+- [x] Define canonical intent schema version
+- [x] Add intent version field
+- [x] Document every intent type
+- [x] Document every allowed action
+- [x] Document required fields per intent
+- [x] Document optional fields per intent
+- [x] Document rejected/unknown intent behavior
 - [ ] Document no-AI deterministic fallback behavior
-- [ ] Add examples of valid intents
-- [ ] Add examples of rejected intents
+- [x] Add examples of valid intents
+- [x] Add examples of rejected intents
 - [ ] Add command-count guard
-- [ ] Add intent-schema smoke test
+- [x] Add intent-schema smoke test
 - [ ] Add router allowlist smoke test
 - [ ] Add docs consistency check for command surface
 - [ ] Add release-check section for intent contract
@@ -319,16 +319,16 @@ mq-hal stack-status --json
 
 ### Structured Intent Engine
 
-- [ ] Move intent contract to formal JSON Schema
-- [ ] Add `schemas/intent.schema.json`
-- [ ] Validate all model output before routing
-- [ ] Reject malformed intents
-- [ ] Reject unknown actions
+- [x] Move intent contract to formal JSON Schema
+- [x] Add `schemas/intent.schema.json`
+- [x] Validate all model output before routing
+- [x] Reject malformed intents
+- [x] Reject unknown actions
 - [ ] Add intent risk classification
 - [ ] Add rollback-plan field
 - [ ] Add requires-confirmation field
-- [ ] Add intent contract examples
-- [ ] Add intent contract tests
+- [x] Add intent contract examples
+- [x] Add intent contract tests
 
 ### Model Profiles
 
@@ -824,10 +824,10 @@ Goal: make the JSON intent format a documented, validated contract.
 
 ### Tasks
 
-- [ ] Document all valid intent types in `docs/intent-schema.md`.
-- [ ] Add a schema file (`docs/intent_schema.json` or inline in code).
-- [ ] Validate that unknown intents are rejected by the router (not silently ignored).
-- [ ] Add tests: known intent accepted, unknown intent rejected,
+- [x] Document all valid intent types in `docs/INTENT_CONTRACT.md`.
+- [x] Add a schema file at `schemas/intent.schema.json`.
+- [x] Validate that unknown intents are rejected by the router (not silently ignored).
+- [x] Add tests: known intent accepted, unknown intent rejected,
   malformed JSON rejected.
 
 ### Definition of done
