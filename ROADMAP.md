@@ -360,7 +360,7 @@ mq-hal --model critic critic plan.json
 - [x] Docs smoke tests pass
 - [x] `release-check.sh` passes
 - [ ] GitHub Actions pass
-- [ ] GitHub release `v0.11.0` exists
+- [x] GitHub release `v0.11.0` exists
 
 ---
 
