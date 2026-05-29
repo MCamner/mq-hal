@@ -657,3 +657,189 @@ v0.11.0 — intent contract and command-surface hardening
 
 This release should make mq-hal easier for mqlaunch, mq-agent and future HAL
 features to trust.
+
+---
+
+## HAL Contract + Router Safety Governance
+
+Goal: make `mq-hal` a reliable, verifiable control layer in the MQ ecosystem without role drift into `mq-mcp`, `mq-agent`, or `repo-signal`.
+
+The most important constraint in this repo is already correct:
+
+```text
+AI may propose intent.
+The router decides what is allowed.
+```
+
+The next risk is that constraint eroding as more commands are added.
+
+**Guiding principles**
+
+```text
+1. The allowlist is the safety boundary — never bypass it.
+2. Every new command must answer: is this HAL's responsibility?
+3. Intent schema is a contract — unknown intents must be rejected.
+4. Command surface must be machine-readable, not just documented in README.
+5. Release may not happen if VERSION, README, CHANGELOG, and CI are out of sync.
+6. HAL summarizes and plans — it does not replace mqlaunch, repo-signal, or mq-mcp.
+7. Router safety tests must cover unknown intents, unsafe commands, and path escapes.
+```
+
+---
+
+## Phase 1 — Branch protection + version signal sync
+
+Goal: close the simplest open gaps before adding anything new.
+
+**Tasks**
+
+- [ ] Enable GitHub branch protection on `main`: require CI success, block force push, require PR for direct pushes.
+- [ ] Verify `VERSION` matches the latest release.
+- [ ] Verify README version badge matches `VERSION`.
+- [ ] Verify `CHANGELOG.md` has an entry for the current version.
+- [ ] Verify GitHub release tag matches current version.
+- [ ] Review the open pull request — merge or close before next release.
+
+**Definition of done**
+
+- [ ] `main` is protected.
+- [ ] README, VERSION, CHANGELOG, and GitHub release all show the same version.
+- [ ] No stale open PRs blocking the release line.
+
+---
+
+## Phase 2 — Intent schema contract
+
+Goal: make the JSON intent format a documented, validated contract.
+
+**Tasks**
+
+- [ ] Document all valid intent types in `docs/intent-schema.md`.
+- [ ] Add a schema file (`docs/intent_schema.json` or inline in code).
+- [ ] Validate that unknown intents are rejected by the router (not silently ignored).
+- [ ] Add tests: known intent accepted, unknown intent rejected, malformed JSON rejected.
+
+**Definition of done**
+
+- [ ] Intent schema is documented and machine-readable.
+- [ ] Unknown intents fail with a clear error, not a silent no-op.
+- [ ] Tests cover schema boundaries.
+
+---
+
+## Phase 3 — Command surface registry
+
+Goal: make the HAL command surface machine-readable so docs, checks, and tests can be generated from a single source.
+
+**New file:** `hal/command_registry.py` or `docs/commands.json`
+
+Each command must declare:
+
+```python
+{
+    "name": "brief",
+    "description": "Short status summary of the current repo",
+    "uses_ai": True,
+    "uses_network": False,
+    "writes_files": False,
+    "requires_confirm": False,
+    "mqlaunch_alias": "hal brief",
+}
+```
+
+**Definition of done**
+
+- [ ] All HAL commands are in the registry.
+- [ ] README command list can be validated against the registry.
+- [ ] `check-command-docs.sh` fails if a command is undocumented.
+
+---
+
+## Phase 4 — Router safety tests
+
+Goal: make the allowlist boundary testable and regression-proof.
+
+**New file:** `tests/test_router_safety.py`
+
+**Required tests**
+
+- [ ] Unknown intent is rejected.
+- [ ] Unsafe shell command is not executed.
+- [ ] Repo path escape (e.g. `../../etc/passwd`) is blocked.
+- [ ] `--confirm` flag is respected for write actions.
+- [ ] `--no-ai` flag bypasses the model but still hits the router.
+- [ ] Empty intent payload is rejected.
+- [ ] Valid intent for each command type is accepted.
+
+**Definition of done**
+
+- [ ] All router safety tests pass in CI.
+- [ ] No new command can be added without a corresponding test.
+
+---
+
+## Phase 5 — Integration boundary
+
+Goal: make the role of `mq-hal` explicit relative to the other MQ repos so future commands are added to the right place.
+
+**Files to update:** `docs/integration.md`, `README.md`
+
+**Role division**
+
+| Repo          | Role                                                       |
+| ------------- | ---------------------------------------------------------- |
+| `mq-hal`      | interprets natural language, produces status and safe plans |
+| `mqlaunch`    | command surface, menu, terminal entrypoint                 |
+| `repo-signal` | repo quality and publish readiness checks                  |
+| `mq-mcp`      | MCP tool surface and local tool execution                  |
+| `mq-agent`    | larger orchestration and agent flows                       |
+
+Every proposed new HAL command must answer:
+
+```text
+Is this HAL's responsibility, or does it belong in mqlaunch, repo-signal, mq-mcp, or mq-agent?
+```
+
+**Definition of done**
+
+- [ ] `docs/integration.md` describes the boundary clearly.
+- [ ] README answers: what does `mq-hal` do, what does it not do?
+- [ ] The boundary is referenced in the command registry.
+
+---
+
+## Phase 6 — Release gate v2
+
+Goal: make release a system check, not just a version bump.
+
+**Files to update:** `scripts/release-check.sh`, `scripts/validate.sh`
+
+**Release must be blocked if**
+
+- [ ] `VERSION` does not match the latest CHANGELOG entry.
+- [ ] README badge is wrong.
+- [ ] CHANGELOG is missing the version.
+- [ ] GitHub release tag is missing.
+- [ ] CI is red.
+- [ ] Any undocumented command exists in the registry.
+- [ ] Any router safety test fails.
+
+**Definition of done**
+
+- [ ] `scripts/release-check.sh` runs all checks automatically.
+- [ ] Release output clearly shows what was verified.
+- [ ] Release can be run with `--dry-run`.
+
+---
+
+**Priorities**
+
+Do first: branch protection → version signal sync → resolve open PR → intent schema contract → router safety tests.
+
+Do next: command surface registry → integration boundary docs → release gate v2.
+
+Defer: more HAL commands, Ollama model tuning, deeper mq-agent integration, voice/TTS output — until the above is stable.
+
+---
+
+This repo is in good shape because the core constraint is right. The next work is not more commands — it is making the existing boundary stronger, documented, and testable.
