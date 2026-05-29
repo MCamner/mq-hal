@@ -80,6 +80,16 @@ case "${1:-}" in
     shift || true
     exec python3 "$ROOT/scripts/session_memory.py" path "$@"
     ;;
+
+  memory-status|memory-brief)
+    shift || true
+    exec python3 "$ROOT/scripts/memory_status.py" "$@"
+    ;;
+
+  agent-brief|agent)
+    shift || true
+    exec python3 "$ROOT/scripts/agent_brief.py" "$@"
+    ;;
 esac
 
 exec python3 "$ROOT/scripts/hal.py" "$@"

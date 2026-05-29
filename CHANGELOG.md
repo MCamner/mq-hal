@@ -1,5 +1,27 @@
 # Changelog
 
+<!-- markdownlint-disable MD013 -->
+
+## [0.12.0] - 2026-05-29
+
+### Added
+
+- `scripts/memory_status.py` — `mq-hal memory-status` and
+  `mq-hal memory-brief`: show mq-agent semantic memory state with graceful
+  fallback if mq-agent is not installed. Checks `$MQ_AGENT_BIN`, PATH,
+  and known local paths.
+- `scripts/agent_brief.py` — `mq-hal agent-brief`: mq-agent availability
+  and memory summary in one command.
+- mq-agent added to `mq-hal stack-status` tools table.
+- Memory brief line added to `mq-hal brief` and `mq-hal release-brief`
+  output.
+- `tests/memory-status-smoke.sh` and `tests/agent-brief-smoke.sh` —
+  smoke tests covering sample output, JSON shape, brief format, and
+  fallback when mq-agent is absent.
+- Both new smoke tests wired into `tests/smoke.sh` and `release-check.sh`.
+- `memory-status`, `memory-brief`, and `agent-brief` added to
+  `docs/COMMAND_SURFACE.md` and `tools/check-command-docs.sh`.
+
 ## [0.11.0] - 2026-05-29
 
 ### Added

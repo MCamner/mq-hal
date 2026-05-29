@@ -27,6 +27,8 @@ COMMANDS=(
   remember
   timeline
   memory-path
+  memory-status
+  agent-brief
 )
 
 for cmd in "${COMMANDS[@]}"; do

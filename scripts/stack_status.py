@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import shutil
 import subprocess
 import sys
@@ -18,7 +19,14 @@ SAMPLE: dict[str, Any] = {
     "tools": {
         "mq-hal": {"available": True, "path": "bin/mq-hal"},
         "mqlaunch": {"available": True, "path": "/usr/local/bin/mqlaunch"},
-        "repo-signal": {"available": True, "path": "/opt/homebrew/bin/repo-signal"},
+        "repo-signal": {
+            "available": True,
+            "path": "/opt/homebrew/bin/repo-signal",
+        },
+        "mq-agent": {
+            "available": True,
+            "path": "~/.local/bin/mq-agent",
+        },
         "bridget": {"available": True, "path": "~/bin/bridget"},
     },
     "repos": [
@@ -160,16 +168,46 @@ def collect_repo(name: str, raw_path: str) -> dict[str, Any]:
     return item
 
 
+def _find_mq_agent() -> str | None:
+    env = os.environ.get("MQ_AGENT_BIN")
+    if env and Path(env).expanduser().exists():
+        return str(Path(env).expanduser())
+    w = shutil.which("mq-agent")
+    if w:
+        return w
+    for candidate in (
+        Path.home() / ".local" / "bin" / "mq-agent",
+        Path.home() / "mq-agent" / ".venv" / "bin" / "mq-agent",
+    ):
+        if candidate.exists():
+            return str(candidate)
+    return None
+
+
 def collect_tools() -> dict[str, dict[str, Any]]:
     local_bin = BASE_DIR / "bin" / "mq-hal"
+    mq_agent = _find_mq_agent()
     return {
-        "mq-hal": {"available": local_bin.exists(), "path": str(local_bin)},
-        "mqlaunch": {"available": shutil.which("mqlaunch") is not None, "path": shutil.which("mqlaunch") or ""},
+        "mq-hal": {
+            "available": local_bin.exists(),
+            "path": str(local_bin),
+        },
+        "mqlaunch": {
+            "available": shutil.which("mqlaunch") is not None,
+            "path": shutil.which("mqlaunch") or "",
+        },
         "repo-signal": {
             "available": shutil.which("repo-signal") is not None,
             "path": shutil.which("repo-signal") or "",
         },
-        "bridget": {"available": shutil.which("bridget") is not None, "path": shutil.which("bridget") or ""},
+        "mq-agent": {
+            "available": mq_agent is not None,
+            "path": mq_agent or "",
+        },
+        "bridget": {
+            "available": shutil.which("bridget") is not None,
+            "path": shutil.which("bridget") or "",
+        },
     }
 
 

@@ -36,6 +36,7 @@ SAMPLE: dict[str, Any] = {
     "release": {"available": True, "tag": "v0.3.9", "name": "Release 0.3.9", "published_at": "2026-05-17"},
     "last_note": "Ready for v0.3.9 release.",
     "last_doctor_status": "Healthy",
+    "memory_brief": "memory: missing-vector-store  mq-agent=ok  repo-signal=ok",
 }
 
 
@@ -178,6 +179,11 @@ def collect_version(repo_path: Path) -> str:
     return "-"
 
 
+def collect_memory_brief() -> str:
+    halbin = str(BASE_DIR / "bin" / "mq-hal")
+    return _run([halbin, "memory-status", "--brief"], timeout=15)
+
+
 def collect_last_note(repo_name: str) -> str:
     events = read_events()
     notes = filter_events(events, event_type="note", repo=repo_name)
@@ -274,6 +280,12 @@ def render_text(data: dict[str, Any]) -> None:
         print("Release: no release found")
     print()
 
+    # Memory
+    memory_brief = data.get("memory_brief", "")
+    if memory_brief:
+        print(f"Memory:  {memory_brief}")
+        print()
+
     # Last note
     note = data.get("last_note", "-")
     if note and note != "-":
@@ -324,6 +336,7 @@ def main(argv: list[str]) -> int:
             "release": collect_release(repo_path),
             "last_note": collect_last_note(repo_name),
             "last_doctor_status": collect_last_doctor_status(repo_name),
+            "memory_brief": collect_memory_brief(),
         }
 
     if args.json:

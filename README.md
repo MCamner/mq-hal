@@ -3,9 +3,10 @@
 Local HAL-style command router for macOS.
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
-[![Version](https://img.shields.io/badge/version-0.11.0-orange)](VERSION)
+[![Version](https://img.shields.io/badge/version-0.12.0-orange)](VERSION)
 
-`mq-hal` lets you ask natural-language questions locally through Ollama, then maps the answer to safe whitelisted terminal actions.
+`mq-hal` lets you ask natural-language questions locally through Ollama,
+then maps the answer to safe whitelisted terminal actions.
 
 Live site: <https://mcamner.github.io/mq-hal/>
 
@@ -97,7 +98,8 @@ mq-hal brief --no-gh
 mq-hal brief --repo macos-scripts
 ```
 
-The brief combines git status, CI status, latest release, HAL memory, and a next-step recommendation.
+The brief combines git status, CI status, latest release, HAL memory,
+and a next-step recommendation.
 
 ## HAL Release Brief
 
@@ -415,7 +417,8 @@ Formal JSON Schema: [schemas/intent.schema.json](schemas/intent.schema.json).
 - Smoke tests cover: doctor summary, fix planner, session memory, timeline,
   repo ops, CI status, release brief, audit, stack status, hal router,
   intent schema contract, router safety, and docs
-- README markdown guard (`tools/markdown_guard.py`) blocks flattened rendering regressions on every push
+- README markdown guard (`tools/markdown_guard.py`) blocks flattened
+  rendering regressions on every push
 - CI runs on `macos-latest` — all smoke tests verified natively on macOS
 
 ## Security

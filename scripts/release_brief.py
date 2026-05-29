@@ -36,6 +36,7 @@ SAMPLE: dict[str, Any] = {
         {"name": "Release check", "status": "ok", "message": "release-check passed"},
     ],
     "recommendation": "Repo appears ready. If this is intended, tag and publish v0.3.9 manually.",
+    "memory_brief": "memory: missing-vector-store  mq-agent=ok  repo-signal=ok",
     "safe_commands": [
         "git status --short",
         "git diff --stat",
@@ -97,6 +98,13 @@ def run(command: list[str], cwd: Path, timeout: int = 60) -> tuple[int, str, str
     except subprocess.TimeoutExpired:
         return 124, "", f"timeout: {' '.join(command)}"
     return completed.returncode, completed.stdout.strip(), completed.stderr.strip()
+
+
+def collect_memory_brief() -> str:
+    halbin = BASE_DIR / "bin" / "mq-hal"
+    code, out, _ = run([str(halbin), "memory-status", "--brief"],
+                       cwd=BASE_DIR, timeout=15)
+    return out if code == 0 else ""
 
 
 def read_text(path: Path) -> str:
@@ -393,6 +401,13 @@ def render(data: dict[str, Any]) -> None:
             print(f"- {item}")
         print()
 
+    memory_brief = data.get("memory_brief", "")
+    if memory_brief:
+        print("Memory")
+        print("------")
+        print(memory_brief)
+        print()
+
     print("Recommendation")
     print("--------------")
     print(data.get("recommendation", "-"))
@@ -432,6 +447,7 @@ def main(argv: list[str]) -> int:
             skip_doctor=args.skip_doctor,
             skip_release_check=args.skip_release_check,
         )
+        data["memory_brief"] = collect_memory_brief()
 
     if not args.sample and not args.no_memory and os.environ.get("MQ_HAL_DISABLE_MEMORY") != "1":
         from session_memory import append_event

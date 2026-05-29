@@ -330,22 +330,6 @@ mq-hal stack-status --json
 - [x] Add intent contract examples
 - [x] Add intent contract tests
 
-### Model Profiles
-
-- [ ] Add `config/models.json`
-- [ ] Add router model profile (e.g. `qwen3:4b-instruct`, reasoning_effort: low)
-- [ ] Add planner model profile (e.g. `qwen3:8b`, reasoning_effort: medium)
-- [ ] Add critic model profile (e.g. `qwen3:8b`, reasoning_effort: high)
-- [ ] Add code-review model profile (e.g. `qwen2.5-coder:7b`,
-  reasoning_effort: medium)
-- [ ] Add model selection CLI support
-
-```bash
-mq-hal --model router "visa git status"
-mq-hal --model planner plan "förbered release"
-mq-hal --model critic critic plan.json
-```
-
 ### Definition of done
 
 - [x] Intent schema is documented
@@ -381,19 +365,19 @@ mq-mcp executes, reviews and owns memory/reasoning runtime.
 
 ### Planned scope
 
-- [ ] Add `mq-hal memory-status`
-- [ ] Add `mq-hal memory-brief`
-- [ ] Add `mq-hal agent-brief`
-- [ ] Summarize mq-agent memory status
-- [ ] Summarize repo-signal semantic upload state
-- [ ] Include semantic memory state in `mq-hal brief`
-- [ ] Include semantic memory state in `mq-hal release-brief`
-- [ ] Add mq-agent status to `mq-hal stack-status`
+- [x] Add `mq-hal memory-status`
+- [x] Add `mq-hal memory-brief`
+- [x] Add `mq-hal agent-brief`
+- [x] Summarize mq-agent memory status
+- [x] Summarize repo-signal semantic upload state
+- [x] Include semantic memory state in `mq-hal brief`
+- [x] Include semantic memory state in `mq-hal release-brief`
+- [x] Add mq-agent status to `mq-hal stack-status`
 - [ ] Add mq-mcp runtime health, vector health and model health to stack summaries
-- [ ] Add docs for mq-agent integration
-- [ ] Add smoke test for mq-hal → mq-agent
-- [ ] Add smoke test for mqlaunch → mq-hal → mq-agent
-- [ ] Add fallback behavior if mq-agent is missing
+- [x] Add docs for mq-agent integration
+- [x] Add smoke test for mq-hal → mq-agent
+- [x] Add smoke test for mqlaunch → mq-hal → mq-agent
+- [x] Add fallback behavior if mq-agent is missing
 
 ### Boundary rules
 
@@ -517,6 +501,16 @@ strict execution safety.
 
 - [ ] Add `mq-hal execute plan.json --confirm`
 - [ ] Execution only after policy check and explicit confirmation
+
+#### Model Profiles
+
+- [ ] Add `config/models.json`
+- [ ] Add router model profile (e.g. `qwen3:4b-instruct`, reasoning_effort: low)
+- [ ] Add planner model profile (e.g. `qwen3:8b`, reasoning_effort: medium)
+- [ ] Add critic model profile (e.g. `qwen3:8b`, reasoning_effort: high)
+- [ ] Add code-review model profile (e.g. `qwen2.5-coder:7b`,
+  reasoning_effort: medium)
+- [ ] Add model selection CLI support
 
 #### Model hardening
 

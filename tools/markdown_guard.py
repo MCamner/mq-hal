@@ -27,7 +27,7 @@ bad_fences = [
 require(not bad_fences, f"Bad fence info strings: {bad_fences[:5]}")
 
 required_strings = [
-    "version-0.11.0",
+    "version-0.12.0",
     "## Proof",
     "## HAL Brief",
     "## HAL Release Brief",

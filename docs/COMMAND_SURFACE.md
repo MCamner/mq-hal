@@ -30,6 +30,8 @@ The detailed reference with flags, examples, and backend notes is in
 | `remember` | — | No | Yes | No | `hal remember` |
 | `timeline` | — | No | No | No | `hal timeline` |
 | `memory-path` | `session-path` | No | No | No | `hal memory-path` |
+| `memory-status` | `memory-brief` | No | No | No | — |
+| `agent-brief` | `agent` | No | No | No | — |
 
 **AI** — calls Ollama when available; falls back to deterministic output.
 **Memory** — writes to `~/.mq-hal/session.jsonl` unless `--no-memory` is
