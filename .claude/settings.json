@@ -11,7 +11,27 @@
       "Bash(git commit -m ' *)",
       "Bash(git tag *)",
       "Bash(gh release *)",
-      "Bash(gh run *)"
+      "Bash(gh run *)",
+      "Bash(git -C /Users/mansys/mq-hal add ROADMAP.md)",
+      "Bash(git -C /Users/mansys/mq-hal commit -m 'docs: tick v0.11.0 GitHub release in roadmap *)",
+      "Bash(git -C /Users/mansys/mq-hal push origin main)",
+      "Bash(python3 -m mq_agent --help)",
+      "Bash(python3 -m mq_agent.main --help)",
+      "Bash(chmod +x /Users/mansys/mq-hal/tests/memory-status-smoke.sh /Users/mansys/mq-hal/tests/agent-brief-smoke.sh)",
+      "Bash(bash tests/memory-status-smoke.sh)",
+      "Bash(bash tests/agent-brief-smoke.sh)",
+      "Bash(bash tests/brief-smoke.sh)",
+      "Bash(bash tests/release-brief-smoke.sh)",
+      "Bash(bash tests/stack-status-smoke.sh)",
+      "Bash(bash /Users/mansys/mq-hal/release-check.sh)",
+      "Bash(git -C /Users/mansys/mq-hal add -A)",
+      "Bash(git -C /Users/mansys/mq-hal diff --staged -- .claude/settings.json)",
+      "Bash(git -C /Users/mansys/mq-hal restore --staged .claude/settings.json)",
+      "Bash(git -C /Users/mansys/mq-hal commit -m ' *)",
+      "Bash(git -C /Users/mansys/mq-hal tag -a v0.12.0 -m \"Release v0.12.0 — mq-agent and semantic memory integration\")",
+      "Bash(git -C /Users/mansys/mq-hal push origin v0.12.0)",
+      "Bash(gh -R McAmner/mq-hal release create v0.12.0 --title 'mq-hal v0.12.0 — mq-agent and semantic memory integration' --notes ' *)",
+      "Bash(git -C /Users/mansys/mq-hal commit -m 'docs: mark v0.12.0 done, v0.13.0 next *)"
     ]
   }
 }
