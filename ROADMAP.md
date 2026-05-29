@@ -92,8 +92,8 @@ v0.12.0 — mq-agent and semantic memory integration
 | v0.10.0 | HAL Stack Status                                     | Done    |
 | v0.10.1 | Version sync, CI coverage and release-check          | Done    |
 | v0.11.0 | Intent contract and command-surface hardening        | Done    |
-| v0.12.0 | mq-agent and semantic memory integration             | Next    |
-| v0.13.0 | Bridget/HAL interaction polish                       | Planned |
+| v0.12.0 | mq-agent and semantic memory integration             | Done    |
+| v0.13.0 | Bridget/HAL interaction polish                       | Next    |
 | v0.14.0 | Advanced Ollama Runtime                              | Planned |
 | v0.14.5 | Visual HAL                                           | Planned |
 | v0.15.0 | Packaged install and update flow                     | Planned |
