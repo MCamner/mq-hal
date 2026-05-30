@@ -564,6 +564,28 @@ mq-hal commands:
         print(repo_path)
         return 0
 
+    # refuse and mqlaunch rejection do not require a real repo path
+    if action == "refuse":
+        if not message:
+            print("HAL: Jag kan inte göra det där säkert.")
+        return 2
+
+    if action == "run_mqlaunch":
+        command = intent.get("command")
+        if not isinstance(command, str):
+            print("ERROR: missing mqlaunch command", file=sys.stderr)
+            return 2
+        normalized = command.strip().lower().replace("_", "-")
+        if normalized not in ALLOWED_MQLAUNCH:
+            print(
+                f"ERROR: mqlaunch command not allowed: {command}",
+                file=sys.stderr,
+            )
+            print("Allowed:")
+            for item in sorted(ALLOWED_MQLAUNCH):
+                print(f"- {item}")
+            return 2
+
     repo_name, repo_path = resolve_repo(intent, repos, state)
     ensure_repo_exists(repo_name, repo_path)
 
@@ -632,27 +654,11 @@ mq-hal commands:
         return 0
 
     if action == "run_mqlaunch":
-        command = intent.get("command")
-
-        if not isinstance(command, str):
-            print("ERROR: missing mqlaunch command", file=sys.stderr)
-            return 2
-
+        command = str(intent.get("command", ""))
         normalized = command.strip().lower().replace("_", "-")
-
-        if normalized not in ALLOWED_MQLAUNCH:
-            print(f"ERROR: mqlaunch command not allowed: {command}", file=sys.stderr)
-            print("Allowed:")
-            for item in sorted(ALLOWED_MQLAUNCH):
-                print(f"- {item}")
-            return 2
-
-        return run_planned_command(ALLOWED_MQLAUNCH[normalized], cwd=repo_path, confirm=confirm)
-
-    if action == "refuse":
-        if not message:
-            print("HAL: Jag kan inte göra det där säkert.")
-        return 2
+        return run_planned_command(
+            ALLOWED_MQLAUNCH[normalized], cwd=repo_path, confirm=confirm
+        )
 
     print(f"ERROR: unhandled intent: {action}", file=sys.stderr)
     return 2
