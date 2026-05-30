@@ -393,14 +393,14 @@ mq-mcp executes, reviews and owns memory/reasoning runtime.
 
 ### Repo Memory
 
-- [ ] Add repo indexing (`mq-hal index <repo>`)
-- [ ] Add Ollama embeddings support
-- [ ] Add memory search
-- [ ] Add repo-aware retrieval
-- [ ] Add repo-map generation
-- [ ] Add architecture knowledge extraction
-- [ ] Add roadmap knowledge extraction
-- [ ] Add release-history knowledge extraction
+- [x] Add repo indexing (`mq-hal index <repo>`)
+- [x] Add optional Ollama embeddings support (`mq-hal index <repo> --embeddings`)
+- [x] Add memory search
+- [x] Add repo-aware retrieval
+- [x] Add repo-map generation
+- [x] Add architecture knowledge extraction
+- [x] Add roadmap knowledge extraction
+- [x] Add release-history knowledge extraction
 
 ### Possible commands
 
@@ -438,12 +438,12 @@ repo-signal semantic memory
 
 - [ ] mq-mcp runtime health, vector health and model health in
   `stack-status`
-- [ ] `mq-hal index <repo>` — local repo indexing
-- [ ] Ollama embeddings support
-- [ ] `mq-hal search <query>` — memory search
-- [ ] `mq-hal ask-repo <question>` — repo-aware retrieval
-- [ ] `mq-hal repo-map` — repo-map generation
-- [ ] Architecture, roadmap and release-history knowledge extraction
+- [x] `mq-hal index <repo>` — local repo indexing
+- [x] Ollama embeddings support
+- [x] `mq-hal search <query>` — memory search
+- [x] `mq-hal ask-repo <question>` — repo-aware retrieval
+- [x] `mq-hal repo-map` — repo-map generation
+- [x] Architecture, roadmap and release-history knowledge extraction
 
 ---
 
@@ -612,7 +612,7 @@ Advanced Ollama Runtime scope:
 - [x] requires-confirmation field in intent schema (from v0.11.0)
 - [x] No new command merged without a router/smoke test (from v0.11.0)
 - [ ] mq-mcp runtime health in `stack-status` (Runtime observability layer)
-- [ ] Repo Memory: index, search, ask-repo, repo-map (future memory layer)
+- [x] Repo Memory: index, search, ask-repo, repo-map (from v0.12.0)
 - [x] Better session summaries (from v0.13.0)
 
 ### Safety rules

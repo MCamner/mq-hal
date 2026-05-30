@@ -20,6 +20,8 @@
 - `scripts/model_test.py` — `mq-hal model-test`: read-only structured
   generation smoke check for a selected model profile.
 - Prompt regression smoke tests for deterministic routing.
+- `scripts/repo_memory.py` — `mq-hal index/search/ask-repo/repo-map`:
+  local deterministic repo memory with optional Ollama embeddings.
 - `scripts/critic.py` — `mq-hal critic plan.json`: deterministic safety
   review of a saved plan with 8 checks: rollback, validation, confirmation
   flags, dangerous commands, known repos, scope (file count), step count,

@@ -28,6 +28,10 @@ COMMANDS=(
   timeline
   memory-path
   memory-status
+  index
+  search
+  ask-repo
+  repo-map
   agent-brief
   hello
   tools

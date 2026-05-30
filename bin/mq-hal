@@ -86,6 +86,26 @@ case "${1:-}" in
     exec python3 "$ROOT/scripts/memory_status.py" "$@"
     ;;
 
+  index)
+    shift || true
+    exec python3 "$ROOT/scripts/repo_memory.py" index "$@"
+    ;;
+
+  search)
+    shift || true
+    exec python3 "$ROOT/scripts/repo_memory.py" search "$@"
+    ;;
+
+  ask-repo)
+    shift || true
+    exec python3 "$ROOT/scripts/repo_memory.py" ask-repo "$@"
+    ;;
+
+  repo-map)
+    shift || true
+    exec python3 "$ROOT/scripts/repo_memory.py" repo-map "$@"
+    ;;
+
   agent-brief|agent)
     shift || true
     exec python3 "$ROOT/scripts/agent_brief.py" "$@"

@@ -263,6 +263,72 @@ Reads the latest doctor summary from memory. Generates copy-paste shell commands
 
 ## MEMORY
 
+### `index`
+
+Build local repo memory for a configured repository.
+
+| Property | Value |
+|---|---|
+| `mq-hal` | `mq-hal index mq-hal` |
+| Backend | `scripts/repo_memory.py index` |
+| Read-only | No (writes local index under `~/.mq-hal/repo_memory/`) |
+| Memory write | Yes |
+| Flags | `--json`, `--embeddings`, `--embedding-model <name>` |
+
+Indexes text files only, skips cache/build folders, and never mutates the
+repository. `--embeddings` optionally asks local Ollama for embeddings; the
+default index is deterministic lexical memory.
+
+---
+
+### `search`
+
+Search indexed repo memory.
+
+| Property | Value |
+|---|---|
+| `mq-hal` | `mq-hal search roadmap --repo mq-hal` |
+| Backend | `scripts/repo_memory.py search` |
+| Read-only | Yes |
+| Memory write | No |
+| Flags | `--repo <name>`, `--limit <n>`, `--json` |
+
+---
+
+### `ask-repo`
+
+Answer from indexed repo memory context.
+
+| Property | Value |
+|---|---|
+| `mq-hal` | `mq-hal ask-repo "what changed in v0.14" --repo mq-hal` |
+| Backend | `scripts/repo_memory.py ask-repo` |
+| Read-only | Yes |
+| Memory write | No |
+| Flags | `--repo <name>`, `--limit <n>`, `--json` |
+
+This is deterministic retrieval, not autonomous reasoning. It returns grounded
+context from indexed files and does not invent beyond the local index.
+
+---
+
+### `repo-map`
+
+Summarize indexed repo memory structure.
+
+| Property | Value |
+|---|---|
+| `mq-hal` | `mq-hal repo-map --repo mq-hal` |
+| Backend | `scripts/repo_memory.py repo-map` |
+| Read-only | Yes |
+| Memory write | No |
+| Flags | `--repo <name>`, `--json` |
+
+Shows indexed directories and knowledge tags such as architecture, roadmap,
+release-history, tests, and implementation.
+
+---
+
 ### `session`
 
 Display local session memory.
@@ -486,6 +552,10 @@ List all configured repos.
 | `last` | No |
 | `remember` | Yes — `note` event |
 | `memory-path` | No |
+| `index` | Yes — local repo memory index |
+| `search` | No |
+| `ask-repo` | No |
+| `repo-map` | No |
 | `tools` | No |
 | `models` | No |
 | `model-status` | No |

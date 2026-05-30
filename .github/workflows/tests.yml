@@ -30,6 +30,7 @@ jobs:
           python3 -m py_compile scripts/audit.py
           python3 -m py_compile scripts/stack_status.py
           python3 -m py_compile scripts/memory_status.py
+          python3 -m py_compile scripts/repo_memory.py
           python3 -m py_compile scripts/agent_brief.py
           python3 -m py_compile scripts/hello.py
           python3 -m py_compile scripts/model_profiles.py
@@ -59,6 +60,7 @@ jobs:
           ./tests/intent-schema-smoke.sh
           ./tests/router-safety-smoke.sh
           ./tests/memory-status-smoke.sh
+          ./tests/repo-memory-smoke.sh
           ./tests/agent-brief-smoke.sh
           ./tests/hello-smoke.sh
           ./tests/tools-smoke.sh

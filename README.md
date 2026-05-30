@@ -381,6 +381,22 @@ mq-hal model-status --profile planner
 mq-hal model-test --profile router
 ```
 
+## HAL Repo Memory
+
+Build and query a local deterministic repo memory index:
+
+```bash
+mq-hal index mq-hal
+mq-hal search roadmap --repo mq-hal
+mq-hal ask-repo "what is planned next" --repo mq-hal
+mq-hal repo-map --repo mq-hal
+```
+
+The index is stored locally under `~/.mq-hal/repo_memory/`. It reads text files,
+skips cache/build folders, and never mutates repositories. Optional local
+Ollama embeddings can be requested with `mq-hal index mq-hal --embeddings`;
+the default mode is lexical and deterministic.
+
 ## Natural-language routing
 
 `mq-hal "prompt"` routes through Ollama by default. The router now supports:

@@ -127,6 +127,42 @@
       "mqlaunch_alias": null
     },
     {
+      "name": "index",
+      "description": "Build local lexical repo memory for a configured repo",
+      "risk_level": "state-write",
+      "requires_confirm": false,
+      "uses_ai": false,
+      "writes_memory": true,
+      "mqlaunch_alias": null
+    },
+    {
+      "name": "search",
+      "description": "Search local repo memory",
+      "risk_level": "read-only",
+      "requires_confirm": false,
+      "uses_ai": false,
+      "writes_memory": false,
+      "mqlaunch_alias": null
+    },
+    {
+      "name": "ask-repo",
+      "description": "Answer from indexed repo memory context",
+      "risk_level": "read-only",
+      "requires_confirm": false,
+      "uses_ai": false,
+      "writes_memory": false,
+      "mqlaunch_alias": null
+    },
+    {
+      "name": "repo-map",
+      "description": "Summarize indexed repo memory structure",
+      "risk_level": "read-only",
+      "requires_confirm": false,
+      "uses_ai": false,
+      "writes_memory": false,
+      "mqlaunch_alias": null
+    },
+    {
       "name": "agent-brief",
       "description": "mq-agent availability and memory summary",
       "risk_level": "read-only",
