@@ -239,17 +239,12 @@ Make release readiness verifiable before adding more HAL features.
 
 ---
 
-## Next: v0.11.0 — Intent contract and command-surface hardening
+## v0.11.0 — Intent contract and command-surface hardening
 
 Goal:
 
 Make mq-hal's routed command surface explicit, testable and stable enough for
 mqlaunch, mq-agent and future HAL workflows to depend on.
-
-This release should reduce ambiguity.
-
-The model should return a structured intent. The router should validate it. The
-docs should describe it. The tests should prove it.
 
 ### Scope
 
@@ -346,6 +341,16 @@ mq-hal stack-status --json
 - [ ] GitHub Actions pass
 - [x] GitHub release `v0.11.0` exists
 
+### Carried forward to v0.14.0
+
+These items were not completed and are required before or during v0.14.0:
+
+- [ ] GitHub Actions pass on `main`
+- [ ] Add intent risk classification to intent schema
+- [ ] Add rollback-plan field to intent schema
+- [ ] Add requires-confirmation field to intent schema
+- [ ] No new command merged without a corresponding router test
+
 ---
 
 ## v0.12.0 — mq-agent and semantic memory integration
@@ -429,6 +434,17 @@ repo-signal semantic memory
 - No destructive agent actions
 - No automatic repo mutation
 
+### Carried forward to v0.14.0
+
+- [ ] mq-mcp runtime health, vector health and model health in
+  `stack-status`
+- [ ] `mq-hal index <repo>` — local repo indexing
+- [ ] Ollama embeddings support
+- [ ] `mq-hal search <query>` — memory search
+- [ ] `mq-hal ask-repo <question>` — repo-aware retrieval
+- [ ] `mq-hal repo-map` — repo-map generation
+- [ ] Architecture, roadmap and release-history knowledge extraction
+
 ---
 
 ## v0.13.0 — Bridget/HAL interaction polish
@@ -466,6 +482,55 @@ mq-hal timeline --details
 - No hidden recording
 - No always-on listener
 - No voice command execution without confirmation
+
+### Carried forward to v0.14.0
+
+- [ ] Add better session summaries (grouped by type, counts)
+
+### Carried forward to v0.15.0
+
+- [ ] Add screenshot or ASCII terminal demo
+
+---
+
+## Before v0.14.0 — Stabilization gate
+
+**Do not add more commands or merge new features until all items below
+are satisfied.**
+
+This gate exists because the constraint "AI may propose intent, the router
+decides what is allowed" must be verifiably true before the runtime layer
+gets more powerful.
+
+### Version sync (satisfied ✓)
+
+- [x] `VERSION` = 0.13.0
+- [x] README badge = 0.13.0
+- [x] CHANGELOG entry for 0.13.0
+- [x] GitHub release `v0.13.0` exists
+
+### Safety infrastructure (satisfied ✓)
+
+- [x] `schemas/intent.schema.json` — formal intent schema
+- [x] `tests/intent-schema-smoke.sh` — schema/code parity enforced
+- [x] `tests/router-safety-smoke.sh` — allowlist boundary tested
+- [x] `docs/COMMAND_SURFACE.md` — canonical command registry
+- [x] `tools/check-command-docs.sh` — command docs enforced in release
+
+### Remaining before v0.14.0
+
+- [ ] GitHub branch protection on `main`: require CI success,
+  block force push
+- [ ] GitHub Actions green on `main`
+- [ ] `docs/INTEGRATION.md` integration boundary describes current
+  role division clearly
+- [ ] All carried-forward items from v0.11.0, v0.12.0, v0.13.0 are
+  triaged: each is either scheduled for v0.14.0 or explicitly deferred
+
+### Rule
+
+No new commands are merged before CI is green and branch protection is
+active on `main`.
 
 ---
 
@@ -535,6 +600,19 @@ mq-hal models
 mq-hal model-status
 mq-hal model-test
 ```
+
+### Carry-forward gaps (required in v0.14.0)
+
+These were left open in earlier releases:
+
+- [ ] GitHub Actions pass on `main` (from v0.11.0)
+- [ ] intent risk classification in intent schema (from v0.11.0)
+- [ ] rollback-plan field in intent schema (from v0.11.0)
+- [ ] requires-confirmation field in intent schema (from v0.11.0)
+- [ ] No new command merged without a router test (from v0.11.0)
+- [ ] mq-mcp runtime health in `stack-status` (from v0.12.0)
+- [ ] Repo Memory: index, search, ask-repo, repo-map (from v0.12.0)
+- [ ] Better session summaries (from v0.13.0)
 
 ### Safety rules
 
@@ -606,6 +684,17 @@ mq-hal doctor
 mq-hal config-check
 mq-hal update
 ```
+
+### Release gate v2
+
+Make release a system check, not just a version bump:
+
+- [ ] `release-check.sh` blocks release if VERSION, README, CHANGELOG,
+  and GitHub release tag do not all match
+- [ ] `release-check.sh` blocks release if any undocumented command
+  exists in the registry
+- [ ] `release-check.sh` blocks release if any router safety test fails
+- [ ] `release-check.sh` supports `--dry-run`
 
 ### Non-goals
 
@@ -749,208 +838,35 @@ Every powerful feature must have:
 
 ---
 
-## Current recommended next step
+## Ecosystem role division
 
-Work on:
+Every proposed new HAL command must answer: is this HAL's
+responsibility, or does it belong in mqlaunch, repo-signal, mq-mcp,
+or mq-agent?
 
-```text
-v0.14.0 — Advanced Ollama Runtime
-```
+| Repo | Role |
+| --- | --- |
+| `mq-hal` | interprets NL, produces status summaries and safe plans |
+| `mqlaunch` | command surface, menus, terminal entrypoint |
+| `repo-signal` | repo quality scoring and publish readiness |
+| `mq-mcp` | MCP tool surface and local tool execution |
+| `mq-agent` | orchestration and larger agent flows |
 
-This release turns mq-hal into a structured local reasoning layer with
-tool registry, planner, critic, and model profiles.
+HAL summarizes and plans. It does not replace the other layers.
 
 ---
 
-## HAL Contract + Router Safety Governance
+## Governance rules
 
-Goal: make `mq-hal` a reliable, verifiable control layer in the MQ
-ecosystem without role drift into `mq-mcp`, `mq-agent`, or `repo-signal`.
-
-The most important constraint in this repo is already correct:
-
-```text
-AI may propose intent.
-The router decides what is allowed.
-```
-
-The next risk is that constraint eroding as more commands are added.
-
-### Guiding principles
+These rules apply to every release, permanently:
 
 ```text
 1. The allowlist is the safety boundary — never bypass it.
 2. Every new command must answer: is this HAL's responsibility?
 3. Intent schema is a contract — unknown intents must be rejected.
-4. Command surface must be machine-readable, not just documented in README.
-5. Release may not happen if VERSION, README, CHANGELOG, and CI are out of sync.
-6. HAL summarizes and plans — it does not replace mqlaunch, repo-signal, or mq-mcp.
-7. Router safety tests must cover unknown intents, unsafe commands, and path escapes.
+4. Command surface must be machine-readable (COMMAND_SURFACE.md).
+5. Release is blocked if VERSION, README, CHANGELOG, and CI diverge.
+6. Router safety tests must cover unknown intents, path escapes,
+   unsafe commands, and confirm flow.
+7. No new command merged without a corresponding smoke test.
 ```
-
----
-
-## Phase 1 — Branch protection + version signal sync
-
-Goal: close the simplest open gaps before adding anything new.
-
-### Tasks
-
-- [ ] Enable GitHub branch protection on `main`: require CI success,
-  block force push, require PR for direct pushes.
-- [ ] Verify `VERSION` matches the latest release.
-- [ ] Verify README version badge matches `VERSION`.
-- [ ] Verify `CHANGELOG.md` has an entry for the current version.
-- [ ] Verify GitHub release tag matches current version.
-- [ ] Review the open pull request — merge or close before next release.
-
-### Definition of done
-
-- [ ] `main` is protected.
-- [ ] README, VERSION, CHANGELOG, and GitHub release all show the same version.
-- [ ] No stale open PRs blocking the release line.
-
----
-
-## Phase 2 — Intent schema contract
-
-Goal: make the JSON intent format a documented, validated contract.
-
-### Tasks
-
-- [x] Document all valid intent types in `docs/INTENT_CONTRACT.md`.
-- [x] Add a schema file at `schemas/intent.schema.json`.
-- [x] Validate that unknown intents are rejected by the router (not silently ignored).
-- [x] Add tests: known intent accepted, unknown intent rejected,
-  malformed JSON rejected.
-
-### Definition of done
-
-- [ ] Intent schema is documented and machine-readable.
-- [ ] Unknown intents fail with a clear error, not a silent no-op.
-- [ ] Tests cover schema boundaries.
-
----
-
-## Phase 3 — Command surface registry
-
-Goal: make the HAL command surface machine-readable so docs, checks,
-and tests can be generated from a single source.
-
-**New file:** `hal/command_registry.py` or `docs/commands.json`
-
-Each command must declare:
-
-```python
-{
-    "name": "brief",
-    "description": "Short status summary of the current repo",
-    "uses_ai": True,
-    "uses_network": False,
-    "writes_files": False,
-    "requires_confirm": False,
-    "mqlaunch_alias": "hal brief",
-}
-```
-
-### Definition of done
-
-- [x] All HAL commands are in the registry.
-- [x] README command list can be validated against the registry.
-- [x] `check-command-docs.sh` fails if a command is undocumented.
-
----
-
-## Phase 4 — Router safety tests
-
-Goal: make the allowlist boundary testable and regression-proof.
-
-**New file:** `tests/test_router_safety.py`
-
-### Required tests
-
-- [x] Unknown intent is rejected.
-- [x] Unsafe shell command is not executed.
-- [x] Repo path escape (e.g. `../../etc/passwd`) is blocked.
-- [x] `--confirm` flag is respected for write actions.
-- [x] `--no-ai` flag bypasses the model but still hits the router.
-- [x] Empty intent payload is rejected.
-- [x] Valid intent for each command type is accepted.
-
-### Definition of done
-
-- [x] All router safety tests pass in CI.
-- [ ] No new command can be added without a corresponding test.
-
----
-
-## Phase 5 — Integration boundary
-
-Goal: make the role of `mq-hal` explicit relative to the other MQ repos
-so future commands are added to the right place.
-
-**Files to update:** `docs/integration.md`, `README.md`
-
-### Role division
-
-| Repo          | Role                                                        |
-| ------------- | ----------------------------------------------------------- |
-| `mq-hal`      | interprets natural language, produces status and safe plans |
-| `mqlaunch`    | command surface, menu, terminal entrypoint                  |
-| `repo-signal` | repo quality and publish readiness checks                   |
-| `mq-mcp`      | MCP tool surface and local tool execution                   |
-| `mq-agent`    | larger orchestration and agent flows                        |
-
-Every proposed new HAL command must answer:
-
-```text
-Is this HAL's responsibility, or does it belong in mqlaunch, repo-signal, mq-mcp, or mq-agent?
-```
-
-### Definition of done
-
-- [ ] `docs/integration.md` describes the boundary clearly.
-- [ ] README answers: what does `mq-hal` do, what does it not do?
-- [ ] The boundary is referenced in the command registry.
-
----
-
-## Phase 6 — Release gate v2
-
-Goal: make release a system check, not just a version bump.
-
-**Files to update:** `scripts/release-check.sh`, `scripts/validate.sh`
-
-### Release must be blocked if
-
-- [ ] `VERSION` does not match the latest CHANGELOG entry.
-- [ ] README badge is wrong.
-- [ ] CHANGELOG is missing the version.
-- [ ] GitHub release tag is missing.
-- [ ] CI is red.
-- [ ] Any undocumented command exists in the registry.
-- [ ] Any router safety test fails.
-
-### Definition of done
-
-- [ ] `scripts/release-check.sh` runs all checks automatically.
-- [ ] Release output clearly shows what was verified.
-- [ ] Release can be run with `--dry-run`.
-
----
-
-### Priorities
-
-Do first: branch protection → version signal sync → resolve open PR →
-intent schema contract → router safety tests.
-
-Do next: command surface registry → integration boundary docs → release gate v2.
-
-Defer: more HAL commands, Ollama model tuning, deeper mq-agent
-integration, voice/TTS output — until the above is stable.
-
----
-
-This repo is in good shape because the core constraint is right. The
-next work is not more commands — it is making the existing boundary
-stronger, documented, and testable.
