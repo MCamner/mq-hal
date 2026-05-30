@@ -33,6 +33,7 @@ COMMANDS=(
   tools
   models
   plan
+  critic
 )
 
 for cmd in "${COMMANDS[@]}"; do

@@ -36,6 +36,7 @@ The detailed reference with flags, examples, and backend notes is in
 | `tools` | — | No | No | No | — |
 | `models` | `model-profiles` | No | No | No | — |
 | `plan` | — | Yes | No | No | — |
+| `critic` | — | No | No | No | — |
 
 **AI** — calls Ollama when available; falls back to deterministic output.
 **Memory** — writes to `~/.mq-hal/session.jsonl` unless `--no-memory` is

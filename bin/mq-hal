@@ -110,6 +110,11 @@ case "${1:-}" in
     shift || true
     exec python3 "$ROOT/scripts/planner.py" "$@"
     ;;
+
+  critic)
+    shift || true
+    exec python3 "$ROOT/scripts/critic.py" "$@"
+    ;;
 esac
 
 exec python3 "$ROOT/scripts/hal.py" "$@"

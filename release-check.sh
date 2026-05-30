@@ -52,6 +52,7 @@ python3 -m py_compile scripts/hello.py
 python3 -m py_compile scripts/tools_list.py
 python3 -m py_compile scripts/models_list.py
 python3 -m py_compile scripts/planner.py
+python3 -m py_compile scripts/critic.py
 python3 -m py_compile tools/write_readme.py
 python3 -m py_compile tools/markdown_guard.py
 pass "Python syntax OK"
@@ -89,6 +90,7 @@ step "Smoke tests"
 ./tests/tools-smoke.sh
 ./tests/models-smoke.sh
 ./tests/plan-smoke.sh
+./tests/critic-smoke.sh
 ./tests/docs-smoke.sh
 pass "all smoke tests passed"
 

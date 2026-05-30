@@ -2,6 +2,18 @@
 
 <!-- markdownlint-disable MD013 -->
 
+## [0.14.2] - 2026-05-31
+
+### Added
+
+- `scripts/critic.py` — `mq-hal critic plan.json`: deterministic safety
+  review of a saved plan with 8 checks: rollback, validation, confirmation
+  flags, dangerous commands, known repos, scope (file count), step count,
+  and missing tests. Verdict: PASS / REVIEW / FAIL.
+- Reads from file path, stdin (`-`), or `--sample`. Returns exit 1 on FAIL.
+- `tests/critic-smoke.sh` — 6 checks including dangerous plan → FAIL and
+  clean plan → PASS/REVIEW assertions.
+
 ## [0.14.1] - 2026-05-30
 
 ### Added
