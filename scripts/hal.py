@@ -77,6 +77,16 @@ INTENT_SCHEMA: dict[str, Any] = {
         "message": {
             "type": "string",
         },
+        "risk_level": {
+            "type": ["string", "null"],
+            "enum": ["low", "medium", "high", "unknown", None],
+        },
+        "rollback_plan": {
+            "type": ["string", "null"],
+        },
+        "requires_confirmation": {
+            "type": ["boolean", "null"],
+        },
     },
     "required": ["schema", "intent", "repo", "command", "args", "message"],
     "additionalProperties": False,
@@ -207,7 +217,16 @@ def call_ollama(prompt: str) -> str | None:
     return text.strip()
 
 
-def empty_intent(intent: str, message: str, repo: str | None = None, command: str | None = None, args: list[str] | None = None) -> dict[str, Any]:
+def empty_intent(
+    intent: str,
+    message: str,
+    repo: str | None = None,
+    command: str | None = None,
+    args: list[str] | None = None,
+    risk_level: str | None = None,
+    rollback_plan: str | None = None,
+    requires_confirmation: bool | None = None,
+) -> dict[str, Any]:
     return {
         "schema": INTENT_SCHEMA_VERSION,
         "intent": intent,
@@ -215,6 +234,9 @@ def empty_intent(intent: str, message: str, repo: str | None = None, command: st
         "command": command,
         "args": args or [],
         "message": message,
+        "risk_level": risk_level,
+        "rollback_plan": rollback_plan,
+        "requires_confirmation": requires_confirmation,
     }
 
 
@@ -320,6 +342,19 @@ def parse_intent(text: str) -> dict[str, Any]:
     if not isinstance(args, list):
         args = []
 
+    risk_raw = parsed.get("risk_level")
+    risk_level = (
+        str(risk_raw) if isinstance(risk_raw, str)
+        and risk_raw in ("low", "medium", "high", "unknown")
+        else None
+    )
+    rollback_raw = parsed.get("rollback_plan")
+    rollback_plan = str(rollback_raw) if isinstance(rollback_raw, str) else None
+    req_conf_raw = parsed.get("requires_confirmation")
+    requires_confirmation = (
+        bool(req_conf_raw) if isinstance(req_conf_raw, bool) else None
+    )
+
     normalized = {
         "schema": str(parsed.get("schema", INTENT_SCHEMA_VERSION)),
         "intent": intent,
@@ -327,6 +362,9 @@ def parse_intent(text: str) -> dict[str, Any]:
         "command": parsed.get("command"),
         "args": [str(item) for item in args],
         "message": str(parsed.get("message", "")),
+        "risk_level": risk_level,
+        "rollback_plan": rollback_plan,
+        "requires_confirmation": requires_confirmation,
     }
 
     return normalized

@@ -46,6 +46,19 @@
     "message": {
       "type": "string",
       "description": "Human-readable description of the resolved action. Use the same language as the user prompt."
+    },
+    "risk_level": {
+      "type": ["string", "null"],
+      "enum": ["low", "medium", "high", "unknown", null],
+      "description": "Risk classification for this intent. Optional."
+    },
+    "rollback_plan": {
+      "type": ["string", "null"],
+      "description": "How to undo this action if needed. Optional."
+    },
+    "requires_confirmation": {
+      "type": ["boolean", "null"],
+      "description": "Whether this intent requires explicit user confirmation beyond the default. Optional."
     }
   },
   "required": ["schema", "intent", "repo", "command", "args", "message"],

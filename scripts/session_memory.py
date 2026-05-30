@@ -132,6 +132,16 @@ def render_events(events: list[dict[str, Any]], limit: int) -> None:
     for event in selected:
         print(summarize_event(event))
 
+    # Summary by type
+    from collections import Counter
+    counts = Counter(str(e.get("type", "unknown")) for e in events)
+    if counts:
+        print()
+        print("Summary")
+        print("-------")
+        for etype, count in sorted(counts.items()):
+            print(f"  {etype:<20}  {count}")
+
 
 def render_last(event: dict[str, Any] | None, as_json: bool) -> None:
     if event is None:

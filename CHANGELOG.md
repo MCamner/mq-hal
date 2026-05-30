@@ -2,6 +2,39 @@
 
 <!-- markdownlint-disable MD013 -->
 
+## [0.14.0] - 2026-05-30
+
+### Added
+
+- `config/tools.json` — machine-readable tool registry: 16 named
+  commands with risk_level, requires_confirm, uses_ai, writes_memory,
+  and mqlaunch_alias.
+- `scripts/tools_list.py` — `mq-hal tools` and `mq-hal tools --json`:
+  list available HAL tools from the registry.
+- `config/models.json` — model profile registry: router, planner,
+  critic, code profiles with model name and reasoning_effort.
+- `scripts/models_list.py` — `mq-hal models` and `mq-hal models --json`:
+  show available model profiles.
+- Intent schema carry-forward (from v0.11.0): `risk_level`,
+  `rollback_plan`, `requires_confirmation` added as optional nullable
+  fields to `schemas/intent.schema.json` and `INTENT_SCHEMA` in
+  `hal.py`. `parse_intent` and `empty_intent` updated accordingly.
+- Session summaries: `mq-hal session` now shows a type-count summary
+  at the bottom of the event list.
+- `tests/tools-smoke.sh` and `tests/models-smoke.sh` (4 checks each).
+- All new smoke tests wired into `tests/smoke.sh`, `release-check.sh`,
+  and `.github/workflows/tests.yml`.
+
+### Fixed
+
+- `handle_intent` in `hal.py`: move `refuse` and mqlaunch allowlist
+  rejection before `resolve_repo`/`ensure_repo_exists` — fixes CI
+  failure on GitHub Actions where configured repos do not exist on the
+  runner.
+- `tests/router-safety-smoke.sh`: replace CLI-level `--confirm` test
+  (which needed a real repo path) with a Python-level test using
+  `confirm_command` and `run_planned_command` directly.
+
 ## [0.13.0] - 2026-05-30
 
 ### Added

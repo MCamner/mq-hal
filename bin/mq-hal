@@ -95,6 +95,16 @@ case "${1:-}" in
     shift || true
     exec python3 "$ROOT/scripts/hello.py" "$@"
     ;;
+
+  tools)
+    shift || true
+    exec python3 "$ROOT/scripts/tools_list.py" "$@"
+    ;;
+
+  models|model-profiles)
+    shift || true
+    exec python3 "$ROOT/scripts/models_list.py" "$@"
+    ;;
 esac
 
 exec python3 "$ROOT/scripts/hal.py" "$@"

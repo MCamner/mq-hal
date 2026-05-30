@@ -1,0 +1,148 @@
+{
+  "tools": [
+    {
+      "name": "brief",
+      "description": "Repo status snapshot: git, doctor, CI, release, memory",
+      "risk_level": "read-only",
+      "requires_confirm": false,
+      "uses_ai": true,
+      "writes_memory": true,
+      "mqlaunch_alias": "hal brief"
+    },
+    {
+      "name": "audit",
+      "description": "Publish quality and README audit via repo-signal",
+      "risk_level": "read-only",
+      "requires_confirm": false,
+      "uses_ai": true,
+      "writes_memory": true,
+      "mqlaunch_alias": "hal audit"
+    },
+    {
+      "name": "stack-status",
+      "description": "Local stack overview: tools, repos, mq-agent",
+      "risk_level": "read-only",
+      "requires_confirm": false,
+      "uses_ai": false,
+      "writes_memory": false,
+      "mqlaunch_alias": null
+    },
+    {
+      "name": "release-brief",
+      "description": "Release readiness check before tagging",
+      "risk_level": "read-only",
+      "requires_confirm": false,
+      "uses_ai": true,
+      "writes_memory": true,
+      "mqlaunch_alias": "hal release-brief"
+    },
+    {
+      "name": "repo-status",
+      "description": "Read-only git repository state",
+      "risk_level": "read-only",
+      "requires_confirm": false,
+      "uses_ai": false,
+      "writes_memory": false,
+      "mqlaunch_alias": "hal repo-status"
+    },
+    {
+      "name": "ci",
+      "description": "GitHub Actions CI status",
+      "risk_level": "read-only",
+      "requires_confirm": false,
+      "uses_ai": false,
+      "writes_memory": false,
+      "mqlaunch_alias": "hal ci"
+    },
+    {
+      "name": "doctor-summary",
+      "description": "Local system health summary via mqlaunch doctor",
+      "risk_level": "read-only",
+      "requires_confirm": false,
+      "uses_ai": true,
+      "writes_memory": true,
+      "mqlaunch_alias": "hal doctor"
+    },
+    {
+      "name": "fix-doctor",
+      "description": "Safe copy-paste repair plan from last doctor summary",
+      "risk_level": "plan-only",
+      "requires_confirm": false,
+      "uses_ai": true,
+      "writes_memory": true,
+      "mqlaunch_alias": "hal fix-doctor"
+    },
+    {
+      "name": "session",
+      "description": "Display local session memory",
+      "risk_level": "read-only",
+      "requires_confirm": false,
+      "uses_ai": false,
+      "writes_memory": false,
+      "mqlaunch_alias": "hal session"
+    },
+    {
+      "name": "last",
+      "description": "Show most recent memory event",
+      "risk_level": "read-only",
+      "requires_confirm": false,
+      "uses_ai": false,
+      "writes_memory": false,
+      "mqlaunch_alias": "hal last"
+    },
+    {
+      "name": "remember",
+      "description": "Save a note to session memory",
+      "risk_level": "state-write",
+      "requires_confirm": false,
+      "uses_ai": false,
+      "writes_memory": true,
+      "mqlaunch_alias": "hal remember"
+    },
+    {
+      "name": "timeline",
+      "description": "Session event history as a compact timeline",
+      "risk_level": "read-only",
+      "requires_confirm": false,
+      "uses_ai": false,
+      "writes_memory": false,
+      "mqlaunch_alias": "hal timeline"
+    },
+    {
+      "name": "memory-path",
+      "description": "Print path to session memory file",
+      "risk_level": "read-only",
+      "requires_confirm": false,
+      "uses_ai": false,
+      "writes_memory": false,
+      "mqlaunch_alias": "hal memory-path"
+    },
+    {
+      "name": "memory-status",
+      "description": "mq-agent semantic memory state",
+      "risk_level": "read-only",
+      "requires_confirm": false,
+      "uses_ai": false,
+      "writes_memory": false,
+      "mqlaunch_alias": null
+    },
+    {
+      "name": "agent-brief",
+      "description": "mq-agent availability and memory summary",
+      "risk_level": "read-only",
+      "requires_confirm": false,
+      "uses_ai": false,
+      "writes_memory": false,
+      "mqlaunch_alias": null
+    },
+    {
+      "name": "hello",
+      "description": "HAL greeting and quick status screen",
+      "risk_level": "read-only",
+      "requires_confirm": false,
+      "uses_ai": false,
+      "writes_memory": false,
+      "mqlaunch_alias": null
+    }
+  ]
+}

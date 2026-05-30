@@ -33,6 +33,8 @@ The detailed reference with flags, examples, and backend notes is in
 | `memory-status` | `memory-brief` | No | No | No | — |
 | `agent-brief` | `agent` | No | No | No | — |
 | `hello` | `status-screen` | No | No | No | — |
+| `tools` | — | No | No | No | — |
+| `models` | `model-profiles` | No | No | No | — |
 
 **AI** — calls Ollama when available; falls back to deterministic output.
 **Memory** — writes to `~/.mq-hal/session.jsonl` unless `--no-memory` is

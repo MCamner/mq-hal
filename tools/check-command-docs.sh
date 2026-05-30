@@ -30,6 +30,8 @@ COMMANDS=(
   memory-status
   agent-brief
   hello
+  tools
+  models
 )
 
 for cmd in "${COMMANDS[@]}"; do

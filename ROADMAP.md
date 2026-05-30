@@ -94,8 +94,8 @@ v0.14.0 — Advanced Ollama Runtime
 | v0.11.0 | Intent contract and command-surface hardening        | Done    |
 | v0.12.0 | mq-agent and semantic memory integration             | Done    |
 | v0.13.0 | Bridget/HAL interaction polish                       | Done    |
-| v0.14.0 | Advanced Ollama Runtime                              | Next    |
-| v0.14.5 | Visual HAL                                           | Planned |
+| v0.14.0 | Advanced Ollama Runtime                              | Done    |
+| v0.14.5 | Visual HAL                                           | Next    |
 | v0.15.0 | Packaged install and update flow                     | Planned |
 | v1.0.0  | Stable local HAL command router                      | Future  |
 
