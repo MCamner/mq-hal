@@ -45,7 +45,7 @@ It should be:
 Latest stable release:
 
 ```text
-v0.11.0 — intent contract and command-surface hardening
+v0.13.0 — Bridget/HAL interaction polish
 ```
 
 Completed foundation:
@@ -76,7 +76,7 @@ Completed foundation:
 Current recommended next step:
 
 ```text
-v0.12.0 — mq-agent and semantic memory integration
+v0.14.0 — Advanced Ollama Runtime
 ```
 
 ---
@@ -93,8 +93,8 @@ v0.12.0 — mq-agent and semantic memory integration
 | v0.10.1 | Version sync, CI coverage and release-check          | Done    |
 | v0.11.0 | Intent contract and command-surface hardening        | Done    |
 | v0.12.0 | mq-agent and semantic memory integration             | Done    |
-| v0.13.0 | Bridget/HAL interaction polish                       | Next    |
-| v0.14.0 | Advanced Ollama Runtime                              | Planned |
+| v0.13.0 | Bridget/HAL interaction polish                       | Done    |
+| v0.14.0 | Advanced Ollama Runtime                              | Next    |
 | v0.14.5 | Visual HAL                                           | Planned |
 | v0.15.0 | Packaged install and update flow                     | Planned |
 | v1.0.0  | Stable local HAL command router                      | Future  |
@@ -440,15 +440,15 @@ weakening the safety model.
 
 ### Planned scope
 
-- [ ] Improve Bridget/HAL identity docs
-- [ ] Add optional HAL greeting/status screen
-- [ ] Add clearer terminal output sections
-- [ ] Add compact and verbose output modes
-- [ ] Add better timeline formatting
+- [x] Improve Bridget/HAL identity docs
+- [x] Add optional HAL greeting/status screen
+- [x] Add clearer terminal output sections
+- [x] Add compact and verbose output modes
+- [x] Add better timeline formatting
 - [ ] Add better session summaries
-- [ ] Add optional voice-mode design doc
-- [ ] Add toggle design for Bridget voice
-- [ ] Add local-only voice safety notes
+- [x] Add optional voice-mode design doc
+- [x] Add toggle design for Bridget voice
+- [x] Add local-only voice safety notes
 - [ ] Add screenshot or terminal demo
 
 ### Possible commands
@@ -754,11 +754,11 @@ Every powerful feature must have:
 Work on:
 
 ```text
-v0.12.0 — mq-agent and semantic memory integration
+v0.14.0 — Advanced Ollama Runtime
 ```
 
-This release should make mq-hal useful as a status layer for mq-agent and
-semantic repo memory workflows.
+This release turns mq-hal into a structured local reasoning layer with
+tool registry, planner, critic, and model profiles.
 
 ---
 

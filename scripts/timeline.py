@@ -78,7 +78,22 @@ def compact_repo(value: Any) -> str:
     return str(value or "-")[:16]
 
 
-def render_timeline(events: list[dict[str, Any]], limit: int, details: bool = False) -> None:
+def parse_time_short(value: Any) -> str:
+    if not isinstance(value, str) or not value:
+        return "-"
+    try:
+        dt = datetime.fromisoformat(value)
+        return dt.strftime("%H:%M")
+    except ValueError:
+        return value[:5]
+
+
+def render_timeline(
+    events: list[dict[str, Any]],
+    limit: int,
+    details: bool = False,
+    compact: bool = False,
+) -> None:
     selected = events[-limit:]
 
     print("HAL Timeline")
@@ -90,6 +105,16 @@ def render_timeline(events: list[dict[str, Any]], limit: int, details: bool = Fa
 
     if not selected:
         print("No timeline events found.")
+        return
+
+    if compact:
+        print(f"{'TIME':5}  {'TYPE':14}  REPO")
+        print(f"{'-' * 5}  {'-' * 14}  {'-' * 14}")
+        for event in selected:
+            time_text = parse_time_short(event.get("timestamp"))
+            type_text = compact_type(event.get("type"))
+            repo_text = compact_repo(event.get("repo"))
+            print(f"{time_text:5}  {type_text:14}  {repo_text}")
         return
 
     print(f"{'TIME':16}  {'TYPE':16}  {'REPO':16}  STATUS")
@@ -106,7 +131,9 @@ def render_timeline(events: list[dict[str, Any]], limit: int, details: bool = Fa
         if details:
             detail = event_detail(event)
             if detail:
-                print(f"{'':16}  {'':16}  {'':16}  ↳ {detail}")
+                print(
+                    f"{'':16}  {'':16}  {'':16}  ↳ {detail}"
+                )
 
 
 def main(argv: list[str]) -> int:
@@ -118,7 +145,10 @@ def main(argv: list[str]) -> int:
     parser.add_argument("--limit", type=int, default=20)
     parser.add_argument("--type", dest="event_type")
     parser.add_argument("--repo")
-    parser.add_argument("--details", action="store_true")
+    parser.add_argument("--details", action="store_true",
+                        help="Show payload detail per event")
+    parser.add_argument("--compact", action="store_true",
+                        help="Short format: time, type, repo only")
     parser.add_argument("--json", action="store_true")
 
     args = parser.parse_args(argv)
@@ -130,7 +160,12 @@ def main(argv: list[str]) -> int:
         print(json.dumps(events[-args.limit:], indent=2, ensure_ascii=False))
         return 0
 
-    render_timeline(events, limit=args.limit, details=args.details)
+    render_timeline(
+        events,
+        limit=args.limit,
+        details=args.details,
+        compact=args.compact,
+    )
     return 0
 
 

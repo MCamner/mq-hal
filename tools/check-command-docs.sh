@@ -29,6 +29,7 @@ COMMANDS=(
   memory-path
   memory-status
   agent-brief
+  hello
 )
 
 for cmd in "${COMMANDS[@]}"; do

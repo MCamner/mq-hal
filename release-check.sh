@@ -48,6 +48,7 @@ python3 -m py_compile scripts/audit.py
 python3 -m py_compile scripts/stack_status.py
 python3 -m py_compile scripts/memory_status.py
 python3 -m py_compile scripts/agent_brief.py
+python3 -m py_compile scripts/hello.py
 python3 -m py_compile tools/write_readme.py
 python3 -m py_compile tools/markdown_guard.py
 pass "Python syntax OK"
@@ -81,6 +82,7 @@ step "Smoke tests"
 ./tests/router-safety-smoke.sh
 ./tests/memory-status-smoke.sh
 ./tests/agent-brief-smoke.sh
+./tests/hello-smoke.sh
 ./tests/docs-smoke.sh
 pass "all smoke tests passed"
 

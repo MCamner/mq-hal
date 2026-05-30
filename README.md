@@ -3,7 +3,7 @@
 Local HAL-style command router for macOS.
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
-[![Version](https://img.shields.io/badge/version-0.12.0-orange)](VERSION)
+[![Version](https://img.shields.io/badge/version-0.13.0-orange)](VERSION)
 
 `mq-hal` lets you ask natural-language questions locally through Ollama,
 then maps the answer to safe whitelisted terminal actions.

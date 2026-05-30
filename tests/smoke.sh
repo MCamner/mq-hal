@@ -29,10 +29,13 @@ echo "[7/10] intent schema contract smoke works"
 echo "[8/10] router safety smoke works"
 "$ROOT/tests/router-safety-smoke.sh" >/dev/null
 
-echo "[9/10] memory-status smoke works"
+echo "[9/11] memory-status smoke works"
 "$ROOT/tests/memory-status-smoke.sh" >/dev/null
 
-echo "[10/10] agent-brief smoke works"
+echo "[10/11] agent-brief smoke works"
 "$ROOT/tests/agent-brief-smoke.sh" >/dev/null
+
+echo "[11/11] hello smoke works"
+"$ROOT/tests/hello-smoke.sh" >/dev/null
 
 echo "OK: smoke test passed"

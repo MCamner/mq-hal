@@ -2,6 +2,26 @@
 
 <!-- markdownlint-disable MD013 -->
 
+## [0.13.0] - 2026-05-30
+
+### Added
+
+- `scripts/hello.py` — `mq-hal hello` / `mq-hal status-screen`: greeting
+  and quick status screen showing active repo, version, memory brief, and
+  recent session events.
+- `timeline --compact` flag: short format showing only time, type, and
+  repo — no status column, useful for at-a-glance overviews.
+- `docs/BRIDGET.md` — Bridget/HAL identity doc: roles, architecture,
+  design rules, and identity background.
+- `docs/VOICE_MODE.md` — voice mode design doc: principles, non-goals,
+  proposed local TTS/STT pipeline, Bridget voice toggle design, and
+  safety constraints.
+- `tests/hello-smoke.sh` — 5-check smoke test covering syntax, sample
+  output, section headings, JSON shape, and status-screen alias.
+- `hello` added to `docs/COMMAND_SURFACE.md` and
+  `tools/check-command-docs.sh`.
+- Both new tests wired into `tests/smoke.sh` and `release-check.sh`.
+
 ## [0.12.0] - 2026-05-29
 
 ### Added

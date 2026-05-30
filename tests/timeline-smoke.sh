@@ -22,8 +22,13 @@ echo "[4/5] timeline shows note"
 "$ROOT/bin/mq-hal" timeline >/tmp/mq-hal-timeline.txt
 grep -q "timeline smoke note" /tmp/mq-hal-timeline.txt
 
-echo "[5/5] json mode works"
+echo "[5/6] json mode works"
 "$ROOT/bin/mq-hal" timeline --json >/tmp/mq-hal-timeline.json
 python3 -m json.tool /tmp/mq-hal-timeline.json >/dev/null
+
+echo "[6/6] --compact mode works"
+"$ROOT/bin/mq-hal" timeline --compact >/tmp/mq-hal-timeline-compact.txt
+grep -q "HAL Timeline" /tmp/mq-hal-timeline-compact.txt
+grep -q "TIME" /tmp/mq-hal-timeline-compact.txt
 
 echo "OK: timeline smoke test passed"
