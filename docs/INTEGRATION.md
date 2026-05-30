@@ -118,19 +118,54 @@ Bad bridge behavior:
 
 ## Current command mapping
 
+Current as of v0.13.0. Full reference: `docs/COMMAND_SURFACE.md`.
+
 | MQLaunch command | mq-hal command | Purpose |
-|---|---|---|
-| `mqlaunch hal "prompt"` | `mq-hal "prompt"` | Natural-language safe intent routing |
+| --- | --- | --- |
+| `mqlaunch hal "prompt"` | `mq-hal "prompt"` | Natural-language intent routing |
 | `mqlaunch hal raw "prompt"` | `mq-hal --raw-intent "prompt"` | Show parsed JSON intent |
 | `mqlaunch hal repos` | `mq-hal --list-repos` | List configured repos |
 | `mqlaunch hal cd <repo>` | `mq-hal --cd <repo>` | Print repo path |
+| `mqlaunch hal brief` | `mq-hal brief` | Repo status snapshot |
 | `mqlaunch hal doctor` | `mq-hal doctor-summary` | Summarize doctor JSON |
-| `mqlaunch hal fix-doctor` | `mq-hal fix-doctor` | Create safe fix plan |
+| `mqlaunch hal fix-doctor` | `mq-hal fix-doctor` | Safe fix plan |
+| `mqlaunch hal release-brief` | `mq-hal release-brief` | Release readiness check |
+| `mqlaunch hal audit` | `mq-hal audit` | Publish quality audit |
 | `mqlaunch hal session` | `mq-hal session` | Show local HAL memory |
 | `mqlaunch hal last` | `mq-hal last` | Show latest memory event |
 | `mqlaunch hal remember "note"` | `mq-hal remember "note"` | Save manual note |
 | `mqlaunch hal memory-path` | `mq-hal memory-path` | Print memory path |
-| `mqlaunch hal timeline` | `mq-hal timeline` | Show session memory as timeline |
+| `mqlaunch hal timeline` | `mq-hal timeline` | Session memory as timeline |
+| — | `mq-hal memory-status` | mq-agent memory state |
+| — | `mq-hal agent-brief` | mq-agent availability summary |
+| — | `mq-hal hello` | Greeting and quick status screen |
+| — | `mq-hal stack-status` | Full local stack overview |
+
+## Boundary rules
+
+Every proposed new HAL command must answer: is this HAL's
+responsibility, or does it belong in mqlaunch, repo-signal, mq-mcp, or
+mq-agent?
+
+| Repo | Role |
+| --- | --- |
+| `mq-hal` | NL routing, status summaries, safe planning |
+| `mqlaunch` | terminal UX, menus, command surface |
+| `repo-signal` | repo quality scoring, publish readiness |
+| `mq-mcp` | MCP tool surface, local tool execution |
+| `mq-agent` | orchestration, agent flows, semantic memory |
+
+mq-hal may:
+
+- call read-only status commands from other tools
+- display availability and health summaries
+- surface mq-agent memory state as a read-only brief
+
+mq-hal must not:
+
+- orchestrate mq-agent or own mq-mcp execution logic
+- implement review, risk scoring, or semantic-memory logic
+- route execution around the allowlist for any reason
 
 ## Tool policy
 

@@ -338,7 +338,7 @@ mq-hal stack-status --json
 - [x] Router smoke tests pass
 - [x] Docs smoke tests pass
 - [x] `release-check.sh` passes
-- [ ] GitHub Actions pass
+- [x] GitHub Actions pass
 - [x] GitHub release `v0.11.0` exists
 
 ### Carried forward to v0.14.0
@@ -519,12 +519,12 @@ gets more powerful.
 
 ### Remaining before v0.14.0
 
-- [ ] GitHub branch protection on `main`: require CI success,
+- [x] GitHub branch protection on `main`: require CI success,
   block force push
-- [ ] GitHub Actions green on `main`
-- [ ] `docs/INTEGRATION.md` integration boundary describes current
+- [x] GitHub Actions green on `main`
+- [x] `docs/INTEGRATION.md` integration boundary describes current
   role division clearly
-- [ ] All carried-forward items from v0.11.0, v0.12.0, v0.13.0 are
+- [x] All carried-forward items from v0.11.0, v0.12.0, v0.13.0 are
   triaged: each is either scheduled for v0.14.0 or explicitly deferred
 
 ### Rule
