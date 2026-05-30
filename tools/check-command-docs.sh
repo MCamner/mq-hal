@@ -32,6 +32,7 @@ COMMANDS=(
   hello
   tools
   models
+  plan
 )
 
 for cmd in "${COMMANDS[@]}"; do

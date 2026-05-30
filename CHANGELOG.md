@@ -2,6 +2,22 @@
 
 <!-- markdownlint-disable MD013 -->
 
+## [0.14.1] - 2026-05-30
+
+### Added
+
+- `scripts/planner.py` — `mq-hal plan "<goal>"`: generates a structured
+  local plan via Ollama with goal, affected repos/files, risk level,
+  numbered steps with safe_command and requires_confirm, validation
+  checklist, and rollback_plan.
+- `prompts/planner.txt` — dedicated planning system prompt with risk
+  level definitions and safety rules.
+- `--out <file>` flag saves the plan to a JSON file for use with
+  `mq-hal critic` (future).
+- `--no-ai` returns a stub plan; Ollama fallback on unavailability.
+- `tests/plan-smoke.sh` — 6 checks: syntax, sample output, section
+  headings, JSON shape, --out file save, --no-ai stub plan.
+
 ## [0.14.0] - 2026-05-30
 
 ### Added
