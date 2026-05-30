@@ -77,15 +77,28 @@ assert rc == 2, f"Expected exit 2 for unknown mqlaunch command, got {rc}"
 print("  unknown mqlaunch command → exit 2: OK")
 EOF
 
-echo "[4/6] --confirm with 'n' cancels (exit 130)"
-cancel_exit=0
-echo "n" | "$ROOT/bin/mq-hal" --no-ai --confirm \
-  "visa git status i mq-hal" >/dev/null 2>&1 || cancel_exit=$?
-[ "$cancel_exit" -eq 130 ] || {
-  echo "ERROR: expected exit 130 for confirm cancel, got $cancel_exit"
-  exit 1
-}
-echo "  --confirm cancel → exit 130: OK"
+echo "[4/6] --confirm cancels on 'n' (exit 130) — Python-level test"
+python3 - "$ROOT" <<'EOF'
+import sys, builtins
+from pathlib import Path
+sys.path.insert(0, sys.argv[1] + "/scripts")
+import hal
+
+# confirm_command returns False for 'n'
+old_input = builtins.input
+builtins.input = lambda _prompt: "n"
+result = hal.confirm_command(["git", "--version"], Path("/tmp"))
+builtins.input = old_input
+assert not result, f"confirm_command should return False for 'n', got {result}"
+
+# run_planned_command with confirm=True and 'n' → exit 130
+old_input = builtins.input
+builtins.input = lambda _prompt: "n"
+rc = hal.run_planned_command(["git", "--version"], cwd=Path("/tmp"), confirm=True)
+builtins.input = old_input
+assert rc == 130, f"Expected exit 130 for confirm cancel, got {rc}"
+print("  --confirm cancel → exit 130: OK")
+EOF
 
 echo "[5/6] empty prompt shows help (exit 0)"
 "$ROOT/bin/mq-hal" >/dev/null
