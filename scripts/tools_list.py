@@ -10,15 +10,23 @@ from typing import Any
 
 BASE_DIR = Path(__file__).resolve().parents[1]
 TOOLS_PATH = BASE_DIR / "config" / "tools.json"
+sys.path.insert(0, str(BASE_DIR))
+
+from mq_hal.tools.registry import load_registry, validate_registry  # noqa: E402
 
 
 def load_tools() -> list[dict[str, Any]]:
     try:
-        data = json.loads(TOOLS_PATH.read_text(encoding="utf-8"))
-        return list(data.get("tools", []))
-    except (OSError, json.JSONDecodeError) as exc:
+        tools = load_registry(TOOLS_PATH)
+    except (OSError, json.JSONDecodeError, ValueError) as exc:
         print(f"ERROR: could not load {TOOLS_PATH}: {exc}", file=sys.stderr)
         raise SystemExit(1)
+    errors = validate_registry(tools)
+    if errors:
+        for error in errors:
+            print(f"ERROR: {error}", file=sys.stderr)
+        raise SystemExit(1)
+    return tools
 
 
 def render(tools: list[dict[str, Any]]) -> None:
@@ -46,9 +54,17 @@ def main(argv: list[str]) -> int:
         "--json", dest="json_out", action="store_true",
         help="Machine-readable JSON output",
     )
+    parser.add_argument(
+        "--check", action="store_true",
+        help="Validate config/tools.json and exit",
+    )
     args = parser.parse_args(argv)
 
     tools = load_tools()
+
+    if args.check:
+        print(f"OK: {len(tools)} tools validated")
+        return 0
 
     if args.json_out:
         print(json.dumps({"tools": tools}, indent=2, ensure_ascii=False))

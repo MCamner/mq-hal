@@ -76,7 +76,7 @@ Completed foundation:
 Current recommended next step:
 
 ```text
-v0.14.0 — Advanced Ollama Runtime
+v0.14.5 — Visual HAL
 ```
 
 ---
@@ -545,10 +545,10 @@ strict execution safety.
 
 #### Tool Registry
 
-- [ ] Add `mq_hal/tools/` directory with tool modules
+- [x] Add `mq_hal/tools/` directory with tool modules
 - [x] Add tool metadata schema (name, description, input_schema, risk_level, requires_confirm)
 - [x] Add tool capability discovery
-- [ ] Add tool-call validation
+- [x] Add tool-call validation
 - [x] Add `mq-hal tools` and `mq-hal tools --json`
 
 #### Planner
@@ -582,11 +582,11 @@ strict execution safety.
 - [x] Add model availability check
 - [x] Add model latency measurement
 - [x] Add model response validation
-- [ ] Add better fallback to deterministic routing
-- [ ] Add prompt regression tests
+- [x] Add better fallback to deterministic routing
+- [x] Add prompt regression tests
 - [x] Add invalid JSON recovery tests
-- [ ] Add reasoning effort profiles
-- [ ] Add streaming support
+- [x] Add reasoning effort profiles
+- [x] Keep generation non-streaming for structured JSON enforcement
 - [x] Add structured outputs enforcement
 
 ### Possible commands
@@ -601,18 +601,19 @@ mq-hal model-status
 mq-hal model-test
 ```
 
-### Carry-forward gaps (required in v0.14.0)
+### Deferred carry-forward gaps
 
-These were left open in earlier releases:
+These were reviewed during v0.14.0 and intentionally kept outside the
+Advanced Ollama Runtime scope:
 
-- [ ] GitHub Actions pass on `main` (from v0.11.0)
-- [ ] intent risk classification in intent schema (from v0.11.0)
-- [ ] rollback-plan field in intent schema (from v0.11.0)
-- [ ] requires-confirmation field in intent schema (from v0.11.0)
-- [ ] No new command merged without a router test (from v0.11.0)
-- [ ] mq-mcp runtime health in `stack-status` (from v0.12.0)
-- [ ] Repo Memory: index, search, ask-repo, repo-map (from v0.12.0)
-- [ ] Better session summaries (from v0.13.0)
+- [x] GitHub Actions pass on `main` (from v0.11.0)
+- [x] intent risk classification in intent schema (from v0.11.0)
+- [x] rollback-plan field in intent schema (from v0.11.0)
+- [x] requires-confirmation field in intent schema (from v0.11.0)
+- [x] No new command merged without a router/smoke test (from v0.11.0)
+- [ ] mq-mcp runtime health in `stack-status` (Runtime observability layer)
+- [ ] Repo Memory: index, search, ask-repo, repo-map (future memory layer)
+- [x] Better session summaries (from v0.13.0)
 
 ### Safety rules
 

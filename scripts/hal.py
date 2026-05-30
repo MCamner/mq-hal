@@ -780,6 +780,12 @@ def main(argv: list[str]) -> int:
             )
     else:
         intent = parse_intent(raw)
+        if intent.get("intent") == "refuse" and str(intent.get("message", "")).startswith(
+            ("Jag kunde inte", "Modellen returnerade")
+        ):
+            fallback = deterministic_intent(prompt)
+            if fallback is not None:
+                intent = fallback
 
     if args.raw_intent:
         print(json.dumps(intent, indent=2, ensure_ascii=False))

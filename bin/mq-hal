@@ -111,6 +111,11 @@ case "${1:-}" in
     exec python3 "$ROOT/scripts/model_status.py" "$@"
     ;;
 
+  model-test)
+    shift || true
+    exec python3 "$ROOT/scripts/model_test.py" "$@"
+    ;;
+
   plan)
     shift || true
     exec python3 "$ROOT/scripts/planner.py" "$@"

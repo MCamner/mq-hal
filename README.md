@@ -378,6 +378,7 @@ Check local model availability and latency:
 mq-hal model-status
 mq-hal model-status --json
 mq-hal model-status --profile planner
+mq-hal model-test --profile router
 ```
 
 ## Natural-language routing

@@ -10,13 +10,14 @@ export PYTHONPYCACHEPREFIX="$STATE_DIR/pycache"
 
 echo "SMOKE: tools"
 
-echo "[1/4] syntax check"
+echo "[1/5] syntax check"
 python3 -m py_compile "$ROOT/scripts/tools_list.py"
+python3 -m py_compile "$ROOT/mq_hal/tools/registry.py"
 
-echo "[2/4] tools output works"
+echo "[2/5] tools output works"
 "$ROOT/bin/mq-hal" tools >/dev/null
 
-echo "[3/4] tools --json produces valid JSON with expected shape"
+echo "[3/5] tools --json produces valid JSON with expected shape"
 python3 - <<EOF
 import json, subprocess
 r = subprocess.run(
@@ -33,7 +34,11 @@ for expected in ("brief", "audit", "doctor-summary", "hello"):
 print(f"  {len(d['tools'])} tools, required names present: OK")
 EOF
 
-echo "[4/4] config/tools.json is valid JSON"
+echo "[4/5] tools --check validates registry"
+"$ROOT/bin/mq-hal" tools --check >/dev/null
+echo "  tools --check valid: OK"
+
+echo "[5/5] config/tools.json is valid JSON"
 python3 -c "import json; json.load(open('$ROOT/config/tools.json'))"
 echo "  config/tools.json valid: OK"
 

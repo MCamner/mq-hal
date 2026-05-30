@@ -36,6 +36,7 @@ The detailed reference with flags, examples, and backend notes is in
 | `tools` | — | No | No | No | — |
 | `models` | `model-profiles` | No | No | No | — |
 | `model-status` | — | No | No | No | — |
+| `model-test` | — | Yes | No | No | — |
 | `plan` | — | Yes | No | No | — |
 | `critic` | — | No | No | No | — |
 | `execute` | — | No | No | Yes | — |

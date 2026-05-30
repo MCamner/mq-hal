@@ -17,6 +17,9 @@
   planner, backed by `config/models.json`.
 - `scripts/model_status.py` — `mq-hal model-status`: read-only Ollama
   reachability, latency, and configured profile availability check.
+- `scripts/model_test.py` — `mq-hal model-test`: read-only structured
+  generation smoke check for a selected model profile.
+- Prompt regression smoke tests for deterministic routing.
 - `scripts/critic.py` — `mq-hal critic plan.json`: deterministic safety
   review of a saved plan with 8 checks: rollback, validation, confirmation
   flags, dangerous commands, known repos, scope (file count), step count,

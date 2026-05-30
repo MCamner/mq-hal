@@ -227,6 +227,23 @@ uses deterministic data for smoke tests.
 
 ---
 
+### `model-test`
+
+Run a tiny structured generation test against Ollama.
+
+| Property | Value |
+|---|---|
+| `mq-hal` | `mq-hal model-test` |
+| Backend | `scripts/model_test.py` |
+| Read-only | Yes |
+| Memory write | No |
+| Flags | `--json`, `--sample`, `--profile <name>` |
+
+Requests a minimal JSON response from the selected profile and verifies that it
+matches the expected shape. `--sample` uses deterministic data for smoke tests.
+
+---
+
 ### `fix-doctor`
 
 Safe repair plan from the last doctor summary.
@@ -472,6 +489,7 @@ List all configured repos.
 | `tools` | No |
 | `models` | No |
 | `model-status` | No |
+| `model-test` | No |
 | `plan` | No |
 | `critic` | No |
 | `execute` | No |

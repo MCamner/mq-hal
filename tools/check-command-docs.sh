@@ -33,6 +33,7 @@ COMMANDS=(
   tools
   models
   model-status
+  model-test
   plan
   critic
   execute

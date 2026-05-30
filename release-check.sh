@@ -36,6 +36,7 @@ pass "intent contract consistent"
 
 step "Python syntax check"
 python3 -m py_compile scripts/hal.py
+python3 -m py_compile mq_hal/tools/registry.py
 python3 -m py_compile scripts/doctor_summary.py
 python3 -m py_compile scripts/fix_planner.py
 python3 -m py_compile scripts/session_memory.py
@@ -51,6 +52,7 @@ python3 -m py_compile scripts/agent_brief.py
 python3 -m py_compile scripts/hello.py
 python3 -m py_compile scripts/model_profiles.py
 python3 -m py_compile scripts/model_status.py
+python3 -m py_compile scripts/model_test.py
 python3 -m py_compile scripts/tools_list.py
 python3 -m py_compile scripts/models_list.py
 python3 -m py_compile scripts/planner.py
@@ -93,6 +95,8 @@ step "Smoke tests"
 ./tests/tools-smoke.sh
 ./tests/models-smoke.sh
 ./tests/model-status-smoke.sh
+./tests/model-test-smoke.sh
+./tests/prompt-regression-smoke.sh
 ./tests/plan-smoke.sh
 ./tests/critic-smoke.sh
 ./tests/execute-smoke.sh
