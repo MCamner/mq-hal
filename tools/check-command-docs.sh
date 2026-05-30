@@ -34,6 +34,7 @@ COMMANDS=(
   models
   plan
   critic
+  execute
 )
 
 for cmd in "${COMMANDS[@]}"; do

@@ -154,6 +154,61 @@ Reads `~/.mq-hal/session.jsonl`. Renders a table of event type, repo, time, and 
 
 ## PLAN
 
+### `plan`
+
+Create a structured local plan for a goal.
+
+| Property | Value |
+|---|---|
+| `mq-hal` | `mq-hal plan "goal"` |
+| Backend | `scripts/planner.py` |
+| Read-only | Yes (generates a plan only) |
+| Memory write | No |
+| Flags | `--json`, `--out <file>`, `--no-ai`, `--sample` |
+
+Uses Ollama when available and falls back to a deterministic stub plan with
+`--no-ai` or when the model is unavailable.
+
+---
+
+### `critic`
+
+Review a saved plan for safety and completeness.
+
+| Property | Value |
+|---|---|
+| `mq-hal` | `mq-hal critic plan.json` |
+| Backend | `scripts/critic.py` |
+| Read-only | Yes |
+| Memory write | No |
+| Flags | `--json`, `--sample` |
+
+Checks rollback, validation, confirmation flags, dangerous commands, known
+repos, scope, step count, and visible test/validation coverage. Returns non-zero
+when the verdict is `FAIL`.
+
+---
+
+### `execute`
+
+Execute a validated plan step by step.
+
+| Property | Value |
+|---|---|
+| `mq-hal` | `mq-hal execute plan.json --confirm` |
+| Backend | `scripts/executor.py` |
+| Read-only | No |
+| Memory write | No |
+| Flags | `--confirm`, `--skip-critic` |
+
+Without `--confirm`, prints a dry-run preview. With `--confirm`, runs a
+pre-flight critic check and refuses plans with a `FAIL` verdict. Commands are
+parsed with `shlex`, shell operators are refused, and steps marked
+`requires_confirm` ask again before running. `--skip-critic` is intended only
+for local debugging; command-level shell-operator checks still apply.
+
+---
+
 ### `fix-doctor`
 
 Safe repair plan from the last doctor summary.
@@ -396,6 +451,11 @@ List all configured repos.
 | `last` | No |
 | `remember` | Yes — `note` event |
 | `memory-path` | No |
+| `tools` | No |
+| `models` | No |
+| `plan` | No |
+| `critic` | No |
+| `execute` | No |
 | Free prompt | Depends on action |
 | `--raw-intent` | No |
 | `--explain-intent` | No |

@@ -564,8 +564,8 @@ strict execution safety.
 
 #### Execute
 
-- [ ] Add `mq-hal execute plan.json --confirm`
-- [ ] Execution only after policy check and explicit confirmation
+- [x] Add `mq-hal execute plan.json --confirm`
+- [x] Execution only after policy check and explicit confirmation
 
 #### Model Profiles
 

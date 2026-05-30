@@ -143,6 +143,51 @@
       "uses_ai": false,
       "writes_memory": false,
       "mqlaunch_alias": null
+    },
+    {
+      "name": "tools",
+      "description": "List available HAL tools",
+      "risk_level": "read-only",
+      "requires_confirm": false,
+      "uses_ai": false,
+      "writes_memory": false,
+      "mqlaunch_alias": null
+    },
+    {
+      "name": "models",
+      "description": "List model profiles used by HAL commands",
+      "risk_level": "read-only",
+      "requires_confirm": false,
+      "uses_ai": false,
+      "writes_memory": false,
+      "mqlaunch_alias": null
+    },
+    {
+      "name": "plan",
+      "description": "Generate a structured local plan for a goal",
+      "risk_level": "plan-only",
+      "requires_confirm": false,
+      "uses_ai": true,
+      "writes_memory": false,
+      "mqlaunch_alias": null
+    },
+    {
+      "name": "critic",
+      "description": "Review a saved plan for safety and completeness",
+      "risk_level": "read-only",
+      "requires_confirm": false,
+      "uses_ai": false,
+      "writes_memory": false,
+      "mqlaunch_alias": null
+    },
+    {
+      "name": "execute",
+      "description": "Execute a validated plan step by step with explicit confirmation",
+      "risk_level": "controlled-exec",
+      "requires_confirm": true,
+      "uses_ai": false,
+      "writes_memory": false,
+      "mqlaunch_alias": null
     }
   ]
 }

@@ -268,6 +268,34 @@ mq-hal fix-doctor
 → execute nothing
 ```
 
+## HAL Plan, Critic and Execute
+
+Create a structured plan, review it, then execute only after explicit
+confirmation:
+
+```bash
+mq-hal plan "update release docs" --out plan.json
+mq-hal critic plan.json
+mq-hal execute plan.json
+mq-hal execute plan.json --confirm
+```
+
+Flow:
+
+```text
+mq-hal plan
+→ save plan.json
+→ mq-hal critic plan.json
+→ mq-hal execute plan.json
+→ dry-run preview
+→ mq-hal execute plan.json --confirm
+→ pre-flight critic check
+→ run safe_command steps one by one
+```
+
+`execute` refuses critic `FAIL` plans, rejects shell operators in planned
+commands, and asks again for steps marked `requires_confirm`.
+
 ## HAL Session Memory
 
 Store local HAL events in:
@@ -409,6 +437,8 @@ Formal JSON Schema: [schemas/intent.schema.json](schemas/intent.schema.json).
 - Model returns a JSON intent only — the Python router decides what is allowed
 - Router enforces an explicit allowlist — unknown or unsafe commands are refused
 - HAL Fix Planner prints copy-paste repair plans but executes nothing
+- Plan execution is opt-in: `mq-hal execute` dry-runs by default and requires
+  `--confirm` plus a passing critic check before running planned commands
 - Session Memory stays local in `~/.mq-hal/session.jsonl` — nothing is sent externally
 - Intent contract is machine-validated: `schemas/intent.schema.json` enum
   must match `ALLOWED_INTENTS` in the router on every smoke run
@@ -416,7 +446,7 @@ Formal JSON Schema: [schemas/intent.schema.json](schemas/intent.schema.json).
   command is added without documentation
 - Smoke tests cover: doctor summary, fix planner, session memory, timeline,
   repo ops, CI status, release brief, audit, stack status, hal router,
-  intent schema contract, router safety, and docs
+  intent schema contract, router safety, plan, critic, execute, and docs
 - README markdown guard (`tools/markdown_guard.py`) blocks flattened
   rendering regressions on every push
 - CI runs on `macos-latest` — all smoke tests verified natively on macOS
@@ -428,6 +458,9 @@ The model only returns a JSON intent from a fixed schema.
 The router enforces an explicit allowlist. Unknown or unsafe commands are refused.
 
 `HAL Fix Planner` does not execute repairs. It only prints commands for manual review.
+
+`mq-hal execute` is explicit and local: without `--confirm` it only previews,
+and before execution it runs the deterministic critic unless explicitly skipped.
 
 Session Memory stays local in `~/.mq-hal/session.jsonl`.
 

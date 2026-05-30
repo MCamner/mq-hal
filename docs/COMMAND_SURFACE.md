@@ -37,12 +37,14 @@ The detailed reference with flags, examples, and backend notes is in
 | `models` | `model-profiles` | No | No | No | — |
 | `plan` | — | Yes | No | No | — |
 | `critic` | — | No | No | No | — |
+| `execute` | — | No | No | Yes | — |
 
 **AI** — calls Ollama when available; falls back to deterministic output.
 **Memory** — writes to `~/.mq-hal/session.jsonl` unless `--no-memory` is
 passed.
-**Confirm** — prompts before executing. `create_branch` in the router
-always confirms regardless.
+**Confirm** — prompts before executing. `execute` requires `--confirm`, and
+plan steps marked `requires_confirm` ask again before running. `create_branch`
+in the router always confirms regardless.
 
 ---
 

@@ -6,6 +6,13 @@
 
 ### Added
 
+- `scripts/executor.py` — `mq-hal execute plan.json --confirm`: executes a
+  validated plan step by step after a pre-flight critic check. Without
+  `--confirm`, it prints a dry-run preview.
+- `execute` refuses critic `FAIL` plans, rejects shell operators in
+  `safe_command`, and asks again for steps marked `requires_confirm`.
+- `tests/execute-smoke.sh` — 5 checks covering dry-run preview, confirmed
+  safe execution, dangerous-plan refusal, and shell-operator refusal.
 - `scripts/critic.py` — `mq-hal critic plan.json`: deterministic safety
   review of a saved plan with 8 checks: rollback, validation, confirmation
   flags, dangerous commands, known repos, scope (file count), step count,

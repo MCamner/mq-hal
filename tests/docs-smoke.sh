@@ -8,28 +8,28 @@ SURFACE="$ROOT/docs/hal-command-surface.md"
 
 echo "SMOKE: docs"
 
-echo "[1/15] README exists"
+echo "[1/16] README exists"
 test -f "$README"
 
-echo "[2/15] integration contract exists"
+echo "[2/16] integration contract exists"
 test -f "$INTEGRATION"
 
-echo "[3/15] command surface reference exists"
+echo "[3/16] command surface reference exists"
 test -f "$SURFACE"
 
-echo "[4/15] README links integration contract"
+echo "[4/16] README links integration contract"
 grep -q "docs/INTEGRATION.md" "$README"
 
-echo "[5/15] README links command surface"
+echo "[5/16] README links command surface"
 grep -q "docs/hal-command-surface.md" "$README"
 
-echo "[6/15] integration contract has bridge contract"
+echo "[6/16] integration contract has bridge contract"
 grep -q "Bridge contract" "$INTEGRATION"
 
-echo "[7/15] integration contract has safety rules"
+echo "[7/16] integration contract has safety rules"
 grep -q "Safety rules" "$INTEGRATION"
 
-echo "[8/15] README contains fenced bash blocks"
+echo "[8/16] README contains fenced bash blocks"
 python3 - "$README" <<'PY'
 from pathlib import Path
 import sys
@@ -38,7 +38,7 @@ needle = chr(96) * 3 + "bash"
 raise SystemExit(0 if needle in s else 1)
 PY
 
-echo "[9/15] README contains fenced text blocks"
+echo "[9/16] README contains fenced text blocks"
 python3 - "$README" <<'PY'
 from pathlib import Path
 import sys
@@ -47,7 +47,7 @@ needle = chr(96) * 3 + "text"
 raise SystemExit(0 if needle in s else 1)
 PY
 
-echo "[10/15] README code fences are balanced"
+echo "[10/16] README code fences are balanced"
 python3 - "$README" <<'PY'
 from pathlib import Path
 import sys
@@ -59,7 +59,7 @@ if count % 2 != 0:
 print(f"Balanced markdown fences: {count}")
 PY
 
-echo "[11/15] README code fences have clean info strings"
+echo "[11/16] README code fences have clean info strings"
 python3 - "$README" <<'PY'
 from pathlib import Path
 import sys
@@ -73,7 +73,7 @@ if bad:
     raise SystemExit(1)
 PY
 
-echo "[12/15] README documents current HAL commands"
+echo "[12/16] README documents current HAL commands"
 grep -q "mq-hal release-brief" "$README"
 grep -q "mq-hal audit" "$README"
 grep -q "mq-hal stack-status" "$README"
@@ -81,10 +81,10 @@ grep -q "mq-hal repo-status" "$README"
 grep -q "mq-hal ci" "$README"
 grep -q "mq-hal fix-doctor" "$README"
 
-echo "[13/15] README documents Repo Ops"
+echo "[13/16] README documents Repo Ops"
 grep -q "HAL Repo Ops" "$README"
 
-echo "[14/15] repo cd helper is multiline"
+echo "[14/16] repo cd helper is multiline"
 grep -q 'mqhcd()' "$README"
 grep -q 'cd "$path" || return $?' "$README"
 
