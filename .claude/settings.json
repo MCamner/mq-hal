@@ -31,7 +31,25 @@
       "Bash(git -C /Users/mansys/mq-hal tag -a v0.12.0 -m \"Release v0.12.0 — mq-agent and semantic memory integration\")",
       "Bash(git -C /Users/mansys/mq-hal push origin v0.12.0)",
       "Bash(gh -R McAmner/mq-hal release create v0.12.0 --title 'mq-hal v0.12.0 — mq-agent and semantic memory integration' --notes ' *)",
-      "Bash(git -C /Users/mansys/mq-hal commit -m 'docs: mark v0.12.0 done, v0.13.0 next *)"
+      "Bash(git -C /Users/mansys/mq-hal commit -m 'docs: mark v0.12.0 done, v0.13.0 next *)",
+      "Bash(chmod +x /Users/mansys/mq-hal/tests/hello-smoke.sh)",
+      "Bash(bash /Users/mansys/mq-hal/tests/hello-smoke.sh)",
+      "Bash(bash tests/timeline-smoke.sh)",
+      "Bash(git -C /Users/mansys/mq-hal status --short)",
+      "Bash(git -C /Users/mansys/mq-hal tag -a v0.13.0 -m \"Release v0.13.0 — Bridget/HAL interaction polish\")",
+      "Bash(git -C /Users/mansys/mq-hal push origin v0.13.0)",
+      "Bash(gh -R McAmner/mq-hal release create v0.13.0 --title 'mq-hal v0.13.0 — Bridget/HAL interaction polish' --notes ' *)",
+      "Bash(git -C /Users/mansys/mq-hal log --oneline -3)",
+      "Bash(gh -R McAmner/mq-hal release list --limit 3)",
+      "Bash(gh -R McAmner/mq-hal run list --limit 5 --branch main)",
+      "Bash(gh -R McAmner/mq-hal run view 26685088418 --log-failed)",
+      "Bash(xargs cat)",
+      "Bash(git -C /Users/mansys/mq-hal show HEAD:config/repos.json)",
+      "Bash(git -C /Users/mansys/mq-hal add tests/router-safety-smoke.sh tests/smoke.sh .github/workflows/tests.yml)",
+      "Bash(gh -R McAmner/mq-hal run list --limit 3 --branch main)",
+      "Bash(gh -R McAmner/mq-hal run view 26685399613 --log-failed)",
+      "Bash(git -C /Users/mansys/mq-hal add scripts/hal.py)",
+      "Bash(gh -R McAmner/mq-hal run watch --exit-status)"
     ]
   }
 }
