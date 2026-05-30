@@ -32,6 +32,7 @@ COMMANDS=(
   hello
   tools
   models
+  model-status
   plan
   critic
   execute

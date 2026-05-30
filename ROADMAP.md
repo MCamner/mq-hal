@@ -546,20 +546,20 @@ strict execution safety.
 #### Tool Registry
 
 - [ ] Add `mq_hal/tools/` directory with tool modules
-- [ ] Add tool metadata schema (name, description, input_schema, risk_level, requires_confirm)
-- [ ] Add tool capability discovery
+- [x] Add tool metadata schema (name, description, input_schema, risk_level, requires_confirm)
+- [x] Add tool capability discovery
 - [ ] Add tool-call validation
-- [ ] Add `mq-hal tools` and `mq-hal tools --json`
+- [x] Add `mq-hal tools` and `mq-hal tools --json`
 
 #### Planner
 
-- [ ] Add `mq-hal plan "<goal>"` mode
-- [ ] Output: Goal, Affected repos, Affected files, Risk, Steps, Validation, Rollback
+- [x] Add `mq-hal plan "<goal>"` mode
+- [x] Output: Goal, Affected repos, Affected files, Risk, Steps, Validation, Rollback
 
 #### Critic
 
-- [ ] Add `mq-hal critic plan.json` mode
-- [ ] Critic checks: missing tests, over-broad changes, shell execution
+- [x] Add `mq-hal critic plan.json` mode
+- [x] Critic checks: missing tests, over-broad changes, shell execution
   risk, missing rollback, wrong repo, wrong release flow
 
 #### Execute
@@ -569,25 +569,25 @@ strict execution safety.
 
 #### Model Profiles
 
-- [ ] Add `config/models.json`
-- [ ] Add router model profile (e.g. `qwen3:4b-instruct`, reasoning_effort: low)
-- [ ] Add planner model profile (e.g. `qwen3:8b`, reasoning_effort: medium)
-- [ ] Add critic model profile (e.g. `qwen3:8b`, reasoning_effort: high)
-- [ ] Add code-review model profile (e.g. `qwen2.5-coder:7b`,
+- [x] Add `config/models.json`
+- [x] Add router model profile (e.g. `qwen3:4b-instruct`, reasoning_effort: low)
+- [x] Add planner model profile (e.g. `qwen3:8b`, reasoning_effort: medium)
+- [x] Add critic model profile (e.g. `qwen3:8b`, reasoning_effort: high)
+- [x] Add code-review model profile (e.g. `qwen2.5-coder:7b`,
   reasoning_effort: medium)
-- [ ] Add model selection CLI support
+- [x] Add model selection CLI support
 
 #### Model hardening
 
-- [ ] Add model availability check
-- [ ] Add model latency measurement
-- [ ] Add model response validation
+- [x] Add model availability check
+- [x] Add model latency measurement
+- [x] Add model response validation
 - [ ] Add better fallback to deterministic routing
 - [ ] Add prompt regression tests
-- [ ] Add invalid JSON recovery tests
+- [x] Add invalid JSON recovery tests
 - [ ] Add reasoning effort profiles
 - [ ] Add streaming support
-- [ ] Add structured outputs enforcement
+- [x] Add structured outputs enforcement
 
 ### Possible commands
 

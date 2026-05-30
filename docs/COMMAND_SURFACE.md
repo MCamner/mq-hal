@@ -35,6 +35,7 @@ The detailed reference with flags, examples, and backend notes is in
 | `hello` | `status-screen` | No | No | No | — |
 | `tools` | — | No | No | No | — |
 | `models` | `model-profiles` | No | No | No | — |
+| `model-status` | — | No | No | No | — |
 | `plan` | — | Yes | No | No | — |
 | `critic` | — | No | No | No | — |
 | `execute` | — | No | No | Yes | — |
@@ -60,6 +61,7 @@ Ollama unless `--no-ai` is passed.
 | `mq-hal --explain-intent "p"` | Print intent and resolved repo |
 | `mq-hal --confirm "prompt"` | Preview command and ask before running |
 | `mq-hal --no-ai "prompt"` | Deterministic routing without Ollama |
+| `mq-hal --model <profile> "prompt"` | Use a profile from `config/models.json` |
 | `mq-hal --list-repos` | List configured repos |
 | `mq-hal --cd <repo>` | Print repo path for shell `cd` |
 

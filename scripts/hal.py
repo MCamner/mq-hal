@@ -13,6 +13,8 @@ import urllib.request
 from pathlib import Path
 from typing import Any
 
+from model_profiles import model_for_profile
+
 BASE_DIR = Path(__file__).resolve().parents[1]
 CONFIG_PATH = BASE_DIR / "config" / "repos.json"
 SYSTEM_PROMPT_PATH = BASE_DIR / "prompts" / "system.txt"
@@ -20,7 +22,8 @@ STATE_DIR = Path(os.environ.get("MQ_HAL_STATE_DIR", str(Path.home() / ".mq-hal")
 STATE_PATH = STATE_DIR / "state.json"
 
 OLLAMA_URL = os.environ.get("OLLAMA_URL", "http://localhost:11434")
-OLLAMA_MODEL = os.environ.get("OLLAMA_MODEL", "qwen3:4b-instruct")
+DEFAULT_OLLAMA_MODEL = "qwen3:4b-instruct"
+OLLAMA_MODEL = os.environ.get("OLLAMA_MODEL", DEFAULT_OLLAMA_MODEL)
 INTENT_SCHEMA_VERSION = "mq-hal.intent.v1"
 
 ALLOWED_INTENTS = {
@@ -175,9 +178,9 @@ def model_prompt(user_prompt: str) -> str:
     )
 
 
-def call_ollama(prompt: str) -> str | None:
+def call_ollama(prompt: str, model: str = OLLAMA_MODEL) -> str | None:
     payload = {
-        "model": OLLAMA_MODEL,
+        "model": model,
         "system": system_prompt(),
         "prompt": model_prompt(prompt),
         "format": INTENT_SCHEMA,
@@ -203,7 +206,7 @@ def call_ollama(prompt: str) -> str | None:
     except urllib.error.URLError as exc:
         print(
             "WARN: could not reach Ollama; trying deterministic fallback. "
-            f"Start Ollama with: ollama pull {OLLAMA_MODEL}. Details: {exc}",
+            f"Start Ollama with: ollama pull {model}. Details: {exc}",
             file=sys.stderr,
         )
         return None
@@ -742,6 +745,7 @@ def main(argv: list[str]) -> int:
     parser.add_argument("--explain-intent", "--why", action="store_true", help="Print parsed intent and resolved repo")
     parser.add_argument("--confirm", action="store_true", help="Preview routed commands and ask before running")
     parser.add_argument("--no-ai", action="store_true", help="Use deterministic fallback routing without Ollama")
+    parser.add_argument("--model", help="Model profile from config/models.json")
 
     args = parser.parse_args(argv)
 
@@ -757,13 +761,22 @@ def main(argv: list[str]) -> int:
         parser.print_help()
         return 0
 
-    raw = None if args.no_ai else call_ollama(prompt)
+    try:
+        model, _profile = model_for_profile(
+            args.model,
+            default_profile="router",
+            env_default=DEFAULT_OLLAMA_MODEL,
+        )
+    except ValueError as exc:
+        die(str(exc))
+
+    raw = None if args.no_ai else call_ollama(prompt, model=model)
     if raw is None:
         intent = deterministic_intent(prompt)
         if intent is None:
             die(
                 "could not route prompt without Ollama. Start Ollama first, "
-                f"then run: ollama pull {OLLAMA_MODEL}"
+                f"then run: ollama pull {model}"
             )
     else:
         intent = parse_intent(raw)

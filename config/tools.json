@@ -163,6 +163,15 @@
       "mqlaunch_alias": null
     },
     {
+      "name": "model-status",
+      "description": "Check configured Ollama model availability and latency",
+      "risk_level": "read-only",
+      "requires_confirm": false,
+      "uses_ai": false,
+      "writes_memory": false,
+      "mqlaunch_alias": null
+    },
+    {
       "name": "plan",
       "description": "Generate a structured local plan for a goal",
       "risk_level": "plan-only",

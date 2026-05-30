@@ -10,13 +10,14 @@ export PYTHONPYCACHEPREFIX="$STATE_DIR/pycache"
 
 echo "SMOKE: models"
 
-echo "[1/4] syntax check"
+echo "[1/6] syntax check"
+python3 -m py_compile "$ROOT/scripts/model_profiles.py"
 python3 -m py_compile "$ROOT/scripts/models_list.py"
 
-echo "[2/4] models output works"
+echo "[2/6] models output works"
 "$ROOT/bin/mq-hal" models >/dev/null
 
-echo "[3/4] models --json produces valid JSON with expected shape"
+echo "[3/6] models --json produces valid JSON with expected shape"
 python3 - <<EOF
 import json, subprocess
 r = subprocess.run(
@@ -35,8 +36,21 @@ for name in ("router", "planner", "critic", "code"):
 print(f"  {len(d['profiles'])} profiles, required keys OK: OK")
 EOF
 
-echo "[4/4] config/models.json is valid JSON"
+echo "[4/6] config/models.json is valid JSON"
 python3 -c "import json; json.load(open('$ROOT/config/models.json'))"
 echo "  config/models.json valid: OK"
+
+echo "[5/6] router accepts model profile flag"
+intent="$("$ROOT/bin/mq-hal" --model router --no-ai --raw-intent "visa git status i mq-hal")"
+python3 -c "import json, sys; d=json.loads(sys.stdin.read()); assert d['intent']=='git_status'" <<< "$intent"
+echo "  router --model profile: OK"
+
+echo "[6/6] unknown model profile fails clearly"
+if "$ROOT/bin/mq-hal" --model missing-profile --no-ai --raw-intent "visa git status i mq-hal" >/tmp/mq-hal-bad-model.out 2>&1; then
+  echo "ERROR: unknown model profile unexpectedly succeeded" >&2
+  exit 1
+fi
+grep -q "unknown model profile" /tmp/mq-hal-bad-model.out
+echo "  unknown profile rejected: OK"
 
 echo "OK: models smoke test passed"

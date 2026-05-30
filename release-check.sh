@@ -49,6 +49,8 @@ python3 -m py_compile scripts/stack_status.py
 python3 -m py_compile scripts/memory_status.py
 python3 -m py_compile scripts/agent_brief.py
 python3 -m py_compile scripts/hello.py
+python3 -m py_compile scripts/model_profiles.py
+python3 -m py_compile scripts/model_status.py
 python3 -m py_compile scripts/tools_list.py
 python3 -m py_compile scripts/models_list.py
 python3 -m py_compile scripts/planner.py
@@ -90,6 +92,7 @@ step "Smoke tests"
 ./tests/hello-smoke.sh
 ./tests/tools-smoke.sh
 ./tests/models-smoke.sh
+./tests/model-status-smoke.sh
 ./tests/plan-smoke.sh
 ./tests/critic-smoke.sh
 ./tests/execute-smoke.sh

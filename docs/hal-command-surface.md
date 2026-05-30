@@ -164,7 +164,7 @@ Create a structured local plan for a goal.
 | Backend | `scripts/planner.py` |
 | Read-only | Yes (generates a plan only) |
 | Memory write | No |
-| Flags | `--json`, `--out <file>`, `--no-ai`, `--sample` |
+| Flags | `--json`, `--out <file>`, `--no-ai`, `--sample`, `--model <profile>` |
 
 Uses Ollama when available and falls back to a deterministic stub plan with
 `--no-ai` or when the model is unavailable.
@@ -206,6 +206,24 @@ pre-flight critic check and refuses plans with a `FAIL` verdict. Commands are
 parsed with `shlex`, shell operators are refused, and steps marked
 `requires_confirm` ask again before running. `--skip-critic` is intended only
 for local debugging; command-level shell-operator checks still apply.
+
+---
+
+### `model-status`
+
+Check configured Ollama model availability and latency.
+
+| Property | Value |
+|---|---|
+| `mq-hal` | `mq-hal model-status` |
+| Backend | `scripts/model_status.py` |
+| Read-only | Yes |
+| Memory write | No |
+| Flags | `--json`, `--sample`, `--profile <name>` |
+
+Calls Ollama's local `/api/tags` endpoint, reports reachability, response
+latency, and whether each configured profile model is installed. `--sample`
+uses deterministic data for smoke tests.
 
 ---
 
@@ -453,6 +471,7 @@ List all configured repos.
 | `memory-path` | No |
 | `tools` | No |
 | `models` | No |
+| `model-status` | No |
 | `plan` | No |
 | `critic` | No |
 | `execute` | No |

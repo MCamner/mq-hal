@@ -41,7 +41,7 @@ def render(data: dict[str, Any]) -> None:
     print(
         "To use a specific profile:\n"
         "  mq-hal --model <profile> \"prompt\"\n"
-        "  (CLI flag not yet implemented — coming in v0.14.0)"
+        "  mq-hal plan --model <profile> \"goal\""
     )
 
 

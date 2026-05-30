@@ -5,11 +5,14 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import re
 import sys
 import urllib.error
 import urllib.request
 from pathlib import Path
 from typing import Any
+
+from model_profiles import model_for_profile
 
 BASE_DIR = Path(__file__).resolve().parents[1]
 CONFIG_PATH = BASE_DIR / "config" / "repos.json"
@@ -20,7 +23,8 @@ STATE_DIR = Path(
 STATE_PATH = STATE_DIR / "state.json"
 
 OLLAMA_URL = os.environ.get("OLLAMA_URL", "http://localhost:11434")
-OLLAMA_MODEL = os.environ.get("OLLAMA_MODEL", "qwen3:8b")
+DEFAULT_OLLAMA_MODEL = "qwen3:8b"
+OLLAMA_MODEL = os.environ.get("OLLAMA_MODEL", DEFAULT_OLLAMA_MODEL)
 
 PLAN_SCHEMA: dict[str, Any] = {
     "type": "object",
@@ -116,7 +120,7 @@ def active_repo(config: dict[str, Any]) -> str:
     return str(config.get("default_repo", ""))
 
 
-def call_ollama(goal: str, config: dict[str, Any]) -> str | None:
+def call_ollama(goal: str, config: dict[str, Any], model: str = OLLAMA_MODEL) -> str | None:
     system = PLANNER_PROMPT_PATH.read_text(encoding="utf-8")
     context = {
         "active_repo": active_repo(config),
@@ -130,7 +134,7 @@ def call_ollama(goal: str, config: dict[str, Any]) -> str | None:
         f"{goal}"
     )
     payload = {
-        "model": OLLAMA_MODEL,
+        "model": model,
         "system": system,
         "prompt": prompt,
         "format": PLAN_SCHEMA,
@@ -151,7 +155,7 @@ def call_ollama(goal: str, config: dict[str, Any]) -> str | None:
     except urllib.error.URLError as exc:
         print(
             f"WARN: could not reach Ollama ({exc}). "
-            f"Start Ollama: ollama pull {OLLAMA_MODEL}",
+            f"Start Ollama: ollama pull {model}",
             file=sys.stderr,
         )
         return None
@@ -166,7 +170,6 @@ def parse_plan(text: str) -> dict[str, Any] | None:
     try:
         parsed = json.loads(text)
     except json.JSONDecodeError:
-        import re
         match = re.search(r"\{.*\}", text, flags=re.DOTALL)
         if not match:
             return None
@@ -176,7 +179,22 @@ def parse_plan(text: str) -> dict[str, Any] | None:
             return None
     if not isinstance(parsed, dict):
         return None
-    # Normalize required fields
+
+    required = (
+        "goal", "affected_repos", "affected_files", "risk",
+        "steps", "validation", "rollback_plan",
+    )
+    if any(key not in parsed for key in required):
+        return None
+    if not isinstance(parsed.get("affected_repos"), list):
+        return None
+    if not isinstance(parsed.get("affected_files"), list):
+        return None
+    if not isinstance(parsed.get("steps"), list):
+        return None
+    if not isinstance(parsed.get("validation"), list):
+        return None
+
     plan: dict[str, Any] = {
         "goal": str(parsed.get("goal", "")),
         "affected_repos": [
@@ -203,16 +221,23 @@ def parse_plan(text: str) -> dict[str, Any] | None:
     }
     for step in parsed.get("steps", []):
         if not isinstance(step, dict):
-            continue
+            return None
+        step_id = step.get("id", len(plan["steps"]) + 1)
+        if not isinstance(step_id, int):
+            return None
+        description = step.get("description")
+        if not isinstance(description, str) or not description.strip():
+            return None
+        if "requires_confirm" not in step or not isinstance(step["requires_confirm"], bool):
+            return None
+        safe_command = step.get("safe_command")
+        if safe_command is not None and not isinstance(safe_command, str):
+            return None
         plan["steps"].append({
-            "id": int(step.get("id", len(plan["steps"]) + 1)),
-            "description": str(step.get("description", "")),
-            "safe_command": (
-                str(step["safe_command"])
-                if isinstance(step.get("safe_command"), str)
-                else None
-            ),
-            "requires_confirm": bool(step.get("requires_confirm", False)),
+            "id": step_id,
+            "description": description,
+            "safe_command": safe_command,
+            "requires_confirm": step["requires_confirm"],
         })
     return plan
 
@@ -312,6 +337,10 @@ def main(argv: list[str]) -> int:
         "--sample", action="store_true",
         help="Print sample plan output without calling Ollama",
     )
+    parser.add_argument(
+        "--model",
+        help="Model profile from config/models.json",
+    )
     args = parser.parse_args(argv)
 
     goal = " ".join(args.goal).strip()
@@ -330,7 +359,16 @@ def main(argv: list[str]) -> int:
         )
     else:
         config = load_config()
-        raw = call_ollama(goal, config)
+        try:
+            model, _profile = model_for_profile(
+                args.model,
+                default_profile="planner",
+                env_default=DEFAULT_OLLAMA_MODEL,
+            )
+        except ValueError as exc:
+            print(f"ERROR: {exc}", file=sys.stderr)
+            return 1
+        raw = call_ollama(goal, config, model=model)
         if raw is None:
             plan = stub_plan(goal)
             print(

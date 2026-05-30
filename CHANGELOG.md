@@ -13,6 +13,10 @@
   `safe_command`, and asks again for steps marked `requires_confirm`.
 - `tests/execute-smoke.sh` — 5 checks covering dry-run preview, confirmed
   safe execution, dangerous-plan refusal, and shell-operator refusal.
+- `scripts/model_profiles.py` plus `--model <profile>` for the router and
+  planner, backed by `config/models.json`.
+- `scripts/model_status.py` — `mq-hal model-status`: read-only Ollama
+  reachability, latency, and configured profile availability check.
 - `scripts/critic.py` — `mq-hal critic plan.json`: deterministic safety
   review of a saved plan with 8 checks: rollback, validation, confirmation
   flags, dangerous commands, known repos, scope (file count), step count,

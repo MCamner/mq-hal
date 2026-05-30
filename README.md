@@ -365,6 +365,19 @@ mqlaunch hal timeline --details
 
 ```bash
 OLLAMA_MODEL=qwen3:4b ~/mq-hal/bin/mq-hal "visa git status"
+mq-hal --model router "visa git status"
+mq-hal plan --model planner "prepare release"
+```
+
+Profiles are defined in `config/models.json` and visible with
+`mq-hal models`.
+
+Check local model availability and latency:
+
+```bash
+mq-hal model-status
+mq-hal model-status --json
+mq-hal model-status --profile planner
 ```
 
 ## Natural-language routing
