@@ -2,6 +2,20 @@
 
 <!-- markdownlint-disable MD013 -->
 
+## [0.15.2] - 2026-05-31
+
+### Changed
+
+- `release-check.sh` now checks whether the GitHub release tag for the current
+  version already exists; fails if it does, preventing accidental re-release.
+- `release-check.sh` smoke tests use `|| fail "..."` so all failures are
+  collected and reported together with the FAILED banner, instead of exiting
+  silently at the first failure.
+- `tools/check-command-docs.sh` extracts commands dynamically from the case
+  statement in `bin/mq-hal` instead of a hardcoded list, blocking release if
+  any dispatched command is undocumented in `docs/COMMAND_SURFACE.md`.
+- ROADMAP release gate v2 items marked complete.
+
 ## [0.15.1] - 2026-05-31
 
 ### Fixed
