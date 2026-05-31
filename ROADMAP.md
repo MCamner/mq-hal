@@ -318,9 +318,9 @@ mq-hal stack-status --json
 - [x] Validate all model output before routing
 - [x] Reject malformed intents
 - [x] Reject unknown actions
-- [ ] Add intent risk classification
-- [ ] Add rollback-plan field
-- [ ] Add requires-confirmation field
+- [x] Add intent risk classification
+- [x] Add rollback-plan field
+- [x] Add requires-confirmation field
 - [x] Add intent contract examples
 - [x] Add intent contract tests
 
@@ -344,11 +344,11 @@ mq-hal stack-status --json
 
 These items were not completed and are required before or during v0.14.0:
 
-- [ ] GitHub Actions pass on `main`
-- [ ] Add intent risk classification to intent schema
-- [ ] Add rollback-plan field to intent schema
-- [ ] Add requires-confirmation field to intent schema
-- [ ] No new command merged without a corresponding router test
+- [x] GitHub Actions pass on `main`
+- [x] Add intent risk classification to intent schema
+- [x] Add rollback-plan field to intent schema
+- [x] Add requires-confirmation field to intent schema
+- [x] No new command merged without a corresponding router test
 
 ---
 
@@ -758,8 +758,8 @@ orchestrator.
 - [ ] Add vector-store health summary (deferred — requires vector store)
 - [x] Add model availability and latency summary — `mq-hal model-status`
 - [x] Add tool availability diagnostics — `mq-hal stack-status`
-- [ ] Add environment-state report with secret redaction — v1.0.2
-- [ ] Add degraded-mode recommendations — v1.0.2
+- [x] Add environment-state report with secret redaction — `mq-hal env-status`
+- [x] Add degraded-mode recommendations — `mq-hal env-status`
 
 ### Non-goals
 
