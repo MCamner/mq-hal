@@ -510,6 +510,10 @@ Formal JSON Schema: [schemas/intent.schema.json](schemas/intent.schema.json).
 
 Terminal demo: [docs/TERMINAL_DEMO.md](docs/TERMINAL_DEMO.md).
 
+Stable formats: [docs/FORMATS.md](docs/FORMATS.md).
+
+Troubleshooting: [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md).
+
 ## Proof
 
 - Model returns a JSON intent only — the Python router decides what is allowed

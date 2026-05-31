@@ -715,25 +715,26 @@ ecosystem.
 
 ### v1.0.0 requirements
 
-- [ ] Stable CLI command surface
-- [ ] Stable intent schema
-- [ ] Stable router allowlist
-- [ ] Stable repo config format
-- [ ] Stable session memory format
-- [ ] Stable timeline output
-- [ ] Stable mqlaunch integration
-- [ ] Stable mq-agent integration
-- [ ] Stable model fallback behavior
-- [ ] Complete command docs
-- [ ] Complete safety docs
-- [ ] Complete troubleshooting docs
-- [ ] Complete smoke tests
-- [ ] Complete release-check
-- [ ] Green CI
-- [ ] Protected main branch
-- [ ] GitHub release
-- [ ] GitHub Pages documentation
-- [ ] No known critical safety gaps
+- [x] Stable CLI command surface — 33 commands, enforced by release-check
+- [x] Stable intent schema — `schemas/intent.schema.json` v1, validated in CI
+- [x] Stable router allowlist — `ALLOWED_INTENTS` in `hal.py`, documented in
+  `INTENT_CONTRACT.md`
+- [x] Stable repo config format — documented in `docs/FORMATS.md`
+- [x] Stable session memory format — documented in `docs/FORMATS.md`
+- [x] Stable timeline output — documented in `docs/FORMATS.md`
+- [x] Stable mqlaunch integration — documented in `INTEGRATION.md`
+- [x] Stable mq-agent integration — documented in `INTEGRATION.md`
+- [x] Stable model fallback behavior — model profiles in `config/models.json`
+- [x] Complete command docs — `docs/COMMAND_SURFACE.md` + `docs/hal-command-surface.md`
+- [x] Complete safety docs — `docs/INTENT_CONTRACT.md`
+- [x] Complete troubleshooting docs — `docs/TROUBLESHOOTING.md`
+- [x] Complete smoke tests — 29 smoke test files, all passing in CI
+- [x] Complete release-check — GitHub tag gate + undocumented-command gate + safety gate
+- [x] Green CI — GitHub Actions passing on main
+- [x] Protected main branch — branch protection active on main
+- [ ] GitHub release — pending v1.0.0 tag
+- [ ] GitHub Pages documentation — pending v1.0.0 update
+- [ ] No known critical safety gaps — final audit pending
 
 ---
 
