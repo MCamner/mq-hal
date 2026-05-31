@@ -7,6 +7,7 @@ import json
 import os
 import subprocess
 import sys
+from collections import Counter
 from datetime import datetime
 from pathlib import Path
 from typing import Any
@@ -40,6 +41,7 @@ SAMPLE: dict[str, Any] = {
             "status": "Release looked good.",
         },
     ],
+    "session_summary": {"brief": 1, "note": 1},
 }
 
 
@@ -105,12 +107,16 @@ def collect() -> dict[str, Any]:
         }
         for e in recent_raw
     ]
+    session_summary = dict(
+        sorted(Counter(str(e.get("type", "unknown")) for e in events).items())
+    )
 
     return {
         "active_repo": active_repo,
         "version": version,
         "memory_brief": memory_brief,
         "recent_events": recent_events,
+        "session_summary": session_summary,
     }
 
 
@@ -135,6 +141,14 @@ def render(data: dict[str, Any]) -> None:
                 f"  {e['timestamp']:16}  {e['type']:<14}  "
                 f"{e['repo']:<14}  {e['status']}"
             )
+        print()
+
+    summary = data.get("session_summary", {})
+    if isinstance(summary, dict) and summary:
+        print("Session summary")
+        print("---------------")
+        for event_type, count in sorted(summary.items()):
+            print(f"  {event_type:<20} {count}")
         print()
 
     print("Commands")

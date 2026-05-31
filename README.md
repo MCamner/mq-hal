@@ -462,6 +462,8 @@ Intent contract: [docs/INTENT_CONTRACT.md](docs/INTENT_CONTRACT.md).
 
 Formal JSON Schema: [schemas/intent.schema.json](schemas/intent.schema.json).
 
+Terminal demo: [docs/TERMINAL_DEMO.md](docs/TERMINAL_DEMO.md).
+
 ## Proof
 
 - Model returns a JSON intent only — the Python router decides what is allowed

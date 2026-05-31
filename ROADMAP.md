@@ -461,11 +461,11 @@ weakening the safety model.
 - [x] Add clearer terminal output sections
 - [x] Add compact and verbose output modes
 - [x] Add better timeline formatting
-- [ ] Add better session summaries
+- [x] Add better session summaries
 - [x] Add optional voice-mode design doc
 - [x] Add toggle design for Bridget voice
 - [x] Add local-only voice safety notes
-- [ ] Add screenshot or terminal demo
+- [x] Add screenshot or terminal demo
 
 ### Possible commands
 
@@ -485,11 +485,11 @@ mq-hal timeline --details
 
 ### Carried forward to v0.14.0
 
-- [ ] Add better session summaries (grouped by type, counts)
+- [x] Add better session summaries (grouped by type, counts)
 
 ### Carried forward to v0.15.0
 
-- [ ] Add screenshot or ASCII terminal demo
+- [x] Add screenshot or ASCII terminal demo
 
 ---
 
