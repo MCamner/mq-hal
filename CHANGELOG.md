@@ -2,6 +2,17 @@
 
 <!-- markdownlint-disable MD013 -->
 
+## [1.0.3] - 2026-05-31
+
+### Changed
+
+- ROADMAP: ticked off 9 stale open items — intent risk classification,
+  rollback-plan and requires-confirmation fields (all implemented in
+  v0.14.0), GitHub Actions gate, and observability items covered by
+  `env-status`. Only two explicitly deferred items remain, both requiring
+  external infrastructure (mq-mcp, vector store).
+- ROADMAP: `Current status` updated to v1.0.3; v1.0.3 added to release map.
+
 ## [1.0.2] - 2026-05-31
 
 ### Added

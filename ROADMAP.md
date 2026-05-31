@@ -73,7 +73,7 @@ Completed foundation:
 Current recommended next step:
 
 ```text
-v1.0.2 — Runtime observability: env-status
+v1.0.3 — ROADMAP cleanup
 ```
 
 ---
@@ -96,7 +96,8 @@ v1.0.2 — Runtime observability: env-status
 | v0.15.x | Packaged install, update flow and release gate v2    | Done    |
 | v1.0.0  | Stable local HAL command router                      | Done    |
 | v1.0.1  | HAL Learn Layer                                      | Done    |
-| v1.0.2  | Runtime observability: env-status                    | Next    |
+| v1.0.2  | Runtime observability: env-status                    | Done    |
+| v1.0.3  | ROADMAP cleanup — all stale items resolved           | Next    |
 
 ---
 
