@@ -5,8 +5,12 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 STATE_DIR="$(mktemp -d)"
 trap 'rm -rf "$STATE_DIR"' EXIT
 
+CONFIG_PATH="$STATE_DIR/repos.json"
 export MQ_HAL_STATE_DIR="$STATE_DIR"
+export MQ_HAL_CONFIG_PATH="$CONFIG_PATH"
 export PYTHONPYCACHEPREFIX="$STATE_DIR/pycache"
+
+printf '{"default_repo":"mq-hal","repos":{"mq-hal":"%s"}}\n' "$ROOT" >"$CONFIG_PATH"
 
 echo "SMOKE: repo-memory"
 
@@ -42,6 +46,7 @@ python3 - <<EOF
 import json, os, subprocess
 env = os.environ.copy()
 env["MQ_HAL_STATE_DIR"] = "$STATE_DIR"
+env["MQ_HAL_CONFIG_PATH"] = "$CONFIG_PATH"
 env["PYTHONPYCACHEPREFIX"] = "$STATE_DIR/pycache"
 cmds = [
     ["$ROOT/bin/mq-hal", "search", "roadmap", "--repo", "mq-hal", "--json"],

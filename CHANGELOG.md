@@ -2,6 +2,16 @@
 
 <!-- markdownlint-disable MD013 -->
 
+## [0.15.1] - 2026-05-31
+
+### Fixed
+
+- `tests/repo-memory-smoke.sh` now points repo-memory at the active checkout
+  via `MQ_HAL_CONFIG_PATH`, so GitHub Actions does not depend on `~/mq-hal`
+  existing on the runner.
+- `scripts/repo_memory.py` supports `MQ_HAL_CONFIG_PATH` for deterministic
+  test and CI configuration overrides.
+
 ## [0.15.0] - 2026-05-31
 
 ### Added

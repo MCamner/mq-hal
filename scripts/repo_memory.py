@@ -15,7 +15,7 @@ from pathlib import Path
 from typing import Any
 
 BASE_DIR = Path(__file__).resolve().parents[1]
-CONFIG_PATH = BASE_DIR / "config" / "repos.json"
+CONFIG_PATH = Path(os.environ.get("MQ_HAL_CONFIG_PATH", str(BASE_DIR / "config" / "repos.json"))).expanduser()
 STATE_DIR = Path(os.environ.get("MQ_HAL_STATE_DIR", str(Path.home() / ".mq-hal"))).expanduser()
 MEMORY_DIR = STATE_DIR / "repo_memory"
 OLLAMA_URL = os.environ.get("OLLAMA_URL", "http://localhost:11434")
