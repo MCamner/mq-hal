@@ -45,7 +45,7 @@ It should be:
 Latest stable release:
 
 ```text
-v1.0.1 — HAL Learn Layer
+v1.0.3 — ROADMAP cleanup
 ```
 
 Completed foundation:
@@ -97,7 +97,8 @@ v1.0.3 — ROADMAP cleanup
 | v1.0.0  | Stable local HAL command router                      | Done    |
 | v1.0.1  | HAL Learn Layer                                      | Done    |
 | v1.0.2  | Runtime observability: env-status                    | Done    |
-| v1.0.3  | ROADMAP cleanup — all stale items resolved           | Next    |
+| v1.0.3  | ROADMAP cleanup — all stale items resolved           | Done    |
+| v1.1.0  | mq-mcp runtime health observability in stack-status  | Next    |
 
 ---
 
