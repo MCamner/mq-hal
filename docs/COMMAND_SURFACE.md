@@ -50,11 +50,13 @@ The detailed reference with flags, examples, and backend notes is in
 | `plan` | — | Yes | No | No | — |
 | `critic` | — | No | No | No | — |
 | `execute` | — | No | No | Yes | — |
+| `learn` | — | No | Yes | No | — |
 
 **AI** — calls Ollama when available; falls back to deterministic output.
 Visual commands can include local `mq-image-analyze` output when that tool is
 installed, but remain read-only and deterministic without it.
-**Memory** — writes to `~/.mq-hal/session.jsonl` unless `--no-memory` is
+**Memory** — writes to `~/.mq-hal/session.jsonl` (session events) or
+`~/.mq-hal/learn/lessons.jsonl` (`learn add`) unless `--no-memory` is
 passed.
 **Confirm** — prompts before executing. `execute` requires `--confirm`, and
 plan steps marked `requires_confirm` ask again before running. `create_branch`

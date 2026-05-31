@@ -2,6 +2,28 @@
 
 <!-- markdownlint-disable MD013 -->
 
+## [1.0.1] - 2026-05-31
+
+### Added
+
+- `mq-hal learn` — local lesson store for verified learnings from Codex,
+  Claude, or manual work. Subcommands: `add`, `list`, `show <id>`,
+  `search <query>`, `summarize`. Storage: `~/.mq-hal/learn/lessons.jsonl`.
+- Secret redaction before write: `api_key:`, `token:`, `bearer`, `ghp_*`,
+  `sk-*` patterns are replaced with `[REDACTED]`.
+- `docs/LEARNING.md` — learn layer documentation with storage format,
+  safety rules, and distinction from session memory.
+- `tests/learn-smoke.sh` — 8-step smoke test covering add, list, show,
+  search, summarize, redaction, and JSON output. Wired into CI and
+  `release-check.sh`.
+
+### Changed
+
+- `docs/COMMAND_SURFACE.md` — `learn` added to named command table
+  (34 commands total, Memory=Yes).
+- `release-check.sh` — `learn.py` syntax check and `learn-smoke.sh`
+  added to smoke test suite.
+
 ## [1.0.0] - 2026-05-31
 
 ### Added

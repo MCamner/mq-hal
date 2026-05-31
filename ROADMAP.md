@@ -729,7 +729,8 @@ ecosystem.
 - [x] Complete safety docs — `docs/INTENT_CONTRACT.md`
 - [x] Complete troubleshooting docs — `docs/TROUBLESHOOTING.md`
 - [x] Complete smoke tests — 29 smoke test files, all passing in CI
-- [x] Complete release-check — GitHub tag gate + undocumented-command gate + safety gate
+- [x] Complete release-check — GitHub tag gate, undocumented-command gate,
+  safety gate
 - [x] Green CI — GitHub Actions passing on main
 - [x] Protected main branch — branch protection active on main
 - [ ] GitHub release — pending v1.0.0 tag

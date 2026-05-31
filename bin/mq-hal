@@ -180,6 +180,11 @@ case "${1:-}" in
     shift || true
     exec python3 "$ROOT/scripts/executor.py" "$@"
     ;;
+
+  learn)
+    shift || true
+    exec python3 "$ROOT/scripts/learn.py" "$@"
+    ;;
 esac
 
 exec python3 "$ROOT/scripts/hal.py" "$@"
