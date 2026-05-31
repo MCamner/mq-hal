@@ -96,8 +96,8 @@ v0.15.0 — Packaged install and update flow
 | v0.13.0 | Bridget/HAL interaction polish                       | Done    |
 | v0.14.0 | Advanced Ollama Runtime                              | Done    |
 | v0.14.5 | Visual HAL                                           | Done    |
-| v0.15.0 | Packaged install and update flow                     | Next    |
-| v1.0.0  | Stable local HAL command router                      | Future  |
+| v0.15.x | Packaged install, update flow and release gate v2    | Done    |
+| v1.0.0  | Stable local HAL command router                      | Next    |
 
 ---
 
@@ -734,7 +734,11 @@ ecosystem.
 - [x] Protected main branch — branch protection active on main
 - [ ] GitHub release — pending v1.0.0 tag
 - [ ] GitHub Pages documentation — pending v1.0.0 update
-- [ ] No known critical safety gaps — final audit pending
+- [x] No known critical safety gaps — audited: no shell=True, no os.system,
+  intent output normalized before routing, path escape protection via
+  is_within(), executor validate_command + critic gate + dry-run default.
+  Critic is pattern-based (not allowlist); cat-style reads return REVIEW not
+  FAIL — user sees them in dry-run and must confirm. Design decision.
 
 ---
 

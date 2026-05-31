@@ -2,6 +2,30 @@
 
 <!-- markdownlint-disable MD013 -->
 
+## [1.0.0] - 2026-05-31
+
+### Added
+
+- `docs/FORMATS.md` — declares stable on-disk formats for repo config
+  (`config/repos.json`), session memory (`~/.mq-hal/session.jsonl`) and
+  timeline output.
+- `docs/TROUBLESHOOTING.md` — common problems and fixes for install, config,
+  Ollama, model profiles, release-check, smoke tests and session memory.
+
+### Changed
+
+- ROADMAP v1.0.0 requirements fully satisfied: all 19 items done.
+- Release map updated: v0.15.x marked done, v1.0.0 promoted to current.
+- README version badge updated to blue (stable release).
+- GitHub Pages subtitle updated to "stable local HAL command router".
+
+### Security
+
+- Full safety audit: no `shell=True`, no `os.system`, intent output
+  normalized before routing, path escape protection (`is_within()`),
+  executor `validate_command` + critic gate + dry-run default. No
+  critical safety gaps found.
+
 ## [0.15.2] - 2026-05-31
 
 ### Changed
