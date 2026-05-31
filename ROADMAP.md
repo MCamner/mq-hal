@@ -45,38 +45,35 @@ It should be:
 Latest stable release:
 
 ```text
-v0.13.0 — Bridget/HAL interaction polish
+v1.0.1 — HAL Learn Layer
 ```
 
 Completed foundation:
 
 - local natural-language command routing
-- Ollama/Qwen intent generation
-- JSON intent schema
-- safe Python router
+- Ollama/Qwen intent generation + model profiles
+- JSON intent schema (v1, formally validated)
+- safe Python router + intent allowlist
 - whitelisted command execution
 - deterministic no-AI fallback
 - repo config
 - repo status and CI status
-- HAL brief
-- HAL release brief
-- HAL audit through repo-signal
-- HAL stack status
-- operator summaries for mqlaunch, repo-signal and mq-mcp-adjacent workflows
-- doctor summary
-- fix planner
-- session memory
-- timeline view
+- HAL brief, release brief, audit
+- HAL stack status + mq-agent integration
+- doctor summary and fix planner
+- session memory and timeline
 - mqlaunch HAL bridge
-- README markdown guard
-- macOS CI smoke tests
-- release-check gate
+- README markdown guard + release-check gate
 - GitHub Pages docs
+- Advanced Ollama Runtime: plan, critic, execute, tools, models
+- Visual HAL: analyze-diagram, review-ui, architecture-brief
+- Packaged install/update flow + release gate v2
+- Learn layer with secret redaction
 
 Current recommended next step:
 
 ```text
-v0.15.0 — Packaged install and update flow
+v1.0.2 — Runtime observability: env-status
 ```
 
 ---
@@ -97,7 +94,9 @@ v0.15.0 — Packaged install and update flow
 | v0.14.0 | Advanced Ollama Runtime                              | Done    |
 | v0.14.5 | Visual HAL                                           | Done    |
 | v0.15.x | Packaged install, update flow and release gate v2    | Done    |
-| v1.0.0  | Stable local HAL command router                      | Next    |
+| v1.0.0  | Stable local HAL command router                      | Done    |
+| v1.0.1  | HAL Learn Layer                                      | Done    |
+| v1.0.2  | Runtime observability: env-status                    | Next    |
 
 ---
 
@@ -733,8 +732,8 @@ ecosystem.
   safety gate
 - [x] Green CI — GitHub Actions passing on main
 - [x] Protected main branch — branch protection active on main
-- [ ] GitHub release — pending v1.0.0 tag
-- [ ] GitHub Pages documentation — pending v1.0.0 update
+- [x] GitHub release — v1.0.0 released
+- [x] GitHub Pages documentation — auto-deployed from main
 - [x] No known critical safety gaps — audited: no shell=True, no os.system,
   intent output normalized before routing, path escape protection via
   is_within(), executor validate_command + critic gate + dry-run default.
@@ -755,13 +754,12 @@ orchestrator.
 
 ### Planned scope
 
-- [ ] Add mq-mcp runtime health summary
-- [ ] Add vector-store health summary
-- [ ] Add model availability and latency summary
-- [ ] Add tool availability diagnostics across mqlaunch, mq-agent, mq-mcp and
-  repo-signal
-- [ ] Add environment-state report with secret redaction
-- [ ] Add degraded-mode recommendations without executing fixes automatically
+- [ ] Add mq-mcp runtime health summary (deferred — requires mq-mcp infra)
+- [ ] Add vector-store health summary (deferred — requires vector store)
+- [x] Add model availability and latency summary — `mq-hal model-status`
+- [x] Add tool availability diagnostics — `mq-hal stack-status`
+- [ ] Add environment-state report with secret redaction — v1.0.2
+- [ ] Add degraded-mode recommendations — v1.0.2
 
 ### Non-goals
 

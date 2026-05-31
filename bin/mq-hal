@@ -185,6 +185,11 @@ case "${1:-}" in
     shift || true
     exec python3 "$ROOT/scripts/learn.py" "$@"
     ;;
+
+  env-status|env)
+    shift || true
+    exec python3 "$ROOT/scripts/env_status.py" "$@"
+    ;;
 esac
 
 exec python3 "$ROOT/scripts/hal.py" "$@"

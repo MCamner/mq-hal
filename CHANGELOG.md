@@ -2,6 +2,26 @@
 
 <!-- markdownlint-disable MD013 -->
 
+## [1.0.2] - 2026-05-31
+
+### Added
+
+- `mq-hal env-status` (`env`) — HAL environment variable report, tool
+  availability check, and degraded-mode recommendations. Shows which of
+  `OLLAMA_URL`, `OLLAMA_MODEL`, `MQ_HAL_STATE_DIR`, `EDITOR`, and related
+  vars are set vs default. Reports availability of git, Python, Ollama,
+  ripgrep, gh, mqlaunch, repo-signal, mq-agent and mq-image-analyze.
+  Prints actionable fix hints for missing optional tools.
+- `tests/env-status-smoke.sh` — 6-step smoke test.
+
+### Changed
+
+- ROADMAP: `Current status` updated to v1.0.2; model-status and stack-status
+  ticked off in observability layer; v1.0.1 and v1.0.2 added to release map.
+- `docs/COMMAND_SURFACE.md` — `env-status` added (35 commands total).
+- `release-check.sh` — `env_status.py` syntax check and `env-status-smoke.sh`
+  added to smoke suite.
+
 ## [1.0.1] - 2026-05-31
 
 ### Added

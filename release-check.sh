@@ -77,6 +77,7 @@ python3 -m py_compile scripts/planner.py
 python3 -m py_compile scripts/critic.py
 python3 -m py_compile scripts/executor.py
 python3 -m py_compile scripts/learn.py
+python3 -m py_compile scripts/env_status.py
 python3 -m py_compile tools/write_readme.py
 python3 -m py_compile tools/markdown_guard.py
 pass "Python syntax OK"
@@ -135,6 +136,7 @@ _smoke_start=$FAILED
 ./tests/critic-smoke.sh                   || fail "critic-smoke.sh"
 ./tests/execute-smoke.sh                  || fail "execute-smoke.sh"
 ./tests/learn-smoke.sh                    || fail "learn-smoke.sh"
+./tests/env-status-smoke.sh               || fail "env-status-smoke.sh"
 ./tests/docs-smoke.sh                     || fail "docs-smoke.sh"
 [[ "$FAILED" -eq "$_smoke_start" ]] && pass "all smoke tests passed"
 

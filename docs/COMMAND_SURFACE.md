@@ -51,6 +51,7 @@ The detailed reference with flags, examples, and backend notes is in
 | `critic` | — | No | No | No | — |
 | `execute` | — | No | No | Yes | — |
 | `learn` | — | No | Yes | No | — |
+| `env-status` | `env` | No | No | No | — |
 
 **AI** — calls Ollama when available; falls back to deterministic output.
 Visual commands can include local `mq-image-analyze` output when that tool is
