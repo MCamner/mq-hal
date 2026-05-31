@@ -217,6 +217,33 @@
       "mqlaunch_alias": null
     },
     {
+      "name": "analyze-diagram",
+      "description": "Read-only architecture diagram observations and trust-boundary draft",
+      "risk_level": "read-only",
+      "requires_confirm": false,
+      "uses_ai": false,
+      "writes_memory": false,
+      "mqlaunch_alias": null
+    },
+    {
+      "name": "review-ui",
+      "description": "Read-only UI screenshot critique",
+      "risk_level": "read-only",
+      "requires_confirm": false,
+      "uses_ai": false,
+      "writes_memory": false,
+      "mqlaunch_alias": null
+    },
+    {
+      "name": "architecture-brief",
+      "description": "Read-only architecture brief draft from visual input",
+      "risk_level": "read-only",
+      "requires_confirm": false,
+      "uses_ai": false,
+      "writes_memory": false,
+      "mqlaunch_alias": null
+    },
+    {
       "name": "plan",
       "description": "Generate a structured local plan for a goal",
       "risk_level": "plan-only",

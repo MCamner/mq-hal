@@ -54,6 +54,7 @@ python3 -m py_compile scripts/hello.py
 python3 -m py_compile scripts/model_profiles.py
 python3 -m py_compile scripts/model_status.py
 python3 -m py_compile scripts/model_test.py
+python3 -m py_compile scripts/visual_hal.py
 python3 -m py_compile scripts/tools_list.py
 python3 -m py_compile scripts/models_list.py
 python3 -m py_compile scripts/planner.py
@@ -98,6 +99,7 @@ step "Smoke tests"
 ./tests/models-smoke.sh
 ./tests/model-status-smoke.sh
 ./tests/model-test-smoke.sh
+./tests/visual-hal-smoke.sh
 ./tests/prompt-regression-smoke.sh
 ./tests/plan-smoke.sh
 ./tests/critic-smoke.sh

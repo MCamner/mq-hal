@@ -29,6 +29,14 @@ SAMPLE: dict[str, Any] = {
         },
         "bridget": {"available": True, "path": "~/bin/bridget"},
     },
+    "mq_mcp": {
+        "available": True,
+        "path": "~/mq-mcp",
+        "version": "1.9.0",
+        "runtime": "ok",
+        "vector": "ok",
+        "model": "configured",
+    },
     "repos": [
         {
             "name": "macos-scripts",
@@ -211,6 +219,56 @@ def collect_tools() -> dict[str, dict[str, Any]]:
     }
 
 
+def _repo_path(config: dict[str, Any], name: str) -> Path | None:
+    repos = config.get("repos", {})
+    if isinstance(repos, dict) and name in repos:
+        return Path(str(repos[name])).expanduser().resolve()
+    return None
+
+
+def collect_mq_mcp(config: dict[str, Any]) -> dict[str, Any]:
+    repo_path = _repo_path(config, "mq-mcp")
+    if repo_path is None:
+        return {
+            "available": False,
+            "path": "",
+            "version": "-",
+            "runtime": "not_configured",
+            "vector": "unknown",
+            "model": "unknown",
+        }
+
+    exists = repo_path.exists() and repo_path.is_dir()
+    version = read_version(repo_path) if exists else "-"
+    server_candidates = [
+        repo_path / "server.py",
+        repo_path / "mq-mcp" / "server.py",
+        repo_path / "mq_mcp" / "server.py",
+    ]
+    runtime = "ok" if exists and any(path.exists() for path in server_candidates) else "missing-runtime"
+
+    semantic_dir = repo_path / "semantic_memory"
+    vector_files = [
+        semantic_dir / "store.json",
+        semantic_dir / "schema.json",
+        repo_path / "vector_store.json",
+    ]
+    vector = "ok" if exists and any(path.exists() for path in vector_files) else "missing-vector-store"
+
+    profiles_dir = repo_path / "profiles"
+    env_model = os.environ.get("OPENAI_API_KEY") or os.environ.get("OLLAMA_MODEL")
+    model = "configured" if env_model or (exists and profiles_dir.exists()) else "unknown"
+
+    return {
+        "available": exists,
+        "path": str(repo_path),
+        "version": version,
+        "runtime": runtime,
+        "vector": vector,
+        "model": model,
+    }
+
+
 def derive_status(data: dict[str, Any]) -> str:
     tools = data["tools"]
     repos = data["repos"]
@@ -220,6 +278,9 @@ def derive_status(data: dict[str, Any]) -> str:
     if any(not repo["exists"] for repo in repos):
         return "needs_review"
     if not tools["repo-signal"]["available"]:
+        return "needs_review"
+    mq_mcp = data.get("mq_mcp", {})
+    if isinstance(mq_mcp, dict) and mq_mcp.get("available") and mq_mcp.get("runtime") != "ok":
         return "needs_review"
     if any(repo["dirty"] for repo in repos):
         return "needs_review"
@@ -242,6 +303,9 @@ def derive_recommendation(data: dict[str, Any]) -> str:
         return "Review dirty repos before release work: " + ", ".join(dirty_repos) + "."
     if "mqlaunch" in missing_tools:
         return "mq-hal works, but mqlaunch is not on PATH. Link mqlaunch before adding menu integration."
+    mq_mcp = data.get("mq_mcp", {})
+    if isinstance(mq_mcp, dict) and mq_mcp.get("available") and mq_mcp.get("vector") != "ok":
+        return "mq-mcp is present, but vector/semantic memory looks incomplete."
     if "bridget" in missing_tools:
         return "Core stack works. Optional: link bridget globally if you want terminal chat from anywhere."
     return "Stack looks usable. Next: add mqlaunch menu bridge for stack-status."
@@ -255,6 +319,7 @@ def collect() -> dict[str, Any]:
     data: dict[str, Any] = {
         "status": "unknown",
         "tools": collect_tools(),
+        "mq_mcp": collect_mq_mcp(config),
         "repos": repos,
         "recommendation": "",
     }
@@ -277,6 +342,19 @@ def render(data: dict[str, Any]) -> None:
         path = meta["path"] or "-"
         print(f"{marker:<5} {name:<12} {path}")
     print()
+
+    mq_mcp = data.get("mq_mcp", {})
+    if isinstance(mq_mcp, dict):
+        print("mq-mcp runtime")
+        print("--------------")
+        print(f"available={mq_mcp.get('available')} path={mq_mcp.get('path') or '-'}")
+        print(
+            f"version={mq_mcp.get('version', '-')} "
+            f"runtime={mq_mcp.get('runtime', '-')} "
+            f"vector={mq_mcp.get('vector', '-')} "
+            f"model={mq_mcp.get('model', '-')}"
+        )
+        print()
 
     print("Configured repos")
     print("----------------")

@@ -38,6 +38,9 @@ COMMANDS=(
   models
   model-status
   model-test
+  analyze-diagram
+  review-ui
+  architecture-brief
   plan
   critic
   execute

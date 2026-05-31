@@ -76,7 +76,7 @@ Completed foundation:
 Current recommended next step:
 
 ```text
-v0.14.5 — Visual HAL
+v0.15.0 — Packaged install and update flow
 ```
 
 ---
@@ -95,8 +95,8 @@ v0.14.5 — Visual HAL
 | v0.12.0 | mq-agent and semantic memory integration             | Done    |
 | v0.13.0 | Bridget/HAL interaction polish                       | Done    |
 | v0.14.0 | Advanced Ollama Runtime                              | Done    |
-| v0.14.5 | Visual HAL                                           | Next    |
-| v0.15.0 | Packaged install and update flow                     | Planned |
+| v0.14.5 | Visual HAL                                           | Done    |
+| v0.15.0 | Packaged install and update flow                     | Next    |
 | v1.0.0  | Stable local HAL command router                      | Future  |
 
 ---
@@ -378,7 +378,7 @@ mq-mcp executes, reviews and owns memory/reasoning runtime.
 - [x] Include semantic memory state in `mq-hal brief`
 - [x] Include semantic memory state in `mq-hal release-brief`
 - [x] Add mq-agent status to `mq-hal stack-status`
-- [ ] Add mq-mcp runtime health, vector health and model health to stack summaries
+- [x] Add mq-mcp runtime health, vector health and model health to stack summaries
 - [x] Add docs for mq-agent integration
 - [x] Add smoke test for mq-hal → mq-agent
 - [x] Add smoke test for mqlaunch → mq-hal → mq-agent
@@ -436,7 +436,7 @@ repo-signal semantic memory
 
 ### Carried forward to v0.14.0
 
-- [ ] mq-mcp runtime health, vector health and model health in
+- [x] mq-mcp runtime health, vector health and model health in
   `stack-status`
 - [x] `mq-hal index <repo>` — local repo indexing
 - [x] Ollama embeddings support
@@ -611,7 +611,7 @@ Advanced Ollama Runtime scope:
 - [x] rollback-plan field in intent schema (from v0.11.0)
 - [x] requires-confirmation field in intent schema (from v0.11.0)
 - [x] No new command merged without a router/smoke test (from v0.11.0)
-- [ ] mq-mcp runtime health in `stack-status` (Runtime observability layer)
+- [x] mq-mcp runtime health in `stack-status` (Runtime observability layer)
 - [x] Repo Memory: index, search, ask-repo, repo-map (from v0.12.0)
 - [x] Better session summaries (from v0.13.0)
 
@@ -635,13 +635,13 @@ and UI reasoning.
 
 ### Planned scope
 
-- [ ] Add `mq-hal analyze-diagram <file>`
-- [ ] Add `mq-hal review-ui <file>`
-- [ ] Add `mq-hal architecture-brief <file>`
-- [ ] Architecture observations
-- [ ] Trust-boundary detection
-- [ ] YAML draft generation from diagrams
-- [ ] UI critique output
+- [x] Add `mq-hal analyze-diagram <file>`
+- [x] Add `mq-hal review-ui <file>`
+- [x] Add `mq-hal architecture-brief <file>`
+- [x] Architecture observations
+- [x] Trust-boundary detection
+- [x] YAML draft generation from diagrams
+- [x] UI critique output
 
 ### Possible commands
 

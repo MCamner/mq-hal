@@ -397,6 +397,21 @@ skips cache/build folders, and never mutates repositories. Optional local
 Ollama embeddings can be requested with `mq-hal index mq-hal --embeddings`;
 the default mode is lexical and deterministic.
 
+## HAL Visual
+
+Review architecture diagrams and UI screenshots as read-only observations:
+
+```bash
+mq-hal analyze-diagram architecture.png
+mq-hal review-ui screenshot.png
+mq-hal architecture-brief architecture.png
+```
+
+Visual HAL reports file metadata, architecture or UI observations, trust
+boundaries, and draft YAML. If `mq-image-analyze` is installed locally its
+output is included as context; without it the commands return deterministic
+checklists. Visual input never becomes executable router intent.
+
 ## Natural-language routing
 
 `mq-hal "prompt"` routes through Ollama by default. The router now supports:
@@ -478,7 +493,8 @@ Terminal demo: [docs/TERMINAL_DEMO.md](docs/TERMINAL_DEMO.md).
   command is added without documentation
 - Smoke tests cover: doctor summary, fix planner, session memory, timeline,
   repo ops, CI status, release brief, audit, stack status, hal router,
-  intent schema contract, router safety, plan, critic, execute, and docs
+  intent schema contract, router safety, visual HAL, plan, critic, execute,
+  and docs
 - README markdown guard (`tools/markdown_guard.py`) blocks flattened
   rendering regressions on every push
 - CI runs on `macos-latest` — all smoke tests verified natively on macOS

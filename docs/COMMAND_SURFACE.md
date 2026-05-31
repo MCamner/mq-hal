@@ -41,11 +41,16 @@ The detailed reference with flags, examples, and backend notes is in
 | `models` | `model-profiles` | No | No | No | — |
 | `model-status` | — | No | No | No | — |
 | `model-test` | — | Yes | No | No | — |
+| `analyze-diagram` | — | No | No | No | — |
+| `review-ui` | — | No | No | No | — |
+| `architecture-brief` | — | No | No | No | — |
 | `plan` | — | Yes | No | No | — |
 | `critic` | — | No | No | No | — |
 | `execute` | — | No | No | Yes | — |
 
 **AI** — calls Ollama when available; falls back to deterministic output.
+Visual commands can include local `mq-image-analyze` output when that tool is
+installed, but remain read-only and deterministic without it.
 **Memory** — writes to `~/.mq-hal/session.jsonl` unless `--no-memory` is
 passed.
 **Confirm** — prompts before executing. `execute` requires `--confirm`, and

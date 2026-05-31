@@ -152,6 +152,60 @@ Reads `~/.mq-hal/session.jsonl`. Renders a table of event type, repo, time, and 
 
 ---
 
+## VISUAL
+
+### `analyze-diagram`
+
+Read-only architecture diagram observations.
+
+| Property | Value |
+|---|---|
+| `mq-hal` | `mq-hal analyze-diagram architecture.png` |
+| Backend | `scripts/visual_hal.py` |
+| Read-only | Yes |
+| Memory write | No |
+| Flags | `--json`, `--sample` |
+
+Reports visual file metadata, architecture observations, trust-boundary
+prompts, and a draft YAML block. If `mq-image-analyze` is installed locally,
+its output is captured as read-only context.
+
+---
+
+### `review-ui`
+
+Read-only UI screenshot critique.
+
+| Property | Value |
+|---|---|
+| `mq-hal` | `mq-hal review-ui screenshot.png` |
+| Backend | `scripts/visual_hal.py` |
+| Read-only | Yes |
+| Memory write | No |
+| Flags | `--json`, `--sample` |
+
+Focuses on hierarchy, spacing, labels, scanability, visible state, and unclear
+feedback. It does not infer executable commands from pixels.
+
+---
+
+### `architecture-brief`
+
+Read-only architecture brief draft from visual input.
+
+| Property | Value |
+|---|---|
+| `mq-hal` | `mq-hal architecture-brief architecture.png` |
+| Backend | `scripts/visual_hal.py` |
+| Read-only | Yes |
+| Memory write | No |
+| Flags | `--json`, `--sample` |
+
+Summarizes likely architecture intent, actors, boundaries, and unknowns as
+observations plus draft YAML. Output is never treated as router intent.
+
+---
+
 ## PLAN
 
 ### `plan`
