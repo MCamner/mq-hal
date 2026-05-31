@@ -6,6 +6,19 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$ROOT"
 
+DRY_RUN=0
+for arg in "$@"; do
+  case "$arg" in
+    --dry-run)
+      DRY_RUN=1
+      ;;
+    *)
+      echo "usage: ./release-check.sh [--dry-run]" >&2
+      exit 2
+      ;;
+  esac
+done
+
 pass() { printf "\033[1;32m[PASS]\033[0m %s\n" "$*"; }
 fail() { printf "\033[1;31m[FAIL]\033[0m %s\n" "$*" >&2; FAILED=1; }
 step() { printf "\033[1;34m[----]\033[0m %s\n" "$*"; }
@@ -54,6 +67,9 @@ python3 -m py_compile scripts/hello.py
 python3 -m py_compile scripts/model_profiles.py
 python3 -m py_compile scripts/model_status.py
 python3 -m py_compile scripts/model_test.py
+python3 -m py_compile scripts/version.py
+python3 -m py_compile scripts/config_check.py
+python3 -m py_compile scripts/update.py
 python3 -m py_compile scripts/visual_hal.py
 python3 -m py_compile scripts/tools_list.py
 python3 -m py_compile scripts/models_list.py
@@ -99,6 +115,7 @@ step "Smoke tests"
 ./tests/models-smoke.sh
 ./tests/model-status-smoke.sh
 ./tests/model-test-smoke.sh
+./tests/install-flow-smoke.sh
 ./tests/visual-hal-smoke.sh
 ./tests/prompt-regression-smoke.sh
 ./tests/plan-smoke.sh
@@ -113,7 +130,11 @@ pass "command surface consistent"
 
 printf '\n'
 if [[ "$FAILED" -eq 0 ]]; then
-  printf "\033[1;32m=== release-check passed — ready for v%s ===\033[0m\n" "$VERSION"
+  if [[ "$DRY_RUN" -eq 1 ]]; then
+    printf "\033[1;32m=== release-check dry-run passed — v%s checks are green ===\033[0m\n" "$VERSION"
+  else
+    printf "\033[1;32m=== release-check passed — ready for v%s ===\033[0m\n" "$VERSION"
+  fi
 else
   printf "\033[1;31m=== release-check FAILED — fix issues before releasing ===\033[0m\n"
   exit 1

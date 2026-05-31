@@ -3,7 +3,7 @@
 Local HAL-style command router for macOS.
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
-[![Version](https://img.shields.io/badge/version-0.14.2-orange)](VERSION)
+[![Version](https://img.shields.io/badge/version-0.15.0-orange)](VERSION)
 
 `mq-hal` lets you ask natural-language questions locally through Ollama,
 then maps the answer to safe whitelisted terminal actions.
@@ -66,6 +66,9 @@ mq-hal fix-doctor
 mq-hal session
 mq-hal last
 mq-hal timeline
+mq-hal version
+mq-hal config-check
+mq-hal update
 mq-hal remember "release looked good"
 mq-hal memory-path
 mq-hal --raw-intent "kör doctor"
@@ -397,6 +400,32 @@ skips cache/build folders, and never mutates repositories. Optional local
 Ollama embeddings can be requested with `mq-hal index mq-hal --embeddings`;
 the default mode is lexical and deterministic.
 
+## Install and Update
+
+Install by linking the local checkout:
+
+```bash
+./install.sh
+mq-hal version
+mq-hal config-check
+```
+
+Preview or run updates:
+
+```bash
+mq-hal update
+mq-hal update --confirm
+```
+
+Remove the symlink:
+
+```bash
+./uninstall.sh
+```
+
+Install docs, PATH setup, shell completion notes, clean reinstall steps, and
+the Homebrew formula plan live in [docs/INSTALL.md](docs/INSTALL.md).
+
 ## HAL Visual
 
 Review architecture diagrams and UI screenshots as read-only observations:
@@ -473,6 +502,8 @@ Full command reference: [docs/hal-command-surface.md](docs/hal-command-surface.m
 
 Command registry: [docs/COMMAND_SURFACE.md](docs/COMMAND_SURFACE.md).
 
+Install and update guide: [docs/INSTALL.md](docs/INSTALL.md).
+
 Intent contract: [docs/INTENT_CONTRACT.md](docs/INTENT_CONTRACT.md).
 
 Formal JSON Schema: [schemas/intent.schema.json](schemas/intent.schema.json).
@@ -493,8 +524,8 @@ Terminal demo: [docs/TERMINAL_DEMO.md](docs/TERMINAL_DEMO.md).
   command is added without documentation
 - Smoke tests cover: doctor summary, fix planner, session memory, timeline,
   repo ops, CI status, release brief, audit, stack status, hal router,
-  intent schema contract, router safety, visual HAL, plan, critic, execute,
-  and docs
+  intent schema contract, router safety, install flow, visual HAL, plan,
+  critic, execute, and docs
 - README markdown guard (`tools/markdown_guard.py`) blocks flattened
   rendering regressions on every push
 - CI runs on `macos-latest` — all smoke tests verified natively on macOS

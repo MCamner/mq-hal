@@ -41,6 +41,9 @@ The detailed reference with flags, examples, and backend notes is in
 | `models` | `model-profiles` | No | No | No | — |
 | `model-status` | — | No | No | No | — |
 | `model-test` | — | Yes | No | No | — |
+| `version` | `--version` | No | No | No | — |
+| `config-check` | `config` | No | No | No | — |
+| `update` | `upgrade` | No | No | Yes | — |
 | `analyze-diagram` | — | No | No | No | — |
 | `review-ui` | — | No | No | No | — |
 | `architecture-brief` | — | No | No | No | — |
@@ -55,7 +58,8 @@ installed, but remain read-only and deterministic without it.
 passed.
 **Confirm** — prompts before executing. `execute` requires `--confirm`, and
 plan steps marked `requires_confirm` ask again before running. `create_branch`
-in the router always confirms regardless.
+in the router always confirms regardless. `update` previews by default and
+requires `--confirm` before running `git pull --ff-only`.
 
 ---
 

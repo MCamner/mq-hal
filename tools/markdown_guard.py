@@ -5,6 +5,11 @@ import sys
 path = Path(sys.argv[1]) if len(sys.argv) > 1 else Path("README.md")
 text = path.read_text(encoding="utf-8")
 lines = text.splitlines()
+root = path.resolve().parent
+version_path = root / "VERSION"
+if not version_path.exists():
+    version_path = Path("VERSION")
+version = version_path.read_text(encoding="utf-8").strip() if version_path.exists() else ""
 
 errors = []
 
@@ -27,7 +32,7 @@ bad_fences = [
 require(not bad_fences, f"Bad fence info strings: {bad_fences[:5]}")
 
 required_strings = [
-    "version-0.14.2",
+    f"version-{version}",
     "## Proof",
     "## HAL Brief",
     "## HAL Release Brief",

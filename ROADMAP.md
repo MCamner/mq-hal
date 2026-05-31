@@ -666,16 +666,16 @@ Make mq-hal easier to install and maintain on a new macOS machine.
 
 ### Planned scope
 
-- [ ] Add install script
-- [ ] Add uninstall script
-- [ ] Add upgrade script
-- [ ] Add shell completion notes
-- [ ] Add PATH setup docs
-- [ ] Add `mq-hal doctor`
-- [ ] Add `mq-hal version`
-- [ ] Add config validation command
-- [ ] Add clean reinstall docs
-- [ ] Add optional Homebrew formula plan
+- [x] Add install script
+- [x] Add uninstall script
+- [x] Add upgrade script
+- [x] Add shell completion notes
+- [x] Add PATH setup docs
+- [x] Add `mq-hal doctor`
+- [x] Add `mq-hal version`
+- [x] Add config validation command
+- [x] Add clean reinstall docs
+- [x] Add optional Homebrew formula plan
 
 ### Possible commands
 
@@ -695,7 +695,7 @@ Make release a system check, not just a version bump:
 - [ ] `release-check.sh` blocks release if any undocumented command
   exists in the registry
 - [ ] `release-check.sh` blocks release if any router safety test fails
-- [ ] `release-check.sh` supports `--dry-run`
+- [x] `release-check.sh` supports `--dry-run`
 
 ### Non-goals
 

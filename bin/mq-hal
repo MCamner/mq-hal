@@ -136,6 +136,21 @@ case "${1:-}" in
     exec python3 "$ROOT/scripts/model_test.py" "$@"
     ;;
 
+  version|--version)
+    shift || true
+    exec python3 "$ROOT/scripts/version.py" "$@"
+    ;;
+
+  config-check|config)
+    shift || true
+    exec python3 "$ROOT/scripts/config_check.py" "$@"
+    ;;
+
+  update|upgrade)
+    shift || true
+    exec python3 "$ROOT/scripts/update.py" "$@"
+    ;;
+
   analyze-diagram)
     shift || true
     exec python3 "$ROOT/scripts/visual_hal.py" analyze-diagram "$@"

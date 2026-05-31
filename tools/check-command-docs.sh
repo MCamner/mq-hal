@@ -38,6 +38,9 @@ COMMANDS=(
   models
   model-status
   model-test
+  version
+  config-check
+  update
   analyze-diagram
   review-ui
   architecture-brief

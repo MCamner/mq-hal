@@ -217,6 +217,33 @@
       "mqlaunch_alias": null
     },
     {
+      "name": "version",
+      "description": "Show mq-hal version and install root",
+      "risk_level": "read-only",
+      "requires_confirm": false,
+      "uses_ai": false,
+      "writes_memory": false,
+      "mqlaunch_alias": null
+    },
+    {
+      "name": "config-check",
+      "description": "Validate local mq-hal configuration files",
+      "risk_level": "read-only",
+      "requires_confirm": false,
+      "uses_ai": false,
+      "writes_memory": false,
+      "mqlaunch_alias": null
+    },
+    {
+      "name": "update",
+      "description": "Preview or run a git pull update for this mq-hal checkout",
+      "risk_level": "repo-write",
+      "requires_confirm": true,
+      "uses_ai": false,
+      "writes_memory": false,
+      "mqlaunch_alias": null
+    },
+    {
       "name": "analyze-diagram",
       "description": "Read-only architecture diagram observations and trust-boundary draft",
       "risk_level": "read-only",

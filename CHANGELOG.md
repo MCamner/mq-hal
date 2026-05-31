@@ -2,6 +2,28 @@
 
 <!-- markdownlint-disable MD013 -->
 
+## [0.15.0] - 2026-05-31
+
+### Added
+
+- Visual HAL: `mq-hal analyze-diagram`, `mq-hal review-ui`, and
+  `mq-hal architecture-brief` for read-only diagram/UI observations,
+  trust-boundary prompts, and draft YAML output.
+- `scripts/visual_hal.py` with deterministic local fallback and optional
+  read-only `mq-image-analyze` context when available.
+- Install/update flow: `install.sh`, `uninstall.sh`, `upgrade.sh`,
+  `mq-hal version`, `mq-hal config-check`, and `mq-hal update`.
+- `docs/INSTALL.md` with PATH setup, shell completion notes, clean reinstall
+  steps, uninstall behavior, and an optional Homebrew formula plan.
+- `release-check.sh --dry-run` for non-mutating release validation.
+- `tests/visual-hal-smoke.sh` and `tests/install-flow-smoke.sh`, wired into
+  CI, `tests/smoke.sh`, and `release-check.sh`.
+
+### Changed
+
+- Command registry, command surface docs, README proof list, and roadmap now
+  include Visual HAL and install/update commands.
+
 ## [0.14.2] - 2026-05-31
 
 ### Added

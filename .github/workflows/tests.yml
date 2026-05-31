@@ -36,6 +36,9 @@ jobs:
           python3 -m py_compile scripts/model_profiles.py
           python3 -m py_compile scripts/model_status.py
           python3 -m py_compile scripts/model_test.py
+          python3 -m py_compile scripts/version.py
+          python3 -m py_compile scripts/config_check.py
+          python3 -m py_compile scripts/update.py
           python3 -m py_compile scripts/visual_hal.py
           python3 -m py_compile scripts/tools_list.py
           python3 -m py_compile scripts/models_list.py
@@ -69,6 +72,7 @@ jobs:
           ./tests/models-smoke.sh
           ./tests/model-status-smoke.sh
           ./tests/model-test-smoke.sh
+          ./tests/install-flow-smoke.sh
           ./tests/visual-hal-smoke.sh
           ./tests/prompt-regression-smoke.sh
           ./tests/plan-smoke.sh

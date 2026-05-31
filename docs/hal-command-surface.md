@@ -152,6 +152,60 @@ Reads `~/.mq-hal/session.jsonl`. Renders a table of event type, repo, time, and 
 
 ---
 
+## INSTALL
+
+### `version`
+
+Show the installed mq-hal version and root path.
+
+| Property | Value |
+|---|---|
+| `mq-hal` | `mq-hal version` |
+| Alias | `mq-hal --version` |
+| Backend | `scripts/version.py` |
+| Read-only | Yes |
+| Memory write | No |
+| Flags | `--json` |
+
+---
+
+### `config-check`
+
+Validate local mq-hal configuration files.
+
+| Property | Value |
+|---|---|
+| `mq-hal` | `mq-hal config-check` |
+| Alias | `mq-hal config` |
+| Backend | `scripts/config_check.py` |
+| Read-only | Yes |
+| Memory write | No |
+| Flags | `--json`, `--strict` |
+
+Checks `config/repos.json`, `config/models.json`, and `config/tools.json`.
+Without `--strict`, missing configured repo paths are warnings so a fresh
+checkout can still validate its bundled config shape.
+
+---
+
+### `update`
+
+Preview or run a fast-forward update for this checkout.
+
+| Property | Value |
+|---|---|
+| `mq-hal` | `mq-hal update` |
+| Alias | `mq-hal upgrade` |
+| Backend | `scripts/update.py` |
+| Read-only | Dry-run by default |
+| Memory write | No |
+| Flags | `--json`, `--confirm` |
+
+Without `--confirm`, prints the command it would run. With `--confirm`, runs
+`git pull --ff-only` in the mq-hal checkout.
+
+---
+
 ## VISUAL
 
 ### `analyze-diagram`
