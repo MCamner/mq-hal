@@ -52,7 +52,25 @@
       "Bash(gh -R McAmner/mq-hal run watch --exit-status)",
       "Bash(bash tools/check-command-docs.sh)",
       "Bash(bash -n /Users/mansys/mq-hal/release-check.sh)",
-      "Bash(./release-check.sh --dry-run)"
+      "Bash(./release-check.sh --dry-run)",
+      "Bash(python3 -c ' *)",
+      "Bash(mq-hal doctor *)",
+      "Bash(mq-hal config-check *)",
+      "Bash(python3 -m py_compile /Users/mansys/mq-hal/scripts/learn.py)",
+      "Bash(MQ_HAL_STATE_DIR=/tmp/hal-learn-test python3 scripts/learn.py add --repo mq-hal --source manual --task 'version sync before release' --lesson 'Always update README badge, CHANGELOG, docs/index.html together.' --validation 'release-check --dry-run passes')",
+      "Bash(MQ_HAL_STATE_DIR=/tmp/hal-learn-test python3 scripts/learn.py list)",
+      "Bash(MQ_HAL_STATE_DIR=/tmp/hal-learn-test python3 scripts/learn.py search \"README\")",
+      "Bash(MQ_HAL_STATE_DIR=/tmp/hal-learn-test python3 scripts/learn.py summarize)",
+      "Bash(MQ_HAL_STATE_DIR=/tmp/hal-learn-test2 python3 scripts/learn.py add --repo mq-hal --source claude --task 'test redaction' --lesson 'api_key: sk-abc123456789012345678901234567890123456789 was in config' --json)",
+      "Bash(python3 -c \"import sys,json; l=json.load\\(sys.stdin\\); print\\('lesson:', l['lesson']\\)\")",
+      "Bash(MQ_HAL_STATE_DIR=/tmp/hal-learn-test mq-hal learn list)",
+      "Bash(chmod +x /Users/mansys/mq-hal/tests/learn-smoke.sh)",
+      "Bash(bash /Users/mansys/mq-hal/tests/learn-smoke.sh)",
+      "Bash(python3 -m py_compile /Users/mansys/mq-hal/scripts/env_status.py)",
+      "Bash(python3 /Users/mansys/mq-hal/scripts/env_status.py)",
+      "Bash(chmod +x /Users/mansys/mq-hal/tests/env-status-smoke.sh)",
+      "Bash(bash /Users/mansys/mq-hal/tests/env-status-smoke.sh)",
+      "Bash(python3 -c \"import sys,json; [print\\(r['conclusion'], r['name'], r['headBranch']\\) for r in json.load\\(sys.stdin\\)]\")"
     ]
   }
 }
