@@ -2,6 +2,28 @@
 
 <!-- markdownlint-disable MD013 -->
 
+## [1.1.0] - 2026-06-01
+
+### Added
+
+- `stack-status` mq-mcp HTTP health probe — `_probe_mq_mcp_http()` tries
+  `GET localhost:8765/tools` (2 s timeout, never raises). Reports:
+  - `http_reachable` — whether mq-mcp server is running
+  - `tool_count` — number of registered tools
+  - `has_orchestration_contract` — `validate_orchestration_contract` present
+  - `has_learn_tools` — `learn_status` / `search_learned_patterns` present
+  - `has_review_skills` — `list_review_skills` / `review_file` present
+- `stack-status` render — new `http=` line shows reachability and feature flags
+- `stack-status` recommendation — suggests `mq-agent mcp start` when mq-mcp
+  is installed but not reachable
+
+### Changed
+
+- ROADMAP — `Current status` updated to v1.0.3; v1.0.3 marked Done;
+  v1.1.0 added to release map
+- README badge — v1.0.3 → v1.1.0
+- SAMPLE — updated to include the five new `http_*` / feature-flag fields
+
 ## [1.0.3] - 2026-05-31
 
 ### Changed

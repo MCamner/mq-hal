@@ -36,6 +36,11 @@ SAMPLE: dict[str, Any] = {
         "runtime": "ok",
         "vector": "ok",
         "model": "configured",
+        "http_reachable": True,
+        "tool_count": 76,
+        "has_orchestration_contract": True,
+        "has_learn_tools": True,
+        "has_review_skills": True,
     },
     "repos": [
         {
@@ -226,6 +231,41 @@ def _repo_path(config: dict[str, Any], name: str) -> Path | None:
     return None
 
 
+def _probe_mq_mcp_http(endpoint: str = "http://localhost:8765") -> dict[str, Any]:
+    """Try GET {endpoint}/tools. Returns tool count and feature flags. Never raises."""
+    import urllib.error
+    import urllib.request
+
+    out: dict[str, Any] = {
+        "reachable": False,
+        "tool_count": 0,
+        "has_orchestration_contract": False,
+        "has_learn_tools": False,
+        "has_review_skills": False,
+    }
+    try:
+        req = urllib.request.Request(
+            f"{endpoint}/tools",
+            headers={"Accept": "application/json"},
+        )
+        with urllib.request.urlopen(req, timeout=2) as resp:
+            if resp.status == 200:
+                data = json.loads(resp.read().decode())
+                raw = data.get("tools", [])
+                names = {
+                    item["name"] if isinstance(item, dict) else str(item)
+                    for item in raw
+                }
+                out["reachable"] = True
+                out["tool_count"] = len(names)
+                out["has_orchestration_contract"] = "validate_orchestration_contract" in names
+                out["has_learn_tools"] = bool({"learn_status", "search_learned_patterns"} & names)
+                out["has_review_skills"] = bool({"list_review_skills", "review_file"} & names)
+    except Exception:
+        pass
+    return out
+
+
 def collect_mq_mcp(config: dict[str, Any]) -> dict[str, Any]:
     repo_path = _repo_path(config, "mq-mcp")
     if repo_path is None:
@@ -259,6 +299,7 @@ def collect_mq_mcp(config: dict[str, Any]) -> dict[str, Any]:
     env_model = os.environ.get("OPENAI_API_KEY") or os.environ.get("OLLAMA_MODEL")
     model = "configured" if env_model or (exists and profiles_dir.exists()) else "unknown"
 
+    http = _probe_mq_mcp_http()
     return {
         "available": exists,
         "path": str(repo_path),
@@ -266,6 +307,11 @@ def collect_mq_mcp(config: dict[str, Any]) -> dict[str, Any]:
         "runtime": runtime,
         "vector": vector,
         "model": model,
+        "http_reachable": http["reachable"],
+        "tool_count": http["tool_count"],
+        "has_orchestration_contract": http["has_orchestration_contract"],
+        "has_learn_tools": http["has_learn_tools"],
+        "has_review_skills": http["has_review_skills"],
     }
 
 
@@ -306,6 +352,8 @@ def derive_recommendation(data: dict[str, Any]) -> str:
     mq_mcp = data.get("mq_mcp", {})
     if isinstance(mq_mcp, dict) and mq_mcp.get("available") and mq_mcp.get("vector") != "ok":
         return "mq-mcp is present, but vector/semantic memory looks incomplete."
+    if isinstance(mq_mcp, dict) and mq_mcp.get("available") and not mq_mcp.get("http_reachable"):
+        return "mq-mcp is installed but not reachable. Start it with: mq-agent mcp start"
     if "bridget" in missing_tools:
         return "Core stack works. Optional: link bridget globally if you want terminal chat from anywhere."
     return "Stack looks usable. Next: add mqlaunch menu bridge for stack-status."
@@ -354,6 +402,19 @@ def render(data: dict[str, Any]) -> None:
             f"vector={mq_mcp.get('vector', '-')} "
             f"model={mq_mcp.get('model', '-')}"
         )
+        reachable = mq_mcp.get("http_reachable")
+        if reachable is not None:
+            tc = mq_mcp.get("tool_count", 0)
+            oc = "yes" if mq_mcp.get("has_orchestration_contract") else "no"
+            learn = "yes" if mq_mcp.get("has_learn_tools") else "no"
+            review = "yes" if mq_mcp.get("has_review_skills") else "no"
+            status = f"reachable tools={tc}" if reachable else "not reachable"
+            print(
+                f"http={status} "
+                f"orchestration_contract={oc} "
+                f"learn={learn} "
+                f"review_skills={review}"
+            )
         print()
 
     print("Configured repos")
