@@ -690,11 +690,11 @@ mq-hal update
 
 Make release a system check, not just a version bump:
 
-- [ ] `release-check.sh` blocks release if VERSION, README, CHANGELOG,
+- [x] `release-check.sh` blocks release if VERSION, README, CHANGELOG,
   and GitHub release tag do not all match
-- [ ] `release-check.sh` blocks release if any undocumented command
+- [x] `release-check.sh` blocks release if any undocumented command
   exists in the registry
-- [ ] `release-check.sh` blocks release if any router safety test fails
+- [x] `release-check.sh` blocks release if any router safety test fails
 - [x] `release-check.sh` supports `--dry-run`
 
 ### Non-goals

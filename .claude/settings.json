@@ -49,7 +49,10 @@
       "Bash(gh -R McAmner/mq-hal run list --limit 3 --branch main)",
       "Bash(gh -R McAmner/mq-hal run view 26685399613 --log-failed)",
       "Bash(git -C /Users/mansys/mq-hal add scripts/hal.py)",
-      "Bash(gh -R McAmner/mq-hal run watch --exit-status)"
+      "Bash(gh -R McAmner/mq-hal run watch --exit-status)",
+      "Bash(bash tools/check-command-docs.sh)",
+      "Bash(bash -n /Users/mansys/mq-hal/release-check.sh)",
+      "Bash(./release-check.sh --dry-run)"
     ]
   }
 }

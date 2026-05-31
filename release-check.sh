@@ -92,37 +92,49 @@ grep -q "\[${VERSION}\]" CHANGELOG.md && pass "CHANGELOG references $VERSION" ||
 step "docs/index.html contains version $VERSION"
 grep -q "v${VERSION}" docs/index.html && pass "docs/index.html references v$VERSION" || fail "docs/index.html does not reference v$VERSION"
 
+step "GitHub release tag"
+if command -v gh &>/dev/null 2>&1; then
+  if gh release view "v${VERSION}" &>/dev/null 2>&1; then
+    fail "GitHub release v${VERSION} already exists — bump VERSION before releasing"
+  else
+    pass "v${VERSION} not yet released on GitHub"
+  fi
+else
+  printf "\033[1;33m[SKIP]\033[0m gh CLI not available — skipping GitHub release check\n"
+fi
+
 step "Smoke tests"
-./tests/smoke.sh
-./tests/doctor-summary-smoke.sh
-./tests/fix-planner-smoke.sh
-./tests/session-memory-smoke.sh
-./tests/timeline-smoke.sh
-./tests/brief-smoke.sh
-./tests/repo-status-smoke.sh
-./tests/ci-status-smoke.sh
-./tests/release-brief-smoke.sh
-./tests/audit-smoke.sh
-./tests/stack-status-smoke.sh
-./tests/hal-router-smoke.sh
-./tests/intent-schema-smoke.sh
-./tests/router-safety-smoke.sh
-./tests/memory-status-smoke.sh
-./tests/repo-memory-smoke.sh
-./tests/agent-brief-smoke.sh
-./tests/hello-smoke.sh
-./tests/tools-smoke.sh
-./tests/models-smoke.sh
-./tests/model-status-smoke.sh
-./tests/model-test-smoke.sh
-./tests/install-flow-smoke.sh
-./tests/visual-hal-smoke.sh
-./tests/prompt-regression-smoke.sh
-./tests/plan-smoke.sh
-./tests/critic-smoke.sh
-./tests/execute-smoke.sh
-./tests/docs-smoke.sh
-pass "all smoke tests passed"
+_smoke_start=$FAILED
+./tests/smoke.sh                          || fail "smoke.sh"
+./tests/doctor-summary-smoke.sh           || fail "doctor-summary-smoke.sh"
+./tests/fix-planner-smoke.sh              || fail "fix-planner-smoke.sh"
+./tests/session-memory-smoke.sh           || fail "session-memory-smoke.sh"
+./tests/timeline-smoke.sh                 || fail "timeline-smoke.sh"
+./tests/brief-smoke.sh                    || fail "brief-smoke.sh"
+./tests/repo-status-smoke.sh              || fail "repo-status-smoke.sh"
+./tests/ci-status-smoke.sh                || fail "ci-status-smoke.sh"
+./tests/release-brief-smoke.sh            || fail "release-brief-smoke.sh"
+./tests/audit-smoke.sh                    || fail "audit-smoke.sh"
+./tests/stack-status-smoke.sh             || fail "stack-status-smoke.sh"
+./tests/hal-router-smoke.sh               || fail "hal-router-smoke.sh"
+./tests/intent-schema-smoke.sh            || fail "intent-schema-smoke.sh"
+./tests/router-safety-smoke.sh            || fail "router-safety-smoke.sh — safety gate failed"
+./tests/memory-status-smoke.sh            || fail "memory-status-smoke.sh"
+./tests/repo-memory-smoke.sh              || fail "repo-memory-smoke.sh"
+./tests/agent-brief-smoke.sh              || fail "agent-brief-smoke.sh"
+./tests/hello-smoke.sh                    || fail "hello-smoke.sh"
+./tests/tools-smoke.sh                    || fail "tools-smoke.sh"
+./tests/models-smoke.sh                   || fail "models-smoke.sh"
+./tests/model-status-smoke.sh             || fail "model-status-smoke.sh"
+./tests/model-test-smoke.sh               || fail "model-test-smoke.sh"
+./tests/install-flow-smoke.sh             || fail "install-flow-smoke.sh"
+./tests/visual-hal-smoke.sh               || fail "visual-hal-smoke.sh"
+./tests/prompt-regression-smoke.sh        || fail "prompt-regression-smoke.sh"
+./tests/plan-smoke.sh                     || fail "plan-smoke.sh"
+./tests/critic-smoke.sh                   || fail "critic-smoke.sh"
+./tests/execute-smoke.sh                  || fail "execute-smoke.sh"
+./tests/docs-smoke.sh                     || fail "docs-smoke.sh"
+[[ "$FAILED" -eq "$_smoke_start" ]] && pass "all smoke tests passed"
 
 step "Command surface consistency"
 ./tools/check-command-docs.sh
