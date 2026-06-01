@@ -98,7 +98,8 @@ v1.0.3 — ROADMAP cleanup
 | v1.0.1  | HAL Learn Layer                                      | Done    |
 | v1.0.2  | Runtime observability: env-status                    | Done    |
 | v1.0.3  | ROADMAP cleanup — all stale items resolved           | Done    |
-| v1.1.0  | mq-mcp runtime health observability in stack-status  | Next    |
+| v1.1.0  | mq-mcp runtime health observability in stack-status  | Done    |
+| v1.2.0  | Vector-store health summary in stack-status          | Next    |
 
 ---
 
@@ -756,8 +757,8 @@ orchestrator.
 
 ### Planned scope
 
-- [ ] Add mq-mcp runtime health summary (deferred — requires mq-mcp infra)
-- [ ] Add vector-store health summary (deferred — requires vector store)
+- [x] Add mq-mcp runtime health summary — `_probe_mq_mcp_http()` in stack-status (v1.1.0)
+- [ ] Add vector-store health summary — deferred to v1.2.0
 - [x] Add model availability and latency summary — `mq-hal model-status`
 - [x] Add tool availability diagnostics — `mq-hal stack-status`
 - [x] Add environment-state report with secret redaction — `mq-hal env-status`
