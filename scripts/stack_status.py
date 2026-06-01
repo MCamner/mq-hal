@@ -41,6 +41,8 @@ SAMPLE: dict[str, Any] = {
         "has_orchestration_contract": True,
         "has_learn_tools": True,
         "has_review_skills": True,
+        "has_vector_store_tools": True,
+        "vector_item_count": 42,
     },
     "repos": [
         {
@@ -231,8 +233,37 @@ def _repo_path(config: dict[str, Any], name: str) -> Path | None:
     return None
 
 
+def _probe_vector_item_count(endpoint: str, timeout: int = 2) -> int | None:
+    """Try POST {endpoint}/tools/list_semantic_memory. Returns item count or None. Never raises."""
+    import urllib.error
+    import urllib.request
+
+    try:
+        payload = json.dumps({"args": {}}).encode()
+        req = urllib.request.Request(
+            f"{endpoint}/tools/list_semantic_memory",
+            data=payload,
+            headers={"Content-Type": "application/json", "Accept": "application/json"},
+            method="POST",
+        )
+        with urllib.request.urlopen(req, timeout=timeout) as resp:
+            if resp.status == 200:
+                data = json.loads(resp.read().decode())
+                result = data.get("result", data)
+                if isinstance(result, list):
+                    return len(result)
+                if isinstance(result, dict):
+                    for key in ("items", "memories", "entries"):
+                        items = result.get(key)
+                        if isinstance(items, list):
+                            return len(items)
+    except Exception:
+        pass
+    return None
+
+
 def _probe_mq_mcp_http(endpoint: str = "http://localhost:8765") -> dict[str, Any]:
-    """Try GET {endpoint}/tools. Returns tool count and feature flags. Never raises."""
+    """Try GET {endpoint}/tools. Returns tool count, feature flags, and vector-store presence. Never raises."""
     import urllib.error
     import urllib.request
 
@@ -242,6 +273,8 @@ def _probe_mq_mcp_http(endpoint: str = "http://localhost:8765") -> dict[str, Any
         "has_orchestration_contract": False,
         "has_learn_tools": False,
         "has_review_skills": False,
+        "has_vector_store_tools": False,
+        "vector_item_count": None,
     }
     try:
         req = urllib.request.Request(
@@ -261,8 +294,15 @@ def _probe_mq_mcp_http(endpoint: str = "http://localhost:8765") -> dict[str, Any
                 out["has_orchestration_contract"] = "validate_orchestration_contract" in names
                 out["has_learn_tools"] = bool({"learn_status", "search_learned_patterns"} & names)
                 out["has_review_skills"] = bool({"list_review_skills", "review_file"} & names)
+                out["has_vector_store_tools"] = bool(
+                    {"search_semantic_memory", "list_semantic_memory"} & names
+                )
     except Exception:
         pass
+
+    if out["has_vector_store_tools"]:
+        out["vector_item_count"] = _probe_vector_item_count(endpoint)
+
     return out
 
 
@@ -300,6 +340,8 @@ def collect_mq_mcp(config: dict[str, Any]) -> dict[str, Any]:
     model = "configured" if env_model or (exists and profiles_dir.exists()) else "unknown"
 
     http = _probe_mq_mcp_http()
+    if http["reachable"]:
+        vector = "ok" if http["has_vector_store_tools"] else "no-vector-tools"
     return {
         "available": exists,
         "path": str(repo_path),
@@ -312,6 +354,8 @@ def collect_mq_mcp(config: dict[str, Any]) -> dict[str, Any]:
         "has_orchestration_contract": http["has_orchestration_contract"],
         "has_learn_tools": http["has_learn_tools"],
         "has_review_skills": http["has_review_skills"],
+        "has_vector_store_tools": http["has_vector_store_tools"],
+        "vector_item_count": http["vector_item_count"],
     }
 
 
@@ -415,6 +459,11 @@ def render(data: dict[str, Any]) -> None:
                 f"learn={learn} "
                 f"review_skills={review}"
             )
+            if mq_mcp.get("has_vector_store_tools") is not None:
+                vs = "ok" if mq_mcp.get("has_vector_store_tools") else "unavailable"
+                count = mq_mcp.get("vector_item_count")
+                count_str = str(count) if count is not None else "unknown"
+                print(f"vector_store={vs} items={count_str}")
         print()
 
     print("Configured repos")
