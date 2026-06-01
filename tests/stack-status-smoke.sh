@@ -15,10 +15,13 @@ python3 scripts/stack_status.py --sample | grep -q "HAL Stack Status"
 python3 scripts/stack_status.py --sample | grep -q "repo-signal"
 python3 scripts/stack_status.py --sample | grep -q "mq-mcp"
 python3 scripts/stack_status.py --sample | grep -q "mq-mcp runtime"
+python3 scripts/stack_status.py --sample | grep -q "vector_store="
 
 echo "[3/5] sample json output"
 python3 scripts/stack_status.py --sample --json | python3 -m json.tool >/dev/null
 python3 scripts/stack_status.py --sample --json | grep -q '"mq_mcp"'
+python3 scripts/stack_status.py --sample --json | grep -q '"has_vector_store_tools"'
+python3 scripts/stack_status.py --sample --json | grep -q '"vector_item_count"'
 
 echo "[4/5] bin wrapper routes stack-status"
 ./bin/mq-hal stack-status --sample | grep -q "HAL Stack Status"
