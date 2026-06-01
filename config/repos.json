@@ -4,7 +4,11 @@
     "macos-scripts": "~/macos-scripts",
     "repo-signal": "~/repo-signal",
     "mq-mcp": "~/mq-mcp",
-    "mcamner-journal": "~/mcamner-journal",
-    "mq-hal": "~/mq-hal"
+    "mq-agent": "~/mq-agent",
+    "mq-image-analyze": "~/mq-image-analyze",
+    "mq-hal": "~/mq-hal",
+    "mq-ums": "~/mq-ums",
+    "atlas-one": "~/atlas-one",
+    "mcamner-journal": "~/mcamner-journal"
   }
 }

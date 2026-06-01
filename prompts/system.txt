@@ -42,6 +42,11 @@ Repo names must match configured repo keys when possible:
 - macos-scripts
 - repo-signal
 - mq-mcp
+- mq-agent
+- mq-image-analyze
+- mq-hal
+- mq-ums
+- atlas-one
 - mcamner-journal
 
 Examples:
