@@ -219,7 +219,7 @@ def check_latest_release(repo_path: Path, target_tag: str, skip_gh: bool) -> dic
         return {"name": "Latest release", "status": "skip", "message": "GitHub CLI release check skipped"}
 
     code, out, err = run(
-        ["gh", "release", "view", "--json", "tagName,name,publishedAt,isLatest"],
+        ["gh", "release", "view", "--json", "tagName,name,publishedAt"],
         repo_path,
     )
 
