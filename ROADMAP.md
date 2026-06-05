@@ -73,7 +73,7 @@ Completed foundation:
 Current recommended next step:
 
 ```text
-v1.0.3 — ROADMAP cleanup
+maintenance mode — define v1.3.0 only when there is a concrete scope
 ```
 
 ---
