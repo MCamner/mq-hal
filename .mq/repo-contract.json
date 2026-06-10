@@ -1,0 +1,11 @@
+{
+  "repo": "mq-hal",
+  "role": "operator-shell",
+  "version": "1.2.0",
+  "status": "active",
+  "contracts": [
+    "operator_routing.v1",
+    "status_check.v1"
+  ],
+  "next_focus": ""
+}
