@@ -73,7 +73,7 @@ Completed foundation:
 Current recommended next step:
 
 ```text
-v1.0.3 — ROADMAP cleanup
+v1.3.0 — MQ stack release/operator status routing
 ```
 
 ---
@@ -100,6 +100,57 @@ v1.0.3 — ROADMAP cleanup
 | v1.0.3  | ROADMAP cleanup — all stale items resolved           | Done    |
 | v1.1.0  | mq-mcp runtime health observability in stack-status  | Done    |
 | v1.2.0  | Vector-store health summary in stack-status          | Done    |
+| v1.3.0  | MQ stack release/operator status routing             | Planned |
+
+---
+
+## Planned: v1.3.0 — MQ stack release/operator status routing
+
+Goal:
+
+Make mq-hal a safe operator/status layer for the cross-repo Release Gate v2
+workflow. mq-hal should summarize and route local status, not own mq-agent
+orchestration or mq-mcp review logic.
+
+Planned scope:
+
+- [ ] Extend stack status with mq-agent release status when available
+- [ ] Surface mq-mcp Release Gate v2 status as read-only operator context
+- [ ] Summarize current blockers, perception findings, repo readiness and next
+  suggested action
+- [ ] Route natural-language operator prompts to existing mq-agent/mqlaunch
+  commands through the safe router
+- [ ] Keep JSON output available for `stack-status` and release/operator briefs
+- [ ] Preserve command allowlists, deterministic fallback and no-shell-from-model
+  behavior
+
+Operator sections:
+
+```text
+MQ Stack Health
+Release Gate Status
+Current Blockers
+Perception Findings
+Repo Readiness
+Suggested Next Action
+```
+
+Boundary:
+
+```text
+mq-hal summarizes and routes operator intent.
+mq-agent orchestrates review and release workflows.
+mq-mcp validates release readiness.
+repo-signal provides repo readiness signals.
+mq-image-analyze provides perception signals.
+```
+
+Non-goals:
+
+- no direct release gate implementation
+- no direct visual analysis implementation
+- no bypassing mq-agent approval gates
+- no autonomous command execution
 
 ---
 
@@ -757,7 +808,8 @@ orchestrator.
 
 ### Planned scope
 
-- [x] Add mq-mcp runtime health summary — `_probe_mq_mcp_http()` in stack-status (v1.1.0)
+- [x] Add mq-mcp runtime health summary — `_probe_mq_mcp_http()` in
+  stack-status (v1.1.0)
 - [x] Add vector-store health summary — `_probe_vector_item_count()` in
   stack-status (v1.2.0)
 - [x] Add model availability and latency summary — `mq-hal model-status`
