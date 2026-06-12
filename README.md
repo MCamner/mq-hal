@@ -52,6 +52,49 @@ mq-hal "kör tester i mq-hal"
 mq-hal --confirm "kör doctor"
 ```
 
+## Examples
+
+```bash
+# Get an operator brief for the default repo
+mq-hal brief
+
+# Ask for a safe repo status action in natural language
+mq-hal "visa git status i repo-signal"
+
+# Preview the parsed intent before routing
+mq-hal --explain-intent "kör tester i mq-hal"
+
+# Require confirmation before an allowed action runs
+mq-hal --confirm "kör doctor"
+```
+
+Through mqlaunch:
+
+```bash
+mqlaunch hal brief
+mqlaunch hal repo-status
+mqlaunch hal ci
+```
+
+---
+
+## Demo
+
+A minimal demo path is:
+
+```bash
+mq-hal config-check
+mq-hal brief --json
+mq-hal --raw-intent "visa git status i mq-agent"
+mq-hal --explain-intent "kör tester i mq-hal"
+```
+
+For screenshots, capture the terminal output from `mq-hal brief`,
+`mq-hal stack-status`, and `mq-hal --explain-intent ...`; those are the
+operator-facing views that best show the router boundary.
+
+---
+
 ## Common commands
 
 ```bash
@@ -89,6 +132,21 @@ mqlaunch hal fix-doctor
 mqlaunch hal timeline
 mqlaunch hal session
 ```
+
+## Contributing
+
+Keep `mq-hal` small and predictable: the model proposes JSON intent, while the
+Python router enforces the whitelist. Before opening a PR, run:
+
+```bash
+./release-check.sh
+mq-hal config-check
+```
+
+When adding a command, update the allowlist/config, README command examples, and
+release checks together. Do not let model output execute shell directly.
+
+---
 
 ## HAL Brief
 
