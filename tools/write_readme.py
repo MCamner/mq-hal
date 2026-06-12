@@ -46,6 +46,7 @@ ln -sf ~/mq-hal/bin/mq-hal ~/bin/mq-hal
 # 4. Edit config/repos.json with your repos, then:
 mq-hal brief
 mq-hal release-brief
+mq-hal release
 mq-hal audit
 mq-hal stack-status
 mq-hal repo-status
@@ -139,6 +140,27 @@ The release brief checks:
 - latest GitHub release
 - doctor summary
 - release-check status
+
+## Release Control Center
+
+Show central release status from mq-agent:
+
+{F}bash
+mq-hal release
+mq-hal release gates
+mq-hal release blockers
+mq-hal release --json
+{F}
+
+Default input:
+
+{F}bash
+mq-agent stack release-check --json
+{F}
+
+Release Control shows repo, version, ready state, blockers, release score, and
+gates. It is read-only and does not publish, tag, run release checks, or write
+memory.
 
 ## HAL Audit
 

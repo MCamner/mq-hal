@@ -29,7 +29,7 @@ echo "[5/6] skip flags parse"
 grep -q "HAL Release Brief" /tmp/mq-hal-release-brief-skip.txt
 
 echo "[6/6] command is routed through bin wrapper"
-"$ROOT/bin/mq-hal" release --sample >/tmp/mq-hal-release-alias.txt
-grep -q "HAL Release Brief" /tmp/mq-hal-release-alias.txt
+"$ROOT/bin/mq-hal" release-brief --sample >/tmp/mq-hal-release-brief-wrapper.txt
+grep -q "HAL Release Brief" /tmp/mq-hal-release-brief-wrapper.txt
 
 echo "OK: release-brief smoke test passed"

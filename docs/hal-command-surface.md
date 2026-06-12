@@ -76,13 +76,34 @@ Release readiness summary before tagging.
 |---|---|
 | `mq-hal` | `mq-hal release-brief` |
 | `mqlaunch` | `mqlaunch hal release-brief` |
-| Alias | `mq-hal release` / `mqlaunch hal release` |
 | Backend | `scripts/release_brief.py` |
 | Read-only | Yes |
 | Memory write | Yes (saves `release_brief` event on success) |
 | Flags | `--repo`, `--json`, `--sample`, `--no-memory`, `--skip-gh`, `--skip-doctor`, `--skip-release-check` |
 
 Checks: VERSION, CHANGELOG entry, README version reference, git tree cleanliness, CI status, latest GitHub release, doctor summary, release-check. Derives overall: `ready` / `needs_review` / `not_ready`.
+
+---
+
+### `release`
+
+Read-only release control center from `mq-agent stack release-check --json`.
+
+| Property | Value |
+|---|---|
+| `mq-hal` | `mq-hal release` |
+| Backend | `hal/release.py` |
+| Read-only | Yes |
+| Memory write | No |
+| Flags | `--json`, `--sample` |
+| Subcommands | `gates`, `blockers` |
+
+Shows repo, version, ready state, release score, blockers, and gate status
+across the MQ stack. JSON output preserves the mq-agent release-check payload
+instead of creating a separate mq-hal release contract.
+
+This command does not run release checks itself, publish releases, create tags,
+or write memory.
 
 ---
 

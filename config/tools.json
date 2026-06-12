@@ -37,6 +37,15 @@
       "mqlaunch_alias": "hal release-brief"
     },
     {
+      "name": "release",
+      "description": "Read-only release control center from mq-agent",
+      "risk_level": "read-only",
+      "requires_confirm": false,
+      "uses_ai": false,
+      "writes_memory": false,
+      "mqlaunch_alias": null
+    },
+    {
       "name": "repo-status",
       "description": "Read-only git repository state",
       "risk_level": "read-only",

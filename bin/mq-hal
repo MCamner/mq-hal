@@ -31,9 +31,14 @@ case "${1:-}" in
     exec python3 "$ROOT/scripts/brief.py" "$@"
     ;;
 
-  release-brief|release)
+  release-brief)
     shift || true
     exec python3 "$ROOT/scripts/release_brief.py" "$@"
+    ;;
+
+  release)
+    shift || true
+    exec python3 "$ROOT/hal/release.py" "$@"
     ;;
 
   repo-status|repo)

@@ -14,6 +14,10 @@
   subcommands for read-only mqobsidian/HAL memory visibility.
 * Added `tests/brain-smoke.sh` coverage for brain summary, health, recent,
   search, JSON, and sample output.
+* `mq-hal release` control center with `gates` and `blockers` subcommands
+  backed by `mq-agent stack release-check --json`.
+* Added `tests/release-control-smoke.sh` coverage for release summary, gates,
+  blockers, JSON, sample output, and `release-brief` compatibility.
 
 ### Changed
 
@@ -23,6 +27,8 @@
   mq-agent cockpit input boundary.
 * ROADMAP now marks v1.4.0 Brain Control Center done and points the next step
   at v1.5.0 Release Control Center.
+* ROADMAP now marks v1.5.0 Release Control Center done and points the next
+  step at v1.6.0 Runtime Control.
 
 ---
 

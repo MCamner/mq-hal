@@ -64,6 +64,7 @@ python3 -m py_compile hal/stack.py
 python3 -m py_compile hal/status.py
 python3 -m py_compile hal/doctor.py
 python3 -m py_compile hal/brain.py
+python3 -m py_compile hal/release.py
 python3 -m py_compile scripts/memory_status.py
 python3 -m py_compile scripts/repo_memory.py
 python3 -m py_compile scripts/agent_brief.py
@@ -120,6 +121,7 @@ _smoke_start=$FAILED
 ./tests/repo-status-smoke.sh              || fail "repo-status-smoke.sh"
 ./tests/ci-status-smoke.sh                || fail "ci-status-smoke.sh"
 ./tests/release-brief-smoke.sh            || fail "release-brief-smoke.sh"
+./tests/release-control-smoke.sh          || fail "release-control-smoke.sh"
 ./tests/audit-smoke.sh                    || fail "audit-smoke.sh"
 ./tests/stack-status-smoke.sh             || fail "stack-status-smoke.sh"
 ./tests/hal-router-smoke.sh               || fail "hal-router-smoke.sh"

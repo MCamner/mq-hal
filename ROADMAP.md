@@ -73,7 +73,7 @@ Completed foundation:
 Current recommended next step:
 
 ```text
-v1.5.0 — Release Control Center
+v1.6.0 — Runtime Control
 ```
 
 ---
@@ -102,7 +102,7 @@ v1.5.0 — Release Control Center
 | v1.2.0  | Vector-store health summary in stack-status          | Done    |
 | v1.3.0  | Stack Operator Foundation                            | Done    |
 | v1.4.0  | Brain Control Center                                 | Done    |
-| v1.5.0  | Release Control Center                               | Planned |
+| v1.5.0  | Release Control Center                               | Done    |
 | v1.6.0  | Runtime Control                                      | Planned |
 | v1.7.0  | TUI Dashboard                                        | Planned |
 | v1.8.0  | Timeline and History                                 | Planned |
@@ -273,8 +273,8 @@ mq-agent stack release-check --json
 
 ### Done
 
-- [ ] blocker list
-- [ ] release score
+- [x] blocker list
+- [x] release score
 
 ---
 
