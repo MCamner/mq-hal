@@ -10,6 +10,10 @@
   `mq-agent stack cockpit --json` when available.
 * Added `hal/stack.py`, `hal/status.py`, and `hal/doctor.py` as the v1.3
   operator foundation modules.
+* `mq-hal brain` control center with `health`, `recent`, and `search`
+  subcommands for read-only mqobsidian/HAL memory visibility.
+* Added `tests/brain-smoke.sh` coverage for brain summary, health, recent,
+  search, JSON, and sample output.
 
 ### Changed
 
@@ -17,6 +21,8 @@
   text fallback when mq-agent cockpit data is unavailable.
 * Documentation now describes `mq-hal stack`, `mq-hal status`, and the
   mq-agent cockpit input boundary.
+* ROADMAP now marks v1.4.0 Brain Control Center done and points the next step
+  at v1.5.0 Release Control Center.
 
 ---
 

@@ -498,6 +498,28 @@ Print the path to the session memory file.
 
 ---
 
+### `brain`
+
+Read-only control center for mqobsidian and local HAL memory exports.
+
+| Property | Value |
+|---|---|
+| `mq-hal` | `mq-hal brain` |
+| Backend | `hal/brain.py` |
+| Read-only | Yes |
+| Memory write | No |
+| Flags | `--json`, `--sample`, `--root` |
+| Subcommands | `health`, `recent`, `search` |
+
+Checks folders under the mqobsidian root: `memory/`, `learn/`, `truth/`, and
+`reviews/`. The root is resolved from `MQ_HAL_BRAIN_DIR`, `MQOBSIDIAN_PATH`,
+`MQ_OBSIDIAN_PATH`, common home-directory candidates, then `MQ_HAL_STATE_DIR`.
+
+This command only reads, summarizes, displays, and searches existing notes and
+exports. It does not create memory, write lessons, or run review logic.
+
+---
+
 ## DEBUG / AI
 
 ### Free prompt

@@ -67,6 +67,7 @@ mq-hal repo-status
 mq-hal ci
 mq-hal doctor-summary
 mq-hal fix-doctor
+mq-hal brain
 mq-hal session
 mq-hal last
 mq-hal timeline
@@ -225,6 +226,29 @@ Through MQLaunch:
 mqlaunch hal repo-status
 mqlaunch hal ci
 {F}
+
+## Brain Control Center
+
+Show mqobsidian and local HAL memory exports:
+
+{F}bash
+mq-hal brain
+mq-hal brain health
+mq-hal brain recent
+mq-hal brain search "release"
+mq-hal brain --json
+{F}
+
+Brain reads:
+
+- `memory/`
+- `learn/`
+- `truth/`
+- `reviews/`
+
+It shows recent notes, recent reviews, latest release export, and folder health.
+It only reads existing mqobsidian/HAL memory files; it does not write memory or
+run reviews.
 
 ## HAL Doctor Summary
 

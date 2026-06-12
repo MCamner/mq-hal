@@ -127,6 +127,15 @@
       "mqlaunch_alias": null
     },
     {
+      "name": "brain",
+      "description": "Read-only mqobsidian and HAL memory control center",
+      "risk_level": "read-only",
+      "requires_confirm": false,
+      "uses_ai": false,
+      "writes_memory": false,
+      "mqlaunch_alias": null
+    },
+    {
       "name": "index",
       "description": "Build local lexical repo memory for a configured repo",
       "risk_level": "state-write",

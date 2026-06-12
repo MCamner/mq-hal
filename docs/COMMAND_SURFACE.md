@@ -31,6 +31,7 @@ The detailed reference with flags, examples, and backend notes is in
 | `timeline` | — | No | No | No | `hal timeline` |
 | `memory-path` | `session-path` | No | No | No | `hal memory-path` |
 | `memory-status` | `memory-brief` | No | No | No | — |
+| `brain` | — | No | No | No | — |
 | `index` | — | No | Yes | No | — |
 | `search` | — | No | No | No | — |
 | `ask-repo` | — | No | No | No | — |

@@ -73,7 +73,7 @@ Completed foundation:
 Current recommended next step:
 
 ```text
-v1.4.0 — Brain Control Center
+v1.5.0 — Release Control Center
 ```
 
 ---
@@ -101,7 +101,7 @@ v1.4.0 — Brain Control Center
 | v1.1.0  | mq-mcp runtime health observability in stack-status  | Done    |
 | v1.2.0  | Vector-store health summary in stack-status          | Done    |
 | v1.3.0  | Stack Operator Foundation                            | Done    |
-| v1.4.0  | Brain Control Center                                 | Planned |
+| v1.4.0  | Brain Control Center                                 | Done    |
 | v1.5.0  | Release Control Center                               | Planned |
 | v1.6.0  | Runtime Control                                      | Planned |
 | v1.7.0  | TUI Dashboard                                        | Planned |
@@ -236,9 +236,9 @@ Latest release
 
 ### Done
 
-- [ ] brain status
-- [ ] brain search
-- [ ] latest exports
+- [x] brain status
+- [x] brain search
+- [x] latest exports
 
 ---
 
