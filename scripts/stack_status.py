@@ -12,6 +12,10 @@ from pathlib import Path
 from typing import Any
 
 BASE_DIR = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(BASE_DIR))
+
+from hal import stack as operator_stack
+
 CONFIG_PATH = BASE_DIR / "config" / "repos.json"
 
 SAMPLE: dict[str, Any] = {
@@ -495,13 +499,60 @@ def render(data: dict[str, Any]) -> None:
 def main(argv: list[str]) -> int:
     parser = argparse.ArgumentParser(
         prog="mq-hal stack-status",
-        description="Show local stack status for mq-hal, repo-signal, mq-mcp, mqlaunch, and configured repos.",
+        description="Show MQ stack status from mq-agent cockpit JSON, with a local legacy fallback.",
     )
     parser.add_argument("--json", action="store_true", help="Print machine-readable JSON.")
     parser.add_argument("--sample", action="store_true", help="Print sample output without touching local repos.")
+    parser.add_argument(
+        "--legacy",
+        action="store_true",
+        help="Use the pre-v1.3 local stack-status collector instead of mq-agent cockpit.",
+    )
     args = parser.parse_args(argv)
 
-    data = SAMPLE if args.sample else collect()
+    if args.sample:
+        data = operator_stack.SAMPLE_COCKPIT
+        if args.json:
+            operator_stack.print_json(data)
+        else:
+            operator_stack.render(data)
+        return 0
+
+    if not args.legacy:
+        cockpit = operator_stack.read_cockpit()
+        if cockpit.ok and cockpit.data is not None:
+            if args.json:
+                operator_stack.print_json(cockpit.data)
+            else:
+                operator_stack.render(cockpit.data)
+            return 0
+
+        if args.json:
+            print(
+                json.dumps(
+                    {
+                        "status": "warn",
+                        "source": "mq-agent stack cockpit --json",
+                        "error": cockpit.error,
+                        "returncode": cockpit.returncode,
+                    },
+                    indent=2,
+                    ensure_ascii=False,
+                )
+            )
+            return 1
+
+        print("MQ Stack")
+        print()
+        print("mq-agent cockpit  WARN")
+        print()
+        print("Overall:")
+        print("unknown")
+        print()
+        print(f"Fallback: {cockpit.error}. Showing legacy local stack-status.")
+        print()
+
+    data = collect()
     if args.json:
         print(json.dumps(data, indent=2, ensure_ascii=False))
         return 0

@@ -2,6 +2,24 @@
 
 <!-- markdownlint-disable MD013 -->
 
+## [Unreleased]
+
+### Added
+
+* `mq-hal stack` / `mq-hal status` now read the operator stack view from
+  `mq-agent stack cockpit --json` when available.
+* Added `hal/stack.py`, `hal/status.py`, and `hal/doctor.py` as the v1.3
+  operator foundation modules.
+
+### Changed
+
+* `stack-status` keeps the legacy local collector behind `--legacy` and as a
+  text fallback when mq-agent cockpit data is unavailable.
+* Documentation now describes `mq-hal stack`, `mq-hal status`, and the
+  mq-agent cockpit input boundary.
+
+---
+
 ## [1.2.0] - 2026-06-01
 
 ### Added

@@ -167,26 +167,39 @@ Requires `repo-signal` locally. Falls back gracefully if unavailable.
 
 ## HAL Stack Status
 
-Show the local AI/repo tooling stack:
+Show the full MQ stack from the operator layer:
 
 {F}bash
+mq-hal stack
+mq-hal stack --json
+mq-hal status
 mq-hal stack-status
 mq-hal stack-status --json
 mq-hal stack-status --sample
 {F}
 
-Stack Status checks:
+Default input:
 
-- mq-hal wrapper
-- mqlaunch availability
-- repo-signal availability
-- optional bridget availability
-- configured repo paths
-- git branch and dirty state
-- VERSION file
-- repo-signal publish checklist when available
+{F}bash
+mq-agent stack cockpit --json
+{F}
 
-This command is read-only and does not write session memory.
+Stack Status shows:
+
+- mq-agent
+- mq-mcp
+- repo-signal
+- mqobsidian / brain
+- overall stack score
+
+`mq-hal` summarizes stack state only. Review execution and semantic-memory
+runtime stay in `mq-mcp`, routed through `mq-agent` where orchestration is
+needed.
+
+This command is read-only, does not write session memory, and does not define a
+separate stack contract. If mq-agent cockpit data is unavailable, text output
+falls back to the legacy local stack collector. Use `--legacy` to force that
+local collector.
 
 ## HAL Repo Ops
 

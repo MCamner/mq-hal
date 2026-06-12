@@ -60,6 +60,9 @@ python3 -m py_compile scripts/brief.py
 python3 -m py_compile scripts/release_brief.py
 python3 -m py_compile scripts/audit.py
 python3 -m py_compile scripts/stack_status.py
+python3 -m py_compile hal/stack.py
+python3 -m py_compile hal/status.py
+python3 -m py_compile hal/doctor.py
 python3 -m py_compile scripts/memory_status.py
 python3 -m py_compile scripts/repo_memory.py
 python3 -m py_compile scripts/agent_brief.py

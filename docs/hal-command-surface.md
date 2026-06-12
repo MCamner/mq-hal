@@ -45,20 +45,24 @@ Runs `repo-signal publish-checklist --format json` and `repo-signal readme-score
 
 ### `stack-status`
 
-Local stack overview for `mq-hal`, `repo-signal`, `mq-mcp`, `mqlaunch`, and configured repos.
+Operator stack overview from `mq-agent stack cockpit --json`.
 
 | Property | Value |
 |---|---|
 | `mq-hal` | `mq-hal stack-status` |
-| Alias | `mq-hal stack` / `mq-hal status-stack` |
-| Backend | `scripts/stack_status.py` |
+| Alias | `mq-hal stack` / `mq-hal status` / `mq-hal status-stack` |
+| Backend | `scripts/stack_status.py`, `hal/stack.py` |
 | Read-only | Yes |
 | Memory write | No |
-| Flags | `--json`, `--sample` |
+| Flags | `--json`, `--sample`, `--legacy` |
 
-Checks: local `mq-hal` wrapper, `mqlaunch`, `repo-signal`, optional `bridget`, configured repo paths, git branch and dirty state, VERSION file, and repo-signal publish checklist when available.
+Default input: `mq-agent stack cockpit --json`. JSON output preserves the
+mq-agent cockpit payload instead of creating a separate mq-hal stack contract.
 
-Planned mq ecosystem extension: include mq-agent availability and mq-mcp runtime/tool health as read-only status signals. `stack-status` must remain an operator summary; it must not orchestrate mq-agent or execute mq-mcp review flows.
+Legacy fallback: when cockpit data is unavailable, text output falls back to the
+pre-v1.3 local collector for `mq-hal`, `mqlaunch`, `repo-signal`, optional
+`bridget`, configured repos, and mq-mcp runtime visibility. Use `--legacy` to
+force the old local collector.
 
 This command does not execute repairs and does not write session memory.
 

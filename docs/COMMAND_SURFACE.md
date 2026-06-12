@@ -19,7 +19,7 @@ The detailed reference with flags, examples, and backend notes is in
 | --------------- | --------------------------------- | --- | ------ | ------- | -------------------- |
 | `brief` | — | Yes | Yes | No | `hal brief` |
 | `audit` | — | Yes | Yes | No | `hal audit` |
-| `stack-status` | `stack`, `status-stack` | No | No | No | — |
+| `stack-status` | `stack`, `status-stack`, `status` | No | No | No | — |
 | `release-brief` | `release` | Yes | Yes | No | `hal release-brief` |
 | `repo-status` | `repo` | No | No | No | `hal repo-status` |
 | `ci` | `ci-status` | No | No | No | `hal ci` |

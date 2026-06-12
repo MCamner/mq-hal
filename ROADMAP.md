@@ -73,7 +73,7 @@ Completed foundation:
 Current recommended next step:
 
 ```text
-v1.3.0 — MQ stack release/operator status routing
+v1.4.0 — Brain Control Center
 ```
 
 ---
@@ -100,57 +100,395 @@ v1.3.0 — MQ stack release/operator status routing
 | v1.0.3  | ROADMAP cleanup — all stale items resolved           | Done    |
 | v1.1.0  | mq-mcp runtime health observability in stack-status  | Done    |
 | v1.2.0  | Vector-store health summary in stack-status          | Done    |
-| v1.3.0  | MQ stack release/operator status routing             | Planned |
+| v1.3.0  | Stack Operator Foundation                            | Done    |
+| v1.4.0  | Brain Control Center                                 | Planned |
+| v1.5.0  | Release Control Center                               | Planned |
+| v1.6.0  | Runtime Control                                      | Planned |
+| v1.7.0  | TUI Dashboard                                        | Planned |
+| v1.8.0  | Timeline and History                                 | Planned |
+| v1.9.0  | Operator Actions                                     | Planned |
+| v2.0.0  | HAL Operator Platform                                | Planned |
 
 ---
 
-## Planned: v1.3.0 — MQ stack release/operator status routing
+## Operator Goal
 
-Goal:
+Build `mq-hal` into the **operator layer for the full MQ stack**.
 
-Make mq-hal a safe operator/status layer for the cross-repo Release Gate v2
-workflow. mq-hal should summarize and route local status, not own mq-agent
-orchestration or mq-mcp review logic.
-
-Planned scope:
-
-- [ ] Extend stack status with mq-agent release status when available
-- [ ] Surface mq-mcp Release Gate v2 status as read-only operator context
-- [ ] Summarize current blockers, perception findings, repo readiness and next
-  suggested action
-- [ ] Route natural-language operator prompts to existing mq-agent/mqlaunch
-  commands through the safe router
-- [ ] Keep JSON output available for `stack-status` and release/operator briefs
-- [ ] Preserve command allowlists, deterministic fallback and no-shell-from-model
-  behavior
-
-Operator sections:
+Role:
 
 ```text
-MQ Stack Health
-Release Gate Status
-Current Blockers
-Perception Findings
-Repo Readiness
-Suggested Next Action
+mqlaunch → start
+mq-agent → orchestration
+mq-mcp → runtime / review
+repo-signal → scoring
+mqobsidian → memory
+mq-hal → operator control room
 ```
 
-Boundary:
+Principle:
+
+**mq-hal should not think, review or store. It should only read, summarize,
+display and route.**
+
+---
+
+## v1.3.0 — Stack Operator Foundation (1–2 weeks)
+
+### Goal
+
+Show the whole stack status from one command.
+
+### Build
+
+```bash
+mq-hal stack
+```
+
+Output:
 
 ```text
-mq-hal summarizes and routes operator intent.
-mq-agent orchestrates review and release workflows.
-mq-mcp validates release readiness.
-repo-signal provides repo readiness signals.
-mq-image-analyze provides perception signals.
+MQ Stack
+
+mq-agent        PASS
+mq-mcp          PASS
+repo-signal     PASS
+mqobsidian      WARN
+brain           PASS
+
+Overall:
+92/100
 ```
 
-Non-goals:
+### Add
 
-- no direct release gate implementation
-- no direct visual analysis implementation
-- no bypassing mq-agent approval gates
-- no autonomous command execution
+```bash
+mq-hal stack --json
+mq-hal status
+mq-hal doctor
+```
+
+### Input
+
+Read from:
+
+```text
+mq-agent stack cockpit --json
+```
+
+### Deliverables
+
+```text
+hal/
+  stack.py
+  status.py
+  doctor.py
+```
+
+### Definition of Done
+
+- [x] stack status works
+- [x] JSON works
+- [x] no custom contracts
+
+---
+
+## v1.4.0 — Brain Control Center (1 week)
+
+### Goal
+
+Make mqobsidian visible.
+
+Commands:
+
+```bash
+mq-hal brain
+mq-hal brain health
+mq-hal brain recent
+mq-hal brain search
+```
+
+Show:
+
+```text
+brain notes
+truth exports
+learn exports
+review exports
+```
+
+### Folders
+
+```text
+memory/
+learn/
+truth/
+reviews/
+```
+
+### Output
+
+```text
+Recent notes
+Recent reviews
+Latest release
+```
+
+### Done
+
+- [ ] brain status
+- [ ] brain search
+- [ ] latest exports
+
+---
+
+## v1.5.0 — Release Control Center (1 week)
+
+### Goal
+
+Central release overview.
+
+Commands:
+
+```bash
+mq-hal release
+mq-hal release gates
+mq-hal release blockers
+```
+
+Show:
+
+```text
+Repo
+Version
+Ready
+Blockers
+```
+
+### Read From
+
+```bash
+mq-agent stack release-check --json
+```
+
+### Done
+
+- [ ] blocker list
+- [ ] release score
+
+---
+
+## v1.6.0 — Runtime Control (1 week)
+
+### Goal
+
+Show local services.
+
+Commands:
+
+```bash
+mq-hal runtime
+mq-hal runtime services
+```
+
+Show:
+
+```text
+Ollama
+mq-mcp
+GitHub
+brain
+```
+
+### Status
+
+```text
+RUNNING
+WARN
+DOWN
+```
+
+### Done
+
+- [ ] runtime status
+- [ ] health checks
+
+---
+
+## v1.7.0 — TUI Dashboard (2 weeks)
+
+### Goal
+
+Full terminal dashboard.
+
+Start:
+
+```bash
+mq-hal
+```
+
+View:
+
+```text
+┌──────────────────────┐
+Stack
+Release
+Brain
+Runtime
+History
+Alerts
+└──────────────────────┘
+```
+
+### Keys
+
+```text
+1 Stack
+2 Brain
+3 Release
+4 Runtime
+5 History
+q Exit
+```
+
+### Done
+
+- [ ] navigation
+- [ ] refresh
+
+---
+
+## v1.8.0 — Timeline & History (1 week)
+
+### Goal
+
+Show changes.
+
+Commands:
+
+```bash
+mq-hal history
+mq-hal alerts
+```
+
+Show:
+
+```text
+stack score
+brain growth
+release history
+```
+
+### Read From
+
+```text
+~/.mq-agent/
+mqobsidian/
+```
+
+### Done
+
+- [ ] trend view
+- [ ] history
+
+---
+
+## v1.9.0 — Operator Actions (1 week)
+
+### Goal
+
+Make HAL useful.
+
+Commands:
+
+```bash
+mq-hal next
+mq-hal fix
+mq-hal open
+```
+
+Example:
+
+```text
+BLOCKER:
+CHANGELOG missing
+
+Action:
+open CHANGELOG.md
+```
+
+### Done
+
+- [ ] actions
+- [ ] routing
+
+---
+
+## v2.0.0 — HAL Operator Platform
+
+### Final Goal
+
+```text
+start mq-hal
+
+↓
+
+see:
+stack
+brain
+runtime
+release
+history
+
+↓
+
+choose
+
+↓
+
+mq-agent runs
+```
+
+### Directory Structure
+
+```text
+mq-hal/
+├── hal/
+│   ├── stack/
+│   ├── release/
+│   ├── runtime/
+│   ├── brain/
+│   ├── dashboard/
+│   ├── history/
+│   └── operator/
+├── docs/
+├── tests/
+├── assets/
+└── ROADMAP.md
+```
+
+### Priority Build Order
+
+```text
+v1.3 Stack
+v1.4 Brain
+v1.5 Release
+v1.6 Runtime
+v1.7 Dashboard
+v1.8 History
+v1.9 Actions
+v2.0 Operator Platform
+```
+
+### Definition of Done
+
+When you can open:
+
+```bash
+mq-hal
+```
+
+and understand the whole MQ ecosystem's status without opening a single repo.
 
 ---
 
