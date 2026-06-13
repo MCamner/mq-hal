@@ -105,6 +105,21 @@ case "${1:-}" in
     exec python3 "$ROOT/hal/history.py" --alerts "$@"
     ;;
 
+  next)
+    shift || true
+    exec python3 "$ROOT/hal/operator.py" "$@"
+    ;;
+
+  fix)
+    shift || true
+    exec python3 "$ROOT/hal/operator.py" --command fix "$@"
+    ;;
+
+  open)
+    shift || true
+    exec python3 "$ROOT/hal/operator.py" --command open "$@"
+    ;;
+
   memory-path|session-path)
     shift || true
     exec python3 "$ROOT/scripts/session_memory.py" path "$@"

@@ -73,7 +73,7 @@ Completed foundation:
 Current recommended next step:
 
 ```text
-v1.9.0 — Operator Actions
+v2.0.0 — HAL Operator Platform
 ```
 
 ---
@@ -106,7 +106,7 @@ v1.9.0 — Operator Actions
 | v1.6.0  | Runtime Control                                      | Done    |
 | v1.7.0  | TUI Dashboard                                        | Done    |
 | v1.8.0  | Timeline and History                                 | Done    |
-| v1.9.0  | Operator Actions                                     | Planned |
+| v1.9.0  | Operator Actions                                     | Done    |
 | v2.0.0  | HAL Operator Platform                                | Planned |
 
 ---
@@ -419,8 +419,8 @@ open CHANGELOG.md
 
 ### Done
 
-- [ ] actions
-- [ ] routing
+- [x] actions
+- [x] routing
 
 ---
 

@@ -29,6 +29,8 @@
   `mq-hal dashboard` available as an explicit command.
 * `mq-hal history` and `mq-hal alerts` add the v1.8 Timeline & History layer
   for stack score, brain growth, release history, and current dashboard alerts.
+* `mq-hal next`, `mq-hal fix`, and `mq-hal open` add v1.9 Operator Actions for
+  routing blockers to existing local tools.
 
 ### Changed
 
@@ -46,6 +48,8 @@
   v1.8.0 Timeline & History.
 * ROADMAP now marks v1.8.0 Timeline & History done and points the next step at
   v1.9.0 Operator Actions.
+* ROADMAP now marks v1.9.0 Operator Actions done and points the next step at
+  v2.0.0 HAL Operator Platform.
 
 ---
 

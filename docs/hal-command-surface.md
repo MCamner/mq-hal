@@ -212,6 +212,66 @@ command reports warnings and blockers but does not route or fix anything.
 
 ---
 
+### `next`
+
+Show the next suggested operator action from release blockers or dashboard
+alerts.
+
+| Property | Value |
+|---|---|
+| `mq-hal` | `mq-hal next` |
+| Backend | `hal/operator.py` |
+| Read-only | Yes |
+| Memory write | No |
+| Flags | `--json`, `--sample` |
+
+Example output:
+
+```text
+BLOCKER:
+CHANGELOG missing
+
+Action:
+open CHANGELOG.md
+```
+
+---
+
+### `fix`
+
+Route a blocker to the existing `mqlaunch fix` tool.
+
+| Property | Value |
+|---|---|
+| `mq-hal` | `mq-hal fix "CHANGELOG missing"` |
+| Backend | `hal/operator.py --command fix` |
+| Read-only | Preview by default |
+| Memory write | No |
+| Flags | `--json`, `--sample`, `--confirm` |
+
+Without `--confirm`, prints the route it would use. With `--confirm`, runs
+`mqlaunch fix <blocker>`.
+
+---
+
+### `open`
+
+Open a suggested file or explicit target in the selected repo.
+
+| Property | Value |
+|---|---|
+| `mq-hal` | `mq-hal open CHANGELOG.md --repo mq-hal` |
+| Backend | `hal/operator.py --command open` |
+| Read-only | Preview by default |
+| Memory write | No |
+| Flags | `--repo`, `--json`, `--sample`, `--confirm` |
+
+Paths are constrained to the selected repo. Without `--confirm`, prints the
+resolved editor command. With `--confirm`, opens via `$VISUAL`, `$EDITOR`,
+`code`, `open`, or `nano`.
+
+---
+
 ## INSTALL
 
 ### `version`

@@ -77,6 +77,9 @@ mq-hal last
 mq-hal timeline
 mq-hal history
 mq-hal alerts
+mq-hal next
+mq-hal fix
+mq-hal open CHANGELOG.md --repo mq-hal
 mq-hal remember "release looked good"
 mq-hal memory-path
 mq-hal --raw-intent "kör doctor"
@@ -472,6 +475,21 @@ mqobsidian/
 It shows stack score history, brain growth, and release history. Alerts reuse
 the operator dashboard summaries and list current warnings or blockers without
 running fixes.
+
+## Operator Actions
+
+Route from blocker to action:
+
+{F}bash
+mq-hal next
+mq-hal fix
+mq-hal open CHANGELOG.md --repo mq-hal
+{F}
+
+`next` reads release blockers and dashboard alerts, then prints the next route.
+`fix` previews a call to `mqlaunch fix <blocker>` and only runs it with
+`--confirm`. `open` previews the editor command and only opens files with
+`--confirm`; paths are constrained to the selected repo.
 
 ## Optional model override
 
