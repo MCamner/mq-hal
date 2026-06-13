@@ -73,7 +73,7 @@ Completed foundation:
 Current recommended next step:
 
 ```text
-v1.8.0 — Timeline & History
+v1.9.0 — Operator Actions
 ```
 
 ---
@@ -105,7 +105,7 @@ v1.8.0 — Timeline & History
 | v1.5.0  | Release Control Center                               | Done    |
 | v1.6.0  | Runtime Control                                      | Done    |
 | v1.7.0  | TUI Dashboard                                        | Done    |
-| v1.8.0  | Timeline and History                                 | Planned |
+| v1.8.0  | Timeline and History                                 | Done    |
 | v1.9.0  | Operator Actions                                     | Planned |
 | v2.0.0  | HAL Operator Platform                                | Planned |
 
@@ -388,8 +388,8 @@ mqobsidian/
 
 ### Done
 
-- [ ] trend view
-- [ ] history
+- [x] trend view
+- [x] history
 
 ---
 

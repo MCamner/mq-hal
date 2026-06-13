@@ -95,6 +95,16 @@ case "${1:-}" in
     exec python3 "$ROOT/scripts/timeline.py" "$@"
     ;;
 
+  history)
+    shift || true
+    exec python3 "$ROOT/hal/history.py" "$@"
+    ;;
+
+  alerts)
+    shift || true
+    exec python3 "$ROOT/hal/history.py" --alerts "$@"
+    ;;
+
   memory-path|session-path)
     shift || true
     exec python3 "$ROOT/scripts/session_memory.py" path "$@"

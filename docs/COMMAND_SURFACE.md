@@ -32,6 +32,8 @@ The detailed reference with flags, examples, and backend notes is in
 | `last` | — | No | No | No | `hal last` |
 | `remember` | — | No | Yes | No | `hal remember` |
 | `timeline` | — | No | No | No | `hal timeline` |
+| `history` | — | No | No | No | — |
+| `alerts` | — | No | No | No | — |
 | `memory-path` | `session-path` | No | No | No | `hal memory-path` |
 | `memory-status` | `memory-brief` | No | No | No | — |
 | `brain` | — | No | No | No | — |

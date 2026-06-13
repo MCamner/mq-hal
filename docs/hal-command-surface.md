@@ -177,6 +177,41 @@ Reads `~/.mq-hal/session.jsonl`. Renders a table of event type, repo, time, and 
 
 ---
 
+### `history`
+
+Read-only trend view for stack score, brain growth, and release history.
+
+| Property | Value |
+|---|---|
+| `mq-hal` | `mq-hal history` |
+| Backend | `hal/history.py` |
+| Read-only | Yes |
+| Memory write | No |
+| Flags | `--json`, `--sample`, `--mq-agent-root`, `--brain-root` |
+
+Reads local history from `~/.mq-agent/` and the mqobsidian vault. It scans
+stack/cockpit JSON or JSONL files for scores, counts dated brain files, and
+lists release-related notes.
+
+---
+
+### `alerts`
+
+Read-only alert list derived from the operator dashboard.
+
+| Property | Value |
+|---|---|
+| `mq-hal` | `mq-hal alerts` |
+| Backend | `hal/history.py --alerts` |
+| Read-only | Yes |
+| Memory write | No |
+| Flags | `--json`, `--sample` |
+
+Alerts reuse the dashboard's stack, release, brain, and runtime summaries. The
+command reports warnings and blockers but does not route or fix anything.
+
+---
+
 ## INSTALL
 
 ### `version`

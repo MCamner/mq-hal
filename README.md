@@ -114,6 +114,8 @@ mq-hal brain
 mq-hal session
 mq-hal last
 mq-hal timeline
+mq-hal history
+mq-hal alerts
 mq-hal version
 mq-hal config-check
 mq-hal update
@@ -534,6 +536,28 @@ Through MQLaunch:
 mqlaunch hal timeline
 mqlaunch hal timeline --details
 ```
+
+## Timeline & History
+
+Show changes across local MQ state:
+
+```bash
+mq-hal history
+mq-hal history --json
+mq-hal alerts
+mq-hal alerts --json
+```
+
+History reads from:
+
+```text
+~/.mq-agent/
+mqobsidian/
+```
+
+It shows stack score history, brain growth, and release history. Alerts reuse
+the operator dashboard summaries and list current warnings or blockers without
+running fixes.
 
 ## Optional model override
 

@@ -75,6 +75,8 @@ mq-hal brain
 mq-hal session
 mq-hal last
 mq-hal timeline
+mq-hal history
+mq-hal alerts
 mq-hal remember "release looked good"
 mq-hal memory-path
 mq-hal --raw-intent "kör doctor"
@@ -448,6 +450,28 @@ Through MQLaunch:
 mqlaunch hal timeline
 mqlaunch hal timeline --details
 {F}
+
+## Timeline & History
+
+Show changes across local MQ state:
+
+{F}bash
+mq-hal history
+mq-hal history --json
+mq-hal alerts
+mq-hal alerts --json
+{F}
+
+History reads from:
+
+{F}text
+~/.mq-agent/
+mqobsidian/
+{F}
+
+It shows stack score history, brain growth, and release history. Alerts reuse
+the operator dashboard summaries and list current warnings or blockers without
+running fixes.
 
 ## Optional model override
 

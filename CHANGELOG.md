@@ -27,6 +27,8 @@
   `DOWN` statuses.
 * `mq-hal` without arguments now opens the read-only operator dashboard, with
   `mq-hal dashboard` available as an explicit command.
+* `mq-hal history` and `mq-hal alerts` add the v1.8 Timeline & History layer
+  for stack score, brain growth, release history, and current dashboard alerts.
 
 ### Changed
 
@@ -42,6 +44,8 @@
   v1.7.0 TUI Dashboard.
 * ROADMAP now marks v1.7.0 TUI Dashboard done and points the next step at
   v1.8.0 Timeline & History.
+* ROADMAP now marks v1.8.0 Timeline & History done and points the next step at
+  v1.9.0 Operator Actions.
 
 ---
 
