@@ -45,7 +45,7 @@ It should be:
 Latest stable release:
 
 ```text
-v1.2.0 — vector-store health summary in stack-status
+v2.0.0 — HAL Operator Platform
 ```
 
 Completed foundation:
@@ -69,11 +69,14 @@ Completed foundation:
 - Visual HAL: analyze-diagram, review-ui, architecture-brief
 - Packaged install/update flow + release gate v2
 - Learn layer with secret redaction
+- Stack / Brain / Release / Runtime control centers (v1.3–v1.6)
+- TUI dashboard, timeline & history, operator actions (v1.7–v1.9)
+- HAL Operator Platform — unified `mq-hal` dashboard over the whole stack (v2.0)
 
 Current recommended next step:
 
 ```text
-v2.0.0 — HAL Operator Platform
+v2.1.0 — operator platform polish
 ```
 
 ---
@@ -107,7 +110,7 @@ v2.0.0 — HAL Operator Platform
 | v1.7.0  | TUI Dashboard                                        | Done    |
 | v1.8.0  | Timeline and History                                 | Done    |
 | v1.9.0  | Operator Actions                                     | Done    |
-| v2.0.0  | HAL Operator Platform                                | Planned |
+| v2.0.0  | HAL Operator Platform                                | Done    |
 
 ---
 
@@ -425,6 +428,9 @@ open CHANGELOG.md
 ---
 
 ## v2.0.0 — HAL Operator Platform
+
+Status: Done — `mq-hal` with no arguments opens the unified operator dashboard
+(stack, brain, release, runtime, history, alerts) over the whole MQ stack.
 
 ### Final Goal
 

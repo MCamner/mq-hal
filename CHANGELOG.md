@@ -4,6 +4,14 @@
 
 ## [Unreleased]
 
+## [2.0.0] - 2026-06-13
+
+HAL Operator Platform — the capstone of the v1.3–v1.9 operator build. Running
+`mq-hal` with no arguments opens one operator dashboard that reads the whole MQ
+stack (stack health, brain/memory, release readiness, local runtime, history,
+and alerts) without opening a single repo. mq-hal stays read-only: it observes,
+summarizes, displays, and routes — it never thinks, reviews, or stores.
+
 ### Added
 
 * `mq-hal stack` / `mq-hal status` now read the operator stack view from
