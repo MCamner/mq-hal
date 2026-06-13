@@ -565,6 +565,25 @@ individual health checks behind each service.
 
 ---
 
+### `dashboard`
+
+Terminal dashboard for the HAL operator layer.
+
+| Property | Value |
+|---|---|
+| `mq-hal` | `mq-hal` / `mq-hal dashboard` |
+| Backend | `hal/dashboard.py` |
+| Read-only | Yes |
+| Memory write | No |
+| Flags | `--json`, `--sample`, `--once`, `--no-clear` |
+| Keys | `1` Stack, `2` Brain, `3` Release, `4` Runtime, `5` History, `a` Alerts, `r` Refresh, `q` Exit |
+
+The dashboard summarizes Stack, Brain, Release, Runtime, History, and Alerts.
+It reuses existing HAL readers and does not introduce a new stack, release, or
+runtime contract.
+
+---
+
 ## DEBUG / AI
 
 ### Free prompt

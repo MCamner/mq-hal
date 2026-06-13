@@ -23,6 +23,7 @@ The detailed reference with flags, examples, and backend notes is in
 | `release-brief` | — | Yes | Yes | No | `hal release-brief` |
 | `release` | — | No | No | No | — |
 | `runtime` | — | No | No | No | — |
+| `dashboard` | no-argument `mq-hal` | No | No | No | — |
 | `repo-status` | `repo` | No | No | No | `hal repo-status` |
 | `ci` | `ci-status` | No | No | No | `hal ci` |
 | `doctor-summary` | `doctor` | Yes | Yes | No | `hal doctor` |

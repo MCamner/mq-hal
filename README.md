@@ -103,6 +103,7 @@ mq-hal brief
 mq-hal release-brief
 mq-hal release
 mq-hal runtime
+mq-hal dashboard
 mq-hal audit
 mq-hal stack-status
 mq-hal repo-status
@@ -362,6 +363,31 @@ Runtime checks:
 Statuses are normalized to `RUNNING`, `WARN`, or `DOWN`. Runtime Control is
 read-only: it does not start services, review code, write memory, or orchestrate
 mq-agent.
+
+## TUI Dashboard
+
+Open the operator dashboard:
+
+```bash
+mq-hal
+mq-hal dashboard
+```
+
+Keys:
+
+```text
+1 Stack
+2 Brain
+3 Release
+4 Runtime
+5 History
+a Alerts
+r Refresh
+q Exit
+```
+
+The dashboard is read-only and reuses the existing Stack, Brain, Release,
+Runtime, and Timeline readers.
 
 ## HAL Doctor Summary
 

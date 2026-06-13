@@ -73,7 +73,7 @@ Completed foundation:
 Current recommended next step:
 
 ```text
-v1.7.0 — TUI Dashboard
+v1.8.0 — Timeline & History
 ```
 
 ---
@@ -104,7 +104,7 @@ v1.7.0 — TUI Dashboard
 | v1.4.0  | Brain Control Center                                 | Done    |
 | v1.5.0  | Release Control Center                               | Done    |
 | v1.6.0  | Runtime Control                                      | Done    |
-| v1.7.0  | TUI Dashboard                                        | Planned |
+| v1.7.0  | TUI Dashboard                                        | Done    |
 | v1.8.0  | Timeline and History                                 | Planned |
 | v1.9.0  | Operator Actions                                     | Planned |
 | v2.0.0  | HAL Operator Platform                                | Planned |
@@ -353,8 +353,8 @@ q Exit
 
 ### Done
 
-- [ ] navigation
-- [ ] refresh
+- [x] navigation
+- [x] refresh
 
 ---
 

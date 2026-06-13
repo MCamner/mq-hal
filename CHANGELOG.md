@@ -25,6 +25,8 @@
 * `mq-hal runtime` and `mq-hal runtime services` show read-only Runtime Control
   for Ollama, mq-mcp, GitHub, and brain health with `RUNNING`, `WARN`, and
   `DOWN` statuses.
+* `mq-hal` without arguments now opens the read-only operator dashboard, with
+  `mq-hal dashboard` available as an explicit command.
 
 ### Changed
 
@@ -38,6 +40,8 @@
   step at v1.6.0 Runtime Control.
 * ROADMAP now marks v1.6.0 Runtime Control done and points the next step at
   v1.7.0 TUI Dashboard.
+* ROADMAP now marks v1.7.0 TUI Dashboard done and points the next step at
+  v1.8.0 Timeline & History.
 
 ---
 

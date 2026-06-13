@@ -15,6 +15,10 @@ done
 
 ROOT="$(cd -P "$(dirname "$SOURCE")/.." >/dev/null 2>&1 && pwd)"
 
+if [[ $# -eq 0 ]]; then
+  exec python3 "$ROOT/hal/dashboard.py"
+fi
+
 case "${1:-}" in
   audit)
     shift || true
@@ -44,6 +48,11 @@ case "${1:-}" in
   runtime)
     shift || true
     exec python3 "$ROOT/hal/runtime.py" "$@"
+    ;;
+
+  dashboard)
+    shift || true
+    exec python3 "$ROOT/hal/dashboard.py" "$@"
     ;;
 
   repo-status|repo)
