@@ -101,6 +101,8 @@ operator-facing views that best show the router boundary.
 ```bash
 mq-hal brief
 mq-hal release-brief
+mq-hal release
+mq-hal runtime
 mq-hal audit
 mq-hal stack-status
 mq-hal repo-status
@@ -339,6 +341,27 @@ target note through `obsidian read`, and `brain sync-status` can update a note's
 Markdown from a web page into the vault. It previews by default and writes only
 with `--confirm`. URLs ending in `.md` are rejected because they are already
 Markdown and should be fetched directly instead of through Defuddle.
+
+## Runtime Control
+
+Show local MQ runtime service health:
+
+```bash
+mq-hal runtime
+mq-hal runtime services
+mq-hal runtime --json
+```
+
+Runtime checks:
+
+- Ollama
+- mq-mcp
+- GitHub
+- brain
+
+Statuses are normalized to `RUNNING`, `WARN`, or `DOWN`. Runtime Control is
+read-only: it does not start services, review code, write memory, or orchestrate
+mq-agent.
 
 ## HAL Doctor Summary
 

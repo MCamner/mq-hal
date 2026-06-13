@@ -22,6 +22,9 @@
   for note reads and confirmed `status` property updates.
 * `mq-hal brain ingest-url` captures clean Markdown from web pages through
   Defuddle and writes confirmed captures into the Obsidian vault.
+* `mq-hal runtime` and `mq-hal runtime services` show read-only Runtime Control
+  for Ollama, mq-mcp, GitHub, and brain health with `RUNNING`, `WARN`, and
+  `DOWN` statuses.
 
 ### Changed
 
@@ -33,6 +36,8 @@
   at v1.5.0 Release Control Center.
 * ROADMAP now marks v1.5.0 Release Control Center done and points the next
   step at v1.6.0 Runtime Control.
+* ROADMAP now marks v1.6.0 Runtime Control done and points the next step at
+  v1.7.0 TUI Dashboard.
 
 ---
 

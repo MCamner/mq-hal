@@ -41,6 +41,11 @@ case "${1:-}" in
     exec python3 "$ROOT/hal/release.py" "$@"
     ;;
 
+  runtime)
+    shift || true
+    exec python3 "$ROOT/hal/runtime.py" "$@"
+    ;;
+
   repo-status|repo)
     shift || true
     exec python3 "$ROOT/scripts/repo_status.py" "$@"

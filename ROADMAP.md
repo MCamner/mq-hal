@@ -73,7 +73,7 @@ Completed foundation:
 Current recommended next step:
 
 ```text
-v1.6.0 — Runtime Control
+v1.7.0 — TUI Dashboard
 ```
 
 ---
@@ -103,7 +103,7 @@ v1.6.0 — Runtime Control
 | v1.3.0  | Stack Operator Foundation                            | Done    |
 | v1.4.0  | Brain Control Center                                 | Done    |
 | v1.5.0  | Release Control Center                               | Done    |
-| v1.6.0  | Runtime Control                                      | Planned |
+| v1.6.0  | Runtime Control                                      | Done    |
 | v1.7.0  | TUI Dashboard                                        | Planned |
 | v1.8.0  | Timeline and History                                 | Planned |
 | v1.9.0  | Operator Actions                                     | Planned |
@@ -310,8 +310,8 @@ DOWN
 
 ### Done
 
-- [ ] runtime status
-- [ ] health checks
+- [x] runtime status
+- [x] health checks
 
 ---
 

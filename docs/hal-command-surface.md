@@ -546,6 +546,25 @@ open, `open` bridges to `obsidian read`, while `sync-status` bridges to
 
 ---
 
+### `runtime`
+
+Read-only control center for local runtime services.
+
+| Property | Value |
+|---|---|
+| `mq-hal` | `mq-hal runtime` |
+| Backend | `hal/runtime.py` |
+| Read-only | Yes |
+| Memory write | No |
+| Flags | `--json`, `--sample`, `--details` |
+| Subcommands | `services` |
+
+Checks `Ollama`, `mq-mcp`, `GitHub`, and `brain`. Health statuses are
+normalized to `RUNNING`, `WARN`, or `DOWN`; `runtime services` includes the
+individual health checks behind each service.
+
+---
+
 ## DEBUG / AI
 
 ### Free prompt
