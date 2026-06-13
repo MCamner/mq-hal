@@ -1,19 +1,23 @@
 # Repo Aware
 
-Use the Codex `repo-aware` skill before answering or changing this repository.
+Use the repository's `repo-aware` skill before answering or changing this
+repository.
 
-Skill file:
+Primary skill file:
+
+```text
+skills/repo-aware/SKILL.md
+```
+
+Canonical Codex fallback:
 
 ```text
 /Users/mansys/.codex/skills/repo-aware/SKILL.md
 ```
 
-First read that file completely and follow its workflow. If the file is not
-available, fall back to:
-
-```text
-skills/repo-aware/SKILL.md
-```
+First read the primary skill completely. If it is missing, read the canonical
+fallback completely. If both exist, use the local skill for repo-specific facts
+and the canonical skill for the general repo-first workflow.
 
 Default inspection pass:
 
