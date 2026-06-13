@@ -18,6 +18,10 @@
   backed by `mq-agent stack release-check --json`.
 * Added `tests/release-control-smoke.sh` coverage for release summary, gates,
   blockers, JSON, sample output, and `release-brief` compatibility.
+* `mq-hal brain open` and `mq-hal brain sync-status` bridge to the Obsidian CLI
+  for note reads and confirmed `status` property updates.
+* `mq-hal brain ingest-url` captures clean Markdown from web pages through
+  Defuddle and writes confirmed captures into the Obsidian vault.
 
 ### Changed
 

@@ -316,6 +316,9 @@ mq-hal brain
 mq-hal brain health
 mq-hal brain recent
 mq-hal brain search "release"
+mq-hal brain ingest-url "https://example.com/docs/page" --confirm
+mq-hal brain open "mq-stack/05_RELEASE_STATUS.md"
+mq-hal brain sync-status "mq-stack/05_RELEASE_STATUS.md" --status active --confirm
 mq-hal brain --json
 ```
 
@@ -327,8 +330,15 @@ Brain reads:
 - `reviews/`
 
 It shows recent notes, recent reviews, latest release export, and folder health.
-It only reads existing mqobsidian/HAL memory files; it does not write memory or
-run reviews.
+When the Obsidian CLI is available and Obsidian is open, `brain open` reads a
+target note through `obsidian read`, and `brain sync-status` can update a note's
+`status` property through `obsidian property:set`. Status sync requires
+`--confirm`.
+
+`brain ingest-url` uses Defuddle (`defuddle parse <url> --md`) to capture clean
+Markdown from a web page into the vault. It previews by default and writes only
+with `--confirm`. URLs ending in `.md` are rejected because they are already
+Markdown and should be fetched directly instead of through Defuddle.
 
 ## HAL Doctor Summary
 

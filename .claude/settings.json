@@ -2,6 +2,12 @@
   "permissions": {
     "allow": [
       "Bash(ollama list *)",
+      "Read(/Users/mansys/.codex/skills/repo-aware/**)",
+      "Bash(sed -n '1,260p' /Users/mansys/.codex/skills/repo-aware/SKILL.md)",
+      "Bash(rg --files)",
+      "Bash(repo-signal doctor)",
+      "Bash(repo-signal analyze)",
+      "Bash(repo-signal repoaware *)",
       "Bash(ls /Users/mansys/.lmstudio/bin/ 2>/dev/null; which -a ollama 2>/dev/null; ls /opt/homebrew/bin/ollama 2>/dev/null)",
       "Read(//opt/homebrew/bin/**)",
       "Bash(export PATH=\"/opt/homebrew/opt/python@3.11/libexec/bin:/opt/homebrew/bin:/opt/homebrew/sbin:$HOME/bin:$HOME/macos-scripts/bin:$PATH\")",

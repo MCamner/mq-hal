@@ -5,10 +5,14 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import re
+import shutil
+import subprocess
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
+from urllib.parse import urlparse
 
 STATE_DIR = Path(
     os.environ.get("MQ_HAL_STATE_DIR", str(Path.home() / ".mq-hal"))
@@ -265,6 +269,354 @@ def print_json(data: dict[str, Any]) -> None:
     print(json.dumps(data, indent=2, ensure_ascii=False))
 
 
+def slugify(value: str) -> str:
+    slug = re.sub(r"[^A-Za-z0-9._-]+", "-", value.strip().lower())
+    slug = re.sub(r"-+", "-", slug).strip("-._")
+    return slug[:80] or "captured-page"
+
+
+def defuddle_bin() -> str | None:
+    env = os.environ.get("DEFUDDLE_BIN")
+    if env:
+        path = Path(env).expanduser()
+        if path.exists():
+            return str(path)
+    return shutil.which("defuddle")
+
+
+def url_looks_markdown(url: str) -> bool:
+    parsed = urlparse(url)
+    return parsed.path.lower().endswith(".md")
+
+
+def title_from_markdown(markdown: str, fallback: str) -> str:
+    for line in markdown.splitlines():
+        stripped = line.strip()
+        if stripped.startswith("# "):
+            title = stripped.lstrip("#").strip()
+            if title:
+                return title[:120]
+    return fallback
+
+
+def fallback_title_from_url(url: str) -> str:
+    parsed = urlparse(url)
+    candidate = Path(parsed.path).stem if parsed.path else ""
+    return candidate.replace("-", " ").replace("_", " ").strip().title() or parsed.netloc or "Captured Page"
+
+
+def unique_note_path(path: Path, overwrite: bool) -> Path:
+    if overwrite or not path.exists():
+        return path
+    stem = path.stem
+    suffix = path.suffix
+    parent = path.parent
+    for index in range(2, 1000):
+        candidate = parent / f"{stem}-{index}{suffix}"
+        if not candidate.exists():
+            return candidate
+    raise RuntimeError(f"could not find unique note path for {path}")
+
+
+def run_defuddle(url: str, timeout: int = 60) -> dict[str, Any]:
+    binary = defuddle_bin()
+    command = ["defuddle", "parse", url, "--md"]
+    if binary is None:
+        return {
+            "available": False,
+            "command": command,
+            "returncode": 127,
+            "stdout": "",
+            "stderr": "defuddle CLI not found",
+        }
+
+    command = [binary, "parse", url, "--md"]
+    try:
+        result = subprocess.run(
+            command,
+            capture_output=True,
+            text=True,
+            timeout=timeout,
+            check=False,
+        )
+    except subprocess.TimeoutExpired:
+        return {
+            "available": True,
+            "command": command,
+            "returncode": 124,
+            "stdout": "",
+            "stderr": "defuddle timed out",
+        }
+    except OSError as exc:
+        return {
+            "available": True,
+            "command": command,
+            "returncode": 1,
+            "stdout": "",
+            "stderr": str(exc),
+        }
+
+    return {
+        "available": True,
+        "command": command,
+        "returncode": int(result.returncode),
+        "stdout": (result.stdout or "").strip(),
+        "stderr": (result.stderr or "").strip(),
+    }
+
+
+def render_capture_note(title: str, url: str, markdown: str) -> str:
+    captured_at = now_iso()
+    return "\n".join(
+        [
+            "---",
+            f"title: {json.dumps(title, ensure_ascii=False)}",
+            "schema_version: web-capture.v1",
+            "status: captured",
+            f"source_url: {json.dumps(url, ensure_ascii=False)}",
+            f"captured_at: {json.dumps(captured_at, ensure_ascii=False)}",
+            "capture_tool: defuddle",
+            "tags:",
+            "  - web/capture",
+            "  - mq/brain",
+            "---",
+            "",
+            f"# {title}",
+            "",
+            f"Source: {url}",
+            "",
+            markdown.strip(),
+            "",
+        ]
+    )
+
+
+def brain_ingest_url(
+    url: str,
+    root: Path,
+    folder: str,
+    title: str | None,
+    confirm: bool,
+    overwrite: bool,
+) -> dict[str, Any]:
+    if url_looks_markdown(url):
+        return {
+            "operation": "brain_ingest_url",
+            "url": url,
+            "status": "rejected",
+            "returncode": 2,
+            "error": "URL ends in .md; defuddle skill says to use direct Markdown fetch instead.",
+        }
+
+    parsed = urlparse(url)
+    if parsed.scheme not in {"http", "https"} or not parsed.netloc:
+        return {
+            "operation": "brain_ingest_url",
+            "url": url,
+            "status": "rejected",
+            "returncode": 2,
+            "error": "URL must be http(s).",
+        }
+
+    fallback_title = title or fallback_title_from_url(url)
+    note_dir = root / folder.strip("/")
+    planned_path = note_dir / f"{slugify(fallback_title)}.md"
+
+    if not confirm:
+        return {
+            "operation": "brain_ingest_url",
+            "url": url,
+            "status": "preview",
+            "requires_confirm": True,
+            "root": str(root),
+            "path": str(planned_path),
+            "command": ["defuddle", "parse", url, "--md"],
+            "returncode": 0,
+        }
+
+    result = run_defuddle(url)
+    if result["returncode"] != 0:
+        return {
+            "operation": "brain_ingest_url",
+            "url": url,
+            "status": "error",
+            "root": str(root),
+            "path": str(planned_path),
+            "defuddle": result,
+            "returncode": result["returncode"],
+        }
+
+    markdown = str(result["stdout"] or "")
+    final_title = title_from_markdown(markdown, fallback_title)
+    note_dir = root / folder.strip("/")
+    note_dir.mkdir(parents=True, exist_ok=True)
+    note_path = unique_note_path(note_dir / f"{slugify(final_title)}.md", overwrite=overwrite)
+    note_path.write_text(render_capture_note(final_title, url, markdown), encoding="utf-8")
+
+    return {
+        "operation": "brain_ingest_url",
+        "url": url,
+        "status": "captured",
+        "root": str(root),
+        "path": str(note_path),
+        "title": final_title,
+        "bytes": note_path.stat().st_size,
+        "defuddle": {
+            "available": result["available"],
+            "command": result["command"],
+            "returncode": result["returncode"],
+        },
+        "returncode": 0,
+    }
+
+
+def render_ingest_result(result: dict[str, Any]) -> None:
+    print("Brain Ingest URL")
+    print("================")
+    print()
+    print(f"url:    {result.get('url', '-')}")
+    print(f"status: {result.get('status', '-')}")
+    if result.get("requires_confirm"):
+        print("mode:   preview; re-run with --confirm to fetch and write the note")
+    if result.get("path"):
+        print(f"path:   {result['path']}")
+    if result.get("title"):
+        print(f"title:  {result['title']}")
+    if result.get("error"):
+        print()
+        print(result["error"])
+    defuddle = result.get("defuddle")
+    if isinstance(defuddle, dict) and defuddle.get("returncode") != 0:
+        print()
+        print(defuddle.get("stderr") or "defuddle failed")
+
+
+def obsidian_bin() -> str | None:
+    env = os.environ.get("OBSIDIAN_BIN")
+    if env:
+        path = Path(env).expanduser()
+        if path.exists():
+            return str(path)
+    return shutil.which("obsidian")
+
+
+def target_arg(note: str) -> str:
+    if note.endswith((".md", ".canvas", ".base")) or "/" in note:
+        return f"path={note}"
+    return f"file={note}"
+
+
+def run_obsidian(args: list[str], timeout: int = 20) -> dict[str, Any]:
+    binary = obsidian_bin()
+    command = ["obsidian", *args]
+    if binary is None:
+        return {
+            "available": False,
+            "command": command,
+            "returncode": 127,
+            "stdout": "",
+            "stderr": "obsidian CLI not found",
+        }
+
+    command = [binary, *args]
+    try:
+        result = subprocess.run(
+            command,
+            capture_output=True,
+            text=True,
+            timeout=timeout,
+            check=False,
+        )
+    except subprocess.TimeoutExpired:
+        return {
+            "available": True,
+            "command": command,
+            "returncode": 124,
+            "stdout": "",
+            "stderr": "obsidian CLI timed out",
+        }
+    except OSError as exc:
+        return {
+            "available": True,
+            "command": command,
+            "returncode": 1,
+            "stdout": "",
+            "stderr": str(exc),
+        }
+
+    return {
+        "available": True,
+        "command": command,
+        "returncode": int(result.returncode),
+        "stdout": (result.stdout or "").strip(),
+        "stderr": (result.stderr or "").strip(),
+    }
+
+
+def brain_open(note: str, vault: str | None = None) -> dict[str, Any]:
+    args = []
+    if vault:
+        args.append(f"vault={vault}")
+    args.extend(["read", target_arg(note)])
+    result = run_obsidian(args)
+    result["note"] = note
+    result["operation"] = "brain_open"
+    return result
+
+
+def brain_sync_status(note: str, status: str, vault: str | None = None, confirm: bool = False) -> dict[str, Any]:
+    args = []
+    if vault:
+        args.append(f"vault={vault}")
+    args.extend(["property:set", "name=status", f"value={status}", target_arg(note)])
+
+    if not confirm:
+        return {
+            "available": obsidian_bin() is not None,
+            "operation": "brain_sync_status",
+            "note": note,
+            "status": status,
+            "requires_confirm": True,
+            "command": ["obsidian", *args],
+            "returncode": 0,
+            "stdout": "",
+            "stderr": "",
+        }
+
+    result = run_obsidian(args)
+    result["note"] = note
+    result["status"] = status
+    result["operation"] = "brain_sync_status"
+    return result
+
+
+def render_obsidian_result(result: dict[str, Any]) -> None:
+    operation = str(result.get("operation") or "obsidian")
+    title = "Brain Open" if operation == "brain_open" else "Brain Sync Status"
+    print(title)
+    print("=" * len(title))
+    print()
+    if not result.get("available"):
+        print("obsidian: unavailable")
+        print("Install or expose the Obsidian CLI, then retry with Obsidian open.")
+        return
+    if result.get("requires_confirm"):
+        print("Preview only. Re-run with --confirm to update Obsidian.")
+        print()
+    print(f"note:       {result.get('note', '-')}")
+    if operation == "brain_sync_status":
+        print(f"status:     {result.get('status', '-')}")
+    print(f"returncode: {result.get('returncode', '-')}")
+    stdout = str(result.get("stdout") or "")
+    stderr = str(result.get("stderr") or "")
+    if stdout:
+        print()
+        print(stdout)
+    if stderr:
+        print()
+        print(stderr)
+
+
 def main(argv: list[str]) -> int:
     parser = argparse.ArgumentParser(
         prog="mq-hal brain",
@@ -286,6 +638,27 @@ def main(argv: list[str]) -> int:
     p_search.add_argument("--limit", type=int, default=8)
     p_search.add_argument("--json", action="store_true")
 
+    p_ingest = sub.add_parser("ingest-url", help="Capture a web page into Obsidian via Defuddle")
+    p_ingest.add_argument("url")
+    p_ingest.add_argument("--folder", default="inbox")
+    p_ingest.add_argument("--title")
+    p_ingest.add_argument("--root", help="Override mqobsidian root")
+    p_ingest.add_argument("--overwrite", action="store_true")
+    p_ingest.add_argument("--confirm", action="store_true")
+    p_ingest.add_argument("--json", action="store_true")
+
+    p_open = sub.add_parser("open", help="Read/open a brain note through obsidian CLI")
+    p_open.add_argument("note")
+    p_open.add_argument("--vault")
+    p_open.add_argument("--json", action="store_true")
+
+    p_sync = sub.add_parser("sync-status", help="Set a note status property through obsidian CLI")
+    p_sync.add_argument("note")
+    p_sync.add_argument("--status", required=True)
+    p_sync.add_argument("--vault")
+    p_sync.add_argument("--confirm", action="store_true")
+    p_sync.add_argument("--json", action="store_true")
+
     args = parser.parse_args(argv)
     root = Path(args.root).expanduser() if args.root else None
 
@@ -299,6 +672,39 @@ def main(argv: list[str]) -> int:
         else:
             render_search(payload)
         return 0
+    elif args.command == "ingest-url":
+        payload = brain_ingest_url(
+            args.url,
+            root=root or resolve_root(),
+            folder=args.folder,
+            title=args.title,
+            confirm=args.confirm,
+            overwrite=args.overwrite,
+        )
+        if args.json:
+            print_json(payload)
+        else:
+            render_ingest_result(payload)
+        return 0 if payload["returncode"] == 0 else int(payload["returncode"])
+    elif args.command == "open":
+        payload = brain_open(args.note, vault=args.vault)
+        if args.json:
+            print_json(payload)
+        else:
+            render_obsidian_result(payload)
+        return 0 if payload["returncode"] == 0 else 1
+    elif args.command == "sync-status":
+        payload = brain_sync_status(
+            args.note,
+            status=args.status,
+            vault=args.vault,
+            confirm=args.confirm,
+        )
+        if args.json:
+            print_json(payload)
+        else:
+            render_obsidian_result(payload)
+        return 0 if payload["returncode"] == 0 else 1
     else:
         data = collect(root)
 

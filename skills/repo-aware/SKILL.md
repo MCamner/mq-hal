@@ -7,6 +7,23 @@ description: Use when inspecting, explaining, planning, reviewing, or changing m
 
 Use this skill to keep work grounded in mq-hal's actual local HAL router architecture.
 
+## Claude Code Usage
+
+Claude Code can run this through the project slash command:
+
+```text
+/repo-aware <task>
+```
+
+The command reads the canonical Codex skill from:
+
+```text
+/Users/mansys/.codex/skills/repo-aware/SKILL.md
+```
+
+Then it applies the mq-hal-specific notes in this file when the task is inside
+this repo.
+
 ## What This Repo Is
 
 `mq-hal` is a local macOS HAL-style command router. It takes natural language, asks Ollama for a strict JSON intent, then routes that intent through safe Python code and whitelisted local actions. The model never runs shell directly.

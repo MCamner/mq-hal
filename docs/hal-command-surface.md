@@ -530,14 +530,19 @@ Read-only control center for mqobsidian and local HAL memory exports.
 | Read-only | Yes |
 | Memory write | No |
 | Flags | `--json`, `--sample`, `--root` |
-| Subcommands | `health`, `recent`, `search` |
+| Subcommands | `health`, `recent`, `search`, `ingest-url`, `open`, `sync-status` |
 
 Checks folders under the mqobsidian root: `memory/`, `learn/`, `truth/`, and
 `reviews/`. The root is resolved from `MQ_HAL_BRAIN_DIR`, `MQOBSIDIAN_PATH`,
 `MQ_OBSIDIAN_PATH`, common home-directory candidates, then `MQ_HAL_STATE_DIR`.
 
 This command only reads, summarizes, displays, and searches existing notes and
-exports. It does not create memory, write lessons, or run review logic.
+exports by default. `ingest-url` bridges to Defuddle with
+`defuddle parse <url> --md`, previews by default, and writes only with
+`--confirm`. URLs ending in `.md` are rejected because the Defuddle skill says
+to fetch Markdown directly. If the Obsidian CLI is available and Obsidian is
+open, `open` bridges to `obsidian read`, while `sync-status` bridges to
+`obsidian property:set` and requires `--confirm`.
 
 ---
 
