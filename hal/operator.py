@@ -70,6 +70,12 @@ def resolve_repo(repo: str | None) -> tuple[str, Path]:
     if name not in known:
         name = "mq-hal" if "mq-hal" in known else default_repo_name()
     path = known.get(name, BASE_DIR).resolve()
+    # The self-repo is configured as ~/mq-hal, which matches the checkout on a
+    # developer machine but not in CI (where the checkout lives elsewhere and
+    # ~/mq-hal does not exist). Fall back to the actual package location so
+    # `open --confirm` doesn't run subprocess with a non-existent cwd.
+    if name == "mq-hal" and not path.is_dir():
+        path = BASE_DIR
     return name, path
 
 
