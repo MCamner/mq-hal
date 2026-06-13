@@ -79,3 +79,7 @@ jobs:
           ./tests/critic-smoke.sh
           ./tests/execute-smoke.sh
           ./tests/docs-smoke.sh
+
+      - name: Check skills consistency
+        run: |
+          ./scripts/check-skills.sh

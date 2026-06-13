@@ -7,6 +7,21 @@ description: Use when preparing mq-hal for release by checking versioning, chang
 
 Use this skill before tagging, publishing, or announcing mq-hal.
 
+## Evals
+
+### Should trigger
+
+- "is mq-hal ready to release?"
+- "run the release checklist"
+- "check version and changelog alignment"
+- "what is blocking the release?"
+
+### Should not trigger
+
+- "update the docs" → use `docs-maintainer`
+- "change routing safety" → use `hal-router-safety-maintainer`
+- "polish the CLI output" → use `terminal-ui-polisher`
+
 ## Always Inspect
 
 - `git status --short`

@@ -7,6 +7,21 @@ description: Use when improving mq-hal CLI output, help text, reports, JSON mode
 
 Use this skill to make mq-hal command output clear, compact, scriptable, and safe.
 
+## Evals
+
+### Should trigger
+
+- "the HAL report output is hard to scan"
+- "improve the help text"
+- "the smoke output is noisy"
+- "clean up these error messages"
+
+### Should not trigger
+
+- "change routing behavior" → use `hal-router-safety-maintainer`
+- "update the docs" → use `docs-maintainer`
+- "add a runtime health check" → use `runtime-observability-maintainer`
+
 ## Surfaces
 
 - `bin/mq-hal`

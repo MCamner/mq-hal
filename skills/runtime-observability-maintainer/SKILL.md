@@ -7,6 +7,21 @@ description: Use when adding or changing mq-hal runtime health, stack status, ve
 
 Use this skill when mq-hal summarizes the health of the local mq ecosystem.
 
+## Evals
+
+### Should trigger
+
+- "add a vector health check"
+- "the model health summary is wrong"
+- "improve degraded-mode recommendations"
+- "the stack status diagnostics are stale"
+
+### Should not trigger
+
+- "change intent routing" → use `hal-router-safety-maintainer`
+- "wire a new external integration" → use `integration-stack-maintainer`
+- "polish the report layout" → use `terminal-ui-polisher`
+
 ## Boundary
 
 mq-hal owns operator-facing diagnostics, runtime summaries, local model status, tool availability, environment state and degraded-mode recommendations.

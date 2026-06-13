@@ -7,6 +7,21 @@ description: Use when inspecting, explaining, planning, reviewing, or changing m
 
 Use this skill to keep work grounded in mq-hal's actual local HAL router architecture.
 
+## Evals
+
+### Should trigger
+
+- "explain mq-hal's architecture"
+- "what surfaces does mq-hal have?"
+- "plan a change that spans the repo"
+- "I'm new to mq-hal — where do I start?"
+
+### Should not trigger
+
+- "change intent routing" → use `hal-router-safety-maintainer`
+- "is it ready to release?" → use `release-readiness`
+- "docs only" → use `docs-maintainer`
+
 ## Claude Code Usage
 
 Claude Code can run this through the project slash command:

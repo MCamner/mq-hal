@@ -7,6 +7,21 @@ description: Use when keeping mq-hal README, command surface docs, integration d
 
 Keep mq-hal docs aligned with the actual command router and smoke-tested behavior.
 
+## Evals
+
+### Should trigger
+
+- "sync the README after a command surface change"
+- "the command surface docs are stale"
+- "update the changelog and roadmap"
+- "do documented intents still match the router?"
+
+### Should not trigger
+
+- "change intent routing or safety" → use `hal-router-safety-maintainer`
+- "polish the CLI output" → use `terminal-ui-polisher`
+- "is mq-hal ready to release?" → use `release-readiness`
+
 ## Docs Surfaces
 
 - `README.md`

@@ -7,6 +7,21 @@ description: Use when adding, changing, reviewing, or documenting mq-hal intents
 
 Use this skill for mq-hal's core safety boundary: natural language can suggest an intent, but only local allowlisted router code can act.
 
+## Evals
+
+### Should trigger
+
+- "add a new HAL intent"
+- "review the repo allowlist for a subprocess call"
+- "does this intent need a confirmation gate?"
+- "tighten routing safety boundaries"
+
+### Should not trigger
+
+- "polish the HAL menu output" → use `terminal-ui-polisher`
+- "update intent docs only" → use `docs-maintainer`
+- "add a runtime health check" → use `runtime-observability-maintainer`
+
 ## Core Files
 
 - `scripts/hal.py`

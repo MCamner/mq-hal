@@ -7,6 +7,21 @@ description: Use when working on mq-hal integration with mqlaunch, repo-signal, 
 
 Use this skill when mq-hal connects to the wider MQ ecosystem.
 
+## Evals
+
+### Should trigger
+
+- "wire up the repo-signal status integration"
+- "the mq-mcp call from HAL fails"
+- "register a configured repo for HAL"
+- "add stack/CI status reporting"
+
+### Should not trigger
+
+- "change intent routing" → use `hal-router-safety-maintainer`
+- "runtime health summaries" → use `runtime-observability-maintainer`
+- "docs only" → use `docs-maintainer`
+
 ## Integration Role
 
 `mq-hal` is the local operator/router layer. It sits between natural-language requests and safe local repo/tool actions.
