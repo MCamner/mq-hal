@@ -40,6 +40,7 @@ The detailed reference with flags, examples, and backend notes is in
 | `memory-path` | `session-path` | No | No | No | `hal memory-path` |
 | `memory-status` | `memory-brief` | No | No | No | — |
 | `brain` | — | No | No | No | — |
+| `context` | — | No | No | No | — |
 | `index` | — | No | Yes | No | — |
 | `search` | — | No | No | No | — |
 | `ask-repo` | — | No | No | No | — |

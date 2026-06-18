@@ -4,6 +4,29 @@
 
 ## [Unreleased]
 
+## [2.1.0] - 2026-06-17
+
+Context Pack Status — mq-hal gains read-only visibility into the mqobsidian
+token-reduction layer. mq-hal observes the context scaffold and latest task
+pack; it never generates packs (that stays in `mq-agent`) and never writes to
+mqobsidian (durable schemas/templates stay there).
+
+### Added
+
+* `mq-hal context` — read-only Context Pack Status for the mqobsidian
+  token-reduction layer, with `status`, `latest-pack`, `budget`, and `open`
+  subcommands plus `--json`, `--sample`, `--root`, and `--no-budget`. It checks
+  the context scaffold (`docs/context-budget.md`,
+  `docs/roadmap-token-reduction.md`, `schemas/context-pack.v1.json`,
+  `templates/context-pack.md`, `examples/sanitized-context-pack.md`,
+  `scripts/check-token-budget.py`) and the latest task pack at
+  `.mq/context/task-pack.md`. `budget` delegates to mqobsidian's
+  `check-token-budget.py`; missing mqobsidian reports `WARN`, never `FAIL`.
+  mq-hal only shows status — context-pack generation stays in `mq-agent` and
+  durable schemas/templates stay in `mqobsidian`.
+* Added `hal/context.py`, `tests/context-smoke.sh`, and a `Context` panel
+  (section 6) in the operator dashboard.
+
 ## [2.0.0] - 2026-06-13
 
 HAL Operator Platform — the capstone of the v1.3–v1.9 operator build. Running

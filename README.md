@@ -3,7 +3,7 @@
 Local HAL-style command router for macOS.
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
-[![Version](https://img.shields.io/badge/version-2.0.0-blue)](VERSION)
+[![Version](https://img.shields.io/badge/version-2.1.0-blue)](VERSION)
 
 `mq-hal` lets you ask natural-language questions locally through Ollama,
 then maps the answer to safe whitelisted terminal actions.
@@ -111,6 +111,7 @@ mq-hal ci
 mq-hal doctor-summary
 mq-hal fix-doctor
 mq-hal brain
+mq-hal context
 mq-hal session
 mq-hal last
 mq-hal timeline
@@ -347,6 +348,50 @@ target note through `obsidian read`, and `brain sync-status` can update a note's
 Markdown from a web page into the vault. It previews by default and writes only
 with `--confirm`. URLs ending in `.md` are rejected because they are already
 Markdown and should be fetched directly instead of through Defuddle.
+
+## Context Pack Status
+
+Show whether the MQ-stack context-compression layer is ready:
+
+```bash
+mq-hal context
+mq-hal context status
+mq-hal context latest-pack
+mq-hal context budget
+mq-hal context open
+mq-hal context --json
+```
+
+`mq-hal context` is read-only. It resolves the local `mqobsidian` vault
+(`--root`, then `MQOBSIDIAN_PATH`, then `~/mqobsidian`) and checks the
+token-reduction scaffold:
+
+- `docs/context-budget.md` and `docs/roadmap-token-reduction.md`
+- `schemas/context-pack.v1.json` and `templates/context-pack.md`
+- `examples/sanitized-context-pack.md`
+- `scripts/check-token-budget.py`
+- the latest task pack at `.mq/context/task-pack.md`
+
+`context budget` delegates the verdict to mqobsidian's
+`check-token-budget.py`; `context latest-pack` reports the newest pack and its
+`target` (Codex/Claude/both); `context open` previews a file strictly inside
+the vault and refuses any path outside it. If `mqobsidian` is missing, status
+is `WARN`, never `FAIL`.
+
+It does not generate context packs and does not write to `mqobsidian`. Context
+generation belongs to `mq-agent`; durable schemas, templates, examples, and
+token-budget rules belong to `mqobsidian`:
+
+```text
+mqobsidian
+  -> stores schemas, templates, context cards, roadmap
+
+mq-agent
+  -> generates context packs
+
+mq-hal
+  -> shows context status to the operator
+```
 
 ## Runtime Control
 
@@ -714,6 +759,8 @@ See [docs/INTEGRATION.md](docs/INTEGRATION.md).
 Full command reference: [docs/hal-command-surface.md](docs/hal-command-surface.md).
 
 Command registry: [docs/COMMAND_SURFACE.md](docs/COMMAND_SURFACE.md).
+
+Operator guide: [docs/mq-hal-guide.md](docs/mq-hal-guide.md).
 
 Install and update guide: [docs/INSTALL.md](docs/INSTALL.md).
 

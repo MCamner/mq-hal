@@ -135,6 +135,11 @@ case "${1:-}" in
     exec python3 "$ROOT/hal/brain.py" "$@"
     ;;
 
+  context)
+    shift || true
+    exec python3 "$ROOT/hal/context.py" "$@"
+    ;;
+
   index)
     shift || true
     exec python3 "$ROOT/scripts/repo_memory.py" index "$@"

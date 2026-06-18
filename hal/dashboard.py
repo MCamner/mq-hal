@@ -15,6 +15,7 @@ sys.path.insert(0, str(BASE_DIR))
 sys.path.append(str(BASE_DIR / "scripts"))
 
 from hal import brain as brain_control  # noqa: E402
+from hal import context as context_control  # noqa: E402
 from hal import release as release_control  # noqa: E402
 from hal import runtime as runtime_control  # noqa: E402
 from hal import stack as stack_control  # noqa: E402
@@ -92,6 +93,14 @@ def runtime_data(sample: bool) -> dict[str, Any]:
     return runtime_control.SAMPLE_RUNTIME if sample else runtime_control.collect_runtime()
 
 
+def context_data(sample: bool) -> dict[str, Any]:
+    if sample:
+        return context_control.SAMPLE
+    # Keep the refresh loop cheap: skip the token-budget subprocess here. The
+    # `mq-hal context budget` command runs it on demand.
+    return context_control.collect(context_control.resolve_root(), run_budget=False)
+
+
 def history_data(sample: bool) -> dict[str, Any]:
     if sample:
         return SAMPLE_HISTORY
@@ -106,14 +115,16 @@ def collect_dashboard(sample: bool = False) -> dict[str, Any]:
     release = release_data(sample)
     brain = brain_data(sample)
     runtime = runtime_data(sample)
+    context = context_data(sample)
     history = history_data(sample)
-    alerts = build_alerts(stack, release, brain, runtime)
+    alerts = build_alerts(stack, release, brain, runtime, context)
     return {
         "title": "HAL Operator Dashboard",
         "stack": stack,
         "release": release,
         "brain": brain,
         "runtime": runtime,
+        "context": context,
         "history": history,
         "alerts": alerts,
     }
@@ -164,14 +175,25 @@ def history_summary(data: dict[str, Any]) -> tuple[str, str]:
     return "PASS", f"{total} recent, {kinds} types"
 
 
+def context_summary(data: dict[str, Any]) -> tuple[str, str]:
+    status = str(data.get("status", "UNKNOWN")).upper()
+    budget = data.get("token_budget", {})
+    budget_status = str(budget.get("status", "UNKNOWN")).lower() if isinstance(budget, dict) else "unknown"
+    pack = "found" if data.get("latest_task_pack") else "missing"
+    return status, f"budget={budget_status} pack={pack}"
+
+
 def build_alerts(
     stack: dict[str, Any],
     release: dict[str, Any],
     brain: dict[str, Any],
     runtime: dict[str, Any],
+    context: dict[str, Any],
 ) -> list[str]:
     alerts: list[str] = []
-    for name, status, detail in dashboard_rows(stack, release, brain, runtime, {"events": [], "summary": {}}):
+    for name, status, detail in dashboard_rows(
+        stack, release, brain, runtime, context, {"events": [], "summary": {}}
+    ):
         if status_rank(status) > 0:
             alerts.append(f"{name}: {status} {detail}")
     blockers = release_control.all_blockers(release)
@@ -185,6 +207,7 @@ def dashboard_rows(
     release: dict[str, Any],
     brain: dict[str, Any],
     runtime: dict[str, Any],
+    context: dict[str, Any],
     history: dict[str, Any],
 ) -> list[tuple[str, str, str]]:
     stack_status, stack_detail = stack_summary(stack)
@@ -192,18 +215,25 @@ def dashboard_rows(
     brain_status, brain_detail = brain_summary(brain)
     runtime_status, runtime_detail = runtime_summary(runtime)
     history_status, history_detail = history_summary(history)
+    context_status, context_detail = context_summary(context)
     return [
         ("Stack", stack_status, stack_detail),
         ("Brain", brain_status, brain_detail),
         ("Release", release_status, release_detail),
         ("Runtime", runtime_status, runtime_detail),
         ("History", history_status, history_detail),
+        ("Context", context_status, context_detail),
     ]
 
 
 def render_home(data: dict[str, Any]) -> None:
     rows = dashboard_rows(
-        data["stack"], data["release"], data["brain"], data["runtime"], data["history"]
+        data["stack"],
+        data["release"],
+        data["brain"],
+        data["runtime"],
+        data["context"],
+        data["history"],
     )
     print("+------------------------------+")
     print("| HAL Operator Dashboard       |")
@@ -213,7 +243,7 @@ def render_home(data: dict[str, Any]) -> None:
         print(f"{index} {name:<8} {status:<7} {detail}")
     print(f"A Alerts   {len(data.get('alerts', []))}")
     print()
-    print("Keys: 1 Stack  2 Brain  3 Release  4 Runtime  5 History  r Refresh  q Exit")
+    print("Keys: 1 Stack  2 Brain  3 Release  4 Runtime  5 History  6 Context  r Refresh  q Exit")
 
 
 def render_stack(data: dict[str, Any]) -> None:
@@ -230,6 +260,10 @@ def render_release(data: dict[str, Any]) -> None:
 
 def render_runtime(data: dict[str, Any]) -> None:
     runtime_control.render_runtime(data, details=True)
+
+
+def render_context(data: dict[str, Any]) -> None:
+    context_control.render_status(data)
 
 
 def render_history(data: dict[str, Any]) -> None:
@@ -272,6 +306,8 @@ def render_panel(data: dict[str, Any], key: str) -> None:
         render_runtime(data["runtime"])
     elif key == "5":
         render_history(data["history"])
+    elif key == "6":
+        render_context(data["context"])
     elif key.lower() == "a":
         render_alerts(data)
     else:
@@ -296,7 +332,7 @@ def run_loop(sample: bool, once: bool, no_clear: bool) -> int:
             return 0
         if choice.lower() in {"r", "refresh"}:
             selected = "home"
-        elif choice in {"1", "2", "3", "4", "5"} or choice.lower() == "a":
+        elif choice in {"1", "2", "3", "4", "5", "6"} or choice.lower() == "a":
             selected = choice
         else:
             selected = "home"

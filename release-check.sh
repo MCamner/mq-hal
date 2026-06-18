@@ -64,6 +64,7 @@ python3 -m py_compile hal/stack.py
 python3 -m py_compile hal/status.py
 python3 -m py_compile hal/doctor.py
 python3 -m py_compile hal/brain.py
+python3 -m py_compile hal/context.py
 python3 -m py_compile hal/release.py
 python3 -m py_compile scripts/memory_status.py
 python3 -m py_compile scripts/repo_memory.py
@@ -129,6 +130,7 @@ _smoke_start=$FAILED
 ./tests/router-safety-smoke.sh            || fail "router-safety-smoke.sh — safety gate failed"
 ./tests/memory-status-smoke.sh            || fail "memory-status-smoke.sh"
 ./tests/brain-smoke.sh                    || fail "brain-smoke.sh"
+./tests/context-smoke.sh                  || fail "context-smoke.sh"
 ./tests/repo-memory-smoke.sh              || fail "repo-memory-smoke.sh"
 ./tests/agent-brief-smoke.sh              || fail "agent-brief-smoke.sh"
 ./tests/hello-smoke.sh                    || fail "hello-smoke.sh"

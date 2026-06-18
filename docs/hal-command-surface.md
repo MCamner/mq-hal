@@ -641,6 +641,39 @@ open, `open` bridges to `obsidian read`, while `sync-status` bridges to
 
 ---
 
+### `context`
+
+Read-only Context Pack Status for the mqobsidian token-reduction layer.
+
+| Property | Value |
+|---|---|
+| `mq-hal` | `mq-hal context` |
+| Backend | `hal/context.py` |
+| Read-only | Yes |
+| Memory write | No |
+| Flags | `--json`, `--sample`, `--root`, `--no-budget` |
+| Subcommands | `status`, `latest-pack`, `budget`, `open` |
+
+Reports whether the mqobsidian context-compression scaffold is present and
+healthy. The root is resolved from `--root`, then `MQOBSIDIAN_PATH`, then
+`~/mqobsidian`. It checks `docs/context-budget.md`,
+`docs/roadmap-token-reduction.md`, `schemas/context-pack.v1.json`,
+`templates/context-pack.md`, `examples/sanitized-context-pack.md`,
+`scripts/check-token-budget.py`, and the latest task pack at
+`.mq/context/task-pack.md` (reading its `target:` for Codex/Claude readiness).
+
+`status` (the default) and `budget` delegate the token-budget verdict to
+mqobsidian's `scripts/check-token-budget.py`; pass `--no-budget` to skip it.
+If mqobsidian is missing the overall status is `WARN`, never `FAIL`. `open`
+previews a file strictly inside the mqobsidian root and refuses any path that
+escapes it.
+
+This command never generates context packs and never writes to mqobsidian.
+Pack generation belongs to `mq-agent`; durable schemas, templates, examples,
+and token-budget rules belong to `mqobsidian`.
+
+---
+
 ### `runtime`
 
 Read-only control center for local runtime services.

@@ -45,7 +45,7 @@ It should be:
 Latest stable release:
 
 ```text
-v2.0.0 — HAL Operator Platform
+v2.1.0 — Context Pack Status
 ```
 
 Completed foundation:
@@ -72,11 +72,12 @@ Completed foundation:
 - Stack / Brain / Release / Runtime control centers (v1.3–v1.6)
 - TUI dashboard, timeline & history, operator actions (v1.7–v1.9)
 - HAL Operator Platform — unified `mq-hal` dashboard over the whole stack (v2.0)
+- Context Pack Status — read-only mqobsidian token-reduction visibility (v2.1)
 
 Current recommended next step:
 
 ```text
-v2.1.0 — operator platform polish
+v2.2.0 — operator feedback polish
 ```
 
 ---
@@ -111,6 +112,7 @@ v2.1.0 — operator platform polish
 | v1.8.0  | Timeline and History                                 | Done    |
 | v1.9.0  | Operator Actions                                     | Done    |
 | v2.0.0  | HAL Operator Platform                                | Done    |
+| v2.1.0  | Context Pack Status                                  | Done    |
 
 ---
 
@@ -495,6 +497,44 @@ mq-hal
 ```
 
 and understand the whole MQ ecosystem's status without opening a single repo.
+
+---
+
+## v2.1.0 — Context Pack Status
+
+Status: Done — `mq-hal context` shows read-only mqobsidian context-pack
+readiness from the operator layer.
+
+### Goal
+
+Make the token-reduction layer visible without moving generation or storage
+ownership into `mq-hal`.
+
+```text
+mqobsidian -> stores schemas, templates, examples and task packs
+mq-agent   -> generates context packs
+mq-hal     -> shows context status and routes the operator
+```
+
+### Build
+
+```bash
+mq-hal context
+mq-hal context status
+mq-hal context latest-pack
+mq-hal context budget
+mq-hal context open
+mq-hal context --json
+```
+
+### Definition of Done
+
+- [x] Context scaffold checks are read-only.
+- [x] Missing mqobsidian returns WARN, not FAIL.
+- [x] Latest task pack and target readiness are visible.
+- [x] Token budget delegates to mqobsidian on demand.
+- [x] Dashboard includes a Context panel.
+- [x] README, command docs, guide and release-check cover the command.
 
 ---
 
