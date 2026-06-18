@@ -1,135 +1,67 @@
 # mq-hal
 
-Local HAL-style command router for macOS.
+Local operator layer for the MQ stack.
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 [![Version](https://img.shields.io/badge/version-2.1.0-blue)](VERSION)
 
-`mq-hal` lets you ask natural-language questions locally through Ollama,
-then maps the answer to safe whitelisted terminal actions.
+`mq-hal` gives a human-friendly command surface for local repo status, stack
+status, release status, runtime health, mqobsidian context readiness, and safe
+natural-language routing through Ollama.
 
 Live site: <https://mcamner.github.io/mq-hal/>
 
-## How it works
+## Operator Role
 
 ```text
-User prompt
-→ Ollama/Qwen
-→ JSON intent
-→ Safe Python router
-→ git / mqlaunch / repo helpers
+mqlaunch -> mq-hal -> mq-agent / mq-mcp / repo-signal / mqobsidian
 ```
 
-The model never runs shell directly.
+`mq-hal` shows and routes. It does not own stack gates, release decisions,
+review logic, semantic memory, or durable truth.
 
-It returns a JSON intent. The Python router decides what is allowed.
+Source-of-truth split:
 
-## Quick start
+* `mq-agent` owns orchestration, stack gates, release checks, and context export.
+* `mq-mcp` owns bounded tool runtime, review contracts, and learning tools.
+* `repo-signal` owns repo health, readiness, README, and docs scoring.
+* `mqobsidian` owns durable memory, truth exports, and context compression.
+* `mqlaunch` owns terminal menus and workflow entrypoints.
+
+## Quick Start
 
 ```bash
-# 1. Install Ollama
+git clone https://github.com/MCamner/mq-hal.git ~/mq-hal
+cd ~/mq-hal
+./install.sh
+
+mq-hal version
+mq-hal config-check
+mq-hal brief
+mq-hal stack
+mq-hal dashboard
+```
+
+Optional local model setup:
+
+```bash
 brew install ollama
 brew services start ollama
-
-# 2. Pull model
 ollama pull qwen3:4b-instruct
-
-# 3. Clone and link binary
-git clone https://github.com/MCamner/mq-hal.git ~/mq-hal
-mkdir -p ~/bin
-ln -sf ~/mq-hal/bin/mq-hal ~/bin/mq-hal
-
-# 4. Edit config/repos.json with your repos, then:
-mq-hal brief
-mq-hal release-brief
-mq-hal release
-mq-hal audit
-mq-hal stack-status
-mq-hal repo-status
-mq-hal ci
-mq-hal "visa git status i macos-scripts"
-mq-hal "hitta OLLAMA_MODEL i mq-hal"
-mq-hal "kör tester i mq-hal"
-mq-hal --confirm "kör doctor"
 ```
 
-## Examples
+## 30 Second Demo
 
 ```bash
-# Get an operator brief for the default repo
-mq-hal brief
-
-# Ask for a safe repo status action in natural language
-mq-hal "visa git status i repo-signal"
-
-# Preview the parsed intent before routing
+mq-hal brief                       # repo operator brief
+mq-hal stack --json                # stack cockpit summary from mq-agent
+mq-hal context                     # mqobsidian context-pack readiness
+mq-hal runtime                     # local service health
 mq-hal --explain-intent "kör tester i mq-hal"
-
-# Require confirmation before an allowed action runs
-mq-hal --confirm "kör doctor"
+mq-hal --confirm "kör doctor"      # confirmation-gated routing
 ```
 
 Through mqlaunch:
-
-```bash
-mqlaunch hal brief
-mqlaunch hal repo-status
-mqlaunch hal ci
-```
-
----
-
-## Demo
-
-A minimal demo path is:
-
-```bash
-mq-hal config-check
-mq-hal brief --json
-mq-hal --raw-intent "visa git status i mq-agent"
-mq-hal --explain-intent "kör tester i mq-hal"
-```
-
-For screenshots, capture the terminal output from `mq-hal brief`,
-`mq-hal stack-status`, and `mq-hal --explain-intent ...`; those are the
-operator-facing views that best show the router boundary.
-
----
-
-## Common commands
-
-```bash
-mq-hal brief
-mq-hal release-brief
-mq-hal release
-mq-hal runtime
-mq-hal dashboard
-mq-hal audit
-mq-hal stack-status
-mq-hal repo-status
-mq-hal ci
-mq-hal doctor-summary
-mq-hal fix-doctor
-mq-hal brain
-mq-hal context
-mq-hal session
-mq-hal last
-mq-hal timeline
-mq-hal history
-mq-hal alerts
-mq-hal next
-mq-hal fix
-mq-hal open CHANGELOG.md --repo mq-hal
-mq-hal version
-mq-hal config-check
-mq-hal update
-mq-hal remember "release looked good"
-mq-hal memory-path
-mq-hal --raw-intent "kör doctor"
-mq-hal --explain-intent "visa git status i repo-signal"
-```
-
-Through MQLaunch:
 
 ```bash
 mqlaunch hal
@@ -137,680 +69,105 @@ mqlaunch hal brief
 mqlaunch hal release-brief
 mqlaunch hal audit
 mqlaunch hal repo-status
-mqlaunch hal ci
-mqlaunch hal doctor
-mqlaunch hal fix-doctor
 mqlaunch hal timeline
-mqlaunch hal session
 ```
 
-## Contributing
+## Main Command Groups
 
-Keep `mq-hal` small and predictable: the model proposes JSON intent, while the
-Python router enforces the whitelist. Before opening a PR, run:
+| Area | Commands |
+| --- | --- |
+| Repo brief | `mq-hal brief`, `mq-hal audit`, `mq-hal repo-status`, `mq-hal ci` |
+| Stack | `mq-hal stack`, `mq-hal stack-status`, `mq-hal status` |
+| Release | `mq-hal release`, `mq-hal release-brief` |
+| Brain/context | `mq-hal brain`, `mq-hal context` |
+| Runtime | `mq-hal runtime`, `mq-hal models`, `mq-hal model-status` |
+| Dashboard | `mq-hal`, `mq-hal dashboard` |
+| Session memory | `mq-hal session`, `mq-hal last`, `mq-hal timeline` |
+| Operator action | `mq-hal next`, `mq-hal fix`, `mq-hal open <file>` |
+| Router | `mq-hal "prompt"`, `--raw-intent`, `--explain-intent`, `--confirm` |
+
+Full command truth lives in [docs/COMMAND_SURFACE.md](docs/COMMAND_SURFACE.md)
+and [docs/hal-command-surface.md](docs/hal-command-surface.md).
+
+## Safety Boundary
+
+```text
+prompt -> local model or deterministic parser -> JSON intent -> Python router
+```
+
+Rules:
+
+* the model never runs shell directly
+* unknown commands are refused
+* unsafe shell operators are rejected
+* write or destructive actions require explicit confirmation
+* `fix-doctor` prints repair plans but executes nothing
+* `execute` dry-runs by default and requires `--confirm`
+* session memory is local and can be disabled
+
+See [docs/INTENT_CONTRACT.md](docs/INTENT_CONTRACT.md).
+
+## Operator Views
+
+`mq-hal` is intentionally read-heavy:
+
+* `stack` reads `mq-agent stack cockpit --json` when available.
+* `release` reads `mq-agent stack release-check --json`.
+* `context` reads the local `mqobsidian` context-pack scaffold.
+* `runtime` checks local service health for Ollama, mq-mcp, GitHub, and brain.
+* `brain` previews mqobsidian and local HAL memory state.
+* `dashboard` combines stack, brain, release, runtime, timeline, and alerts.
+
+These views summarize state; they do not publish, tag, review code, write
+semantic memory, or define new gates.
+
+## Natural-Language Routing
+
+Examples:
+
+```bash
+mq-hal "visa git status i repo-signal"
+mq-hal --raw-intent "kör doctor"
+mq-hal --explain-intent "kör tester i mq-hal"
+mq-hal --confirm "skapa branch för release"
+mq-hal --no-ai "visa git status i mq-agent"
+```
+
+Configured repos live in `config/repos.json`. The router resolves names to
+known repo paths and only runs allowlisted actions.
+
+## Development
+
+Keep `mq-hal` small and predictable. Before opening a PR, run:
 
 ```bash
 ./release-check.sh
 mq-hal config-check
 ```
 
-When adding a command, update the allowlist/config, README command examples, and
-release checks together. Do not let model output execute shell directly.
-
----
-
-## HAL Brief
-
-Get a quick status snapshot of a repo:
-
-```bash
-mq-hal brief
-mq-hal brief --json
-mq-hal brief --no-gh
-mq-hal brief --repo macos-scripts
-```
-
-The brief combines git status, CI status, latest release, HAL memory,
-and a next-step recommendation.
-
-## HAL Release Brief
-
-Check whether a repo appears ready for release:
-
-```bash
-mq-hal release-brief
-mq-hal release-brief --json
-mq-hal release-brief --repo macos-scripts
-```
-
-Skip external or expensive checks:
-
-```bash
-mq-hal release-brief --skip-gh
-mq-hal release-brief --skip-doctor
-mq-hal release-brief --skip-release-check
-```
-
-Through MQLaunch:
-
-```bash
-mqlaunch hal release-brief
-```
-
-The release brief checks:
-
-- VERSION
-- CHANGELOG entry
-- README badge or version reference
-- git clean/dirty state
-- recent CI status
-- latest GitHub release
-- doctor summary
-- release-check status
-
-## Release Control Center
-
-Show central release status from mq-agent:
-
-```bash
-mq-hal release
-mq-hal release gates
-mq-hal release blockers
-mq-hal release --json
-```
-
-Default input:
-
-```bash
-mq-agent stack release-check --json
-```
-
-Release Control shows repo, version, ready state, blockers, release score, and
-gates. It is read-only and does not publish, tag, run release checks, or write
-memory.
-
-## HAL Audit
-
-Check publish quality and README quality via `repo-signal`:
-
-```bash
-mq-hal audit
-mq-hal audit --json
-mq-hal audit --repo macos-scripts
-```
-
-Through MQLaunch:
-
-```bash
-mqlaunch hal audit
-```
-
-Audit checks:
-
-- publish checklist score
-- README score
-- GitHub Pages readiness
-- documentation quality signals
-- safe next-step recommendation
-
-Requires `repo-signal` locally. Falls back gracefully if unavailable.
-
-## HAL Stack Status
-
-Show the full MQ stack from the operator layer:
-
-```bash
-mq-hal stack
-mq-hal stack --json
-mq-hal status
-mq-hal stack-status
-mq-hal stack-status --json
-mq-hal stack-status --sample
-```
-
-Default input:
-
-```bash
-mq-agent stack cockpit --json
-```
-
-Stack Status shows:
-
-- mq-agent
-- mq-mcp
-- repo-signal
-- mqobsidian / brain
-- overall stack score
-
-`mq-hal` summarizes stack state only. Review execution and semantic-memory
-runtime stay in `mq-mcp`, routed through `mq-agent` where orchestration is
-needed.
-
-This command is read-only, does not write session memory, and does not define a
-separate stack contract. If mq-agent cockpit data is unavailable, text output
-falls back to the legacy local stack collector. Use `--legacy` to force that
-local collector.
-
-## HAL Repo Ops
-
-Read-only repository status:
-
-```bash
-mq-hal repo-status
-mq-hal repo-status --json
-mq-hal repo-status --repo macos-scripts
-```
-
-GitHub Actions status:
-
-```bash
-mq-hal ci
-mq-hal ci --json
-mq-hal ci --repo macos-scripts
-```
-
-Through MQLaunch:
-
-```bash
-mqlaunch hal repo-status
-mqlaunch hal ci
-```
-
-## Brain Control Center
-
-Show mqobsidian and local HAL memory exports:
-
-```bash
-mq-hal brain
-mq-hal brain health
-mq-hal brain recent
-mq-hal brain search "release"
-mq-hal brain ingest-url "https://example.com/docs/page" --confirm
-mq-hal brain open "mq-stack/05_RELEASE_STATUS.md"
-mq-hal brain sync-status "mq-stack/05_RELEASE_STATUS.md" --status active --confirm
-mq-hal brain --json
-```
-
-Brain reads:
-
-- `memory/`
-- `learn/`
-- `truth/`
-- `reviews/`
-
-It shows recent notes, recent reviews, latest release export, and folder health.
-When the Obsidian CLI is available and Obsidian is open, `brain open` reads a
-target note through `obsidian read`, and `brain sync-status` can update a note's
-`status` property through `obsidian property:set`. Status sync requires
-`--confirm`.
-
-`brain ingest-url` uses Defuddle (`defuddle parse <url> --md`) to capture clean
-Markdown from a web page into the vault. It previews by default and writes only
-with `--confirm`. URLs ending in `.md` are rejected because they are already
-Markdown and should be fetched directly instead of through Defuddle.
-
-## Context Pack Status
-
-Show whether the MQ-stack context-compression layer is ready:
-
-```bash
-mq-hal context
-mq-hal context status
-mq-hal context latest-pack
-mq-hal context budget
-mq-hal context open
-mq-hal context --json
-```
-
-`mq-hal context` is read-only. It resolves the local `mqobsidian` vault
-(`--root`, then `MQOBSIDIAN_PATH`, then `~/mqobsidian`) and checks the
-token-reduction scaffold:
-
-- `docs/context-budget.md` and `docs/roadmap-token-reduction.md`
-- `schemas/context-pack.v1.json` and `templates/context-pack.md`
-- `examples/sanitized-context-pack.md`
-- `scripts/check-token-budget.py`
-- the latest task pack at `.mq/context/task-pack.md`
-
-`context budget` delegates the verdict to mqobsidian's
-`check-token-budget.py`; `context latest-pack` reports the newest pack and its
-`target` (Codex/Claude/both); `context open` previews a file strictly inside
-the vault and refuses any path outside it. If `mqobsidian` is missing, status
-is `WARN`, never `FAIL`.
-
-It does not generate context packs and does not write to `mqobsidian`. Context
-generation belongs to `mq-agent`; durable schemas, templates, examples, and
-token-budget rules belong to `mqobsidian`:
-
-```text
-mqobsidian
-  -> stores schemas, templates, context cards, roadmap
-
-mq-agent
-  -> generates context packs
-
-mq-hal
-  -> shows context status to the operator
-```
-
-## Runtime Control
-
-Show local MQ runtime service health:
-
-```bash
-mq-hal runtime
-mq-hal runtime services
-mq-hal runtime --json
-```
-
-Runtime checks:
-
-- Ollama
-- mq-mcp
-- GitHub
-- brain
-
-Statuses are normalized to `RUNNING`, `WARN`, or `DOWN`. Runtime Control is
-read-only: it does not start services, review code, write memory, or orchestrate
-mq-agent.
-
-## TUI Dashboard
-
-Open the operator dashboard:
-
-```bash
-mq-hal
-mq-hal dashboard
-```
-
-Keys:
-
-```text
-1 Stack
-2 Brain
-3 Release
-4 Runtime
-5 History
-a Alerts
-r Refresh
-q Exit
-```
-
-The dashboard is read-only and reuses the existing Stack, Brain, Release,
-Runtime, and Timeline readers.
-
-## HAL Doctor Summary
-
-Run a local health check and summarize it:
-
-```bash
-mq-hal doctor-summary
-mq-hal doctor-summary --json
-mq-hal doctor-summary --no-ai
-```
-
-Through MQLaunch:
-
-```bash
-mqlaunch hal doctor
-```
-
-Flow:
-
-```text
-mq-hal doctor-summary
-→ mqlaunch doctor --json
-→ parse doctor JSON
-→ summarize with Ollama when available
-→ fall back to deterministic local summary when Ollama is unavailable
-```
-
-## HAL Fix Planner
-
-Create a safe fix plan from HAL Doctor Summary:
-
-```bash
-mq-hal fix-doctor
-mq-hal fix-doctor --json
-mq-hal fix-doctor --no-ai
-```
-
-Through MQLaunch:
-
-```bash
-mqlaunch hal fix-doctor
-```
-
-Flow:
-
-```text
-mq-hal fix-doctor
-→ mq-hal doctor-summary --json --no-ai
-→ parse findings
-→ create safe fix plan
-→ print copy-paste commands
-→ execute nothing
-```
-
-## HAL Plan, Critic and Execute
-
-Create a structured plan, review it, then execute only after explicit
-confirmation:
-
-```bash
-mq-hal plan "update release docs" --out plan.json
-mq-hal critic plan.json
-mq-hal execute plan.json
-mq-hal execute plan.json --confirm
-```
-
-Flow:
-
-```text
-mq-hal plan
-→ save plan.json
-→ mq-hal critic plan.json
-→ mq-hal execute plan.json
-→ dry-run preview
-→ mq-hal execute plan.json --confirm
-→ pre-flight critic check
-→ run safe_command steps one by one
-```
-
-`execute` refuses critic `FAIL` plans, rejects shell operators in planned
-commands, and asks again for steps marked `requires_confirm`.
-
-## HAL Session Memory
-
-Store local HAL events in:
-
-```text
-~/.mq-hal/session.jsonl
-```
-
-Show memory:
-
-```bash
-mq-hal session
-mq-hal last
-mq-hal session --json
-mq-hal last --json
-```
-
-Save a manual note:
-
-```bash
-mq-hal remember "doctor looked clean after release"
-```
-
-Through MQLaunch:
-
-```bash
-mqlaunch hal session
-mqlaunch hal last
-mqlaunch hal remember "release looked good"
-```
-
-Disable memory for one command:
-
-```bash
-mq-hal doctor-summary --no-memory
-mq-hal fix-doctor --no-memory
-```
-
-Or disable via environment:
-
-```bash
-MQ_HAL_DISABLE_MEMORY=1 mq-hal doctor-summary
-```
-
-## HAL Timeline UI
-
-Show HAL Session Memory as a compact timeline:
-
-```bash
-mq-hal timeline
-mq-hal timeline --details
-mq-hal timeline --repo macos-scripts
-mq-hal timeline --type doctor_summary
-mq-hal timeline --type fix_plan
-mq-hal timeline --type note
-mq-hal timeline --json
-```
-
-Through MQLaunch:
-
-```bash
-mqlaunch hal timeline
-mqlaunch hal timeline --details
-```
-
-## Timeline & History
-
-Show changes across local MQ state:
-
-```bash
-mq-hal history
-mq-hal history --json
-mq-hal alerts
-mq-hal alerts --json
-```
-
-History reads from:
-
-```text
-~/.mq-agent/
-mqobsidian/
-```
-
-It shows stack score history, brain growth, and release history. Alerts reuse
-the operator dashboard summaries and list current warnings or blockers without
-running fixes.
-
-## Operator Actions
-
-Route from blocker to action:
-
-```bash
-mq-hal next
-mq-hal fix
-mq-hal open CHANGELOG.md --repo mq-hal
-```
-
-`next` reads release blockers and dashboard alerts, then prints the next route.
-`fix` previews a call to `mqlaunch fix <blocker>` and only runs it with
-`--confirm`. `open` previews the editor command and only opens files with
-`--confirm`; paths are constrained to the selected repo.
-
-## Optional model override
-
-```bash
-OLLAMA_MODEL=qwen3:4b ~/mq-hal/bin/mq-hal "visa git status"
-mq-hal --model router "visa git status"
-mq-hal plan --model planner "prepare release"
-```
-
-Profiles are defined in `config/models.json` and visible with
-`mq-hal models`.
-
-Check local model availability and latency:
-
-```bash
-mq-hal model-status
-mq-hal model-status --json
-mq-hal model-status --profile planner
-mq-hal model-test --profile router
-```
-
-## HAL Repo Memory
-
-Build and query a local deterministic repo memory index:
-
-```bash
-mq-hal index mq-hal
-mq-hal search roadmap --repo mq-hal
-mq-hal ask-repo "what is planned next" --repo mq-hal
-mq-hal repo-map --repo mq-hal
-```
-
-The index is stored locally under `~/.mq-hal/repo_memory/`. It reads text files,
-skips cache/build folders, and never mutates repositories. Optional local
-Ollama embeddings can be requested with `mq-hal index mq-hal --embeddings`;
-the default mode is lexical and deterministic.
-
-## Install and Update
-
-Install by linking the local checkout:
-
-```bash
-./install.sh
-mq-hal version
-mq-hal config-check
-```
-
-Preview or run updates:
-
-```bash
-mq-hal update
-mq-hal update --confirm
-```
-
-Remove the symlink:
-
-```bash
-./uninstall.sh
-```
-
-Install docs, PATH setup, shell completion notes, clean reinstall steps, and
-the Homebrew formula plan live in [docs/INSTALL.md](docs/INSTALL.md).
-
-## HAL Visual
-
-Review architecture diagrams and UI screenshots as read-only observations:
-
-```bash
-mq-hal analyze-diagram architecture.png
-mq-hal review-ui screenshot.png
-mq-hal architecture-brief architecture.png
-```
-
-Visual HAL reports file metadata, architecture or UI observations, trust
-boundaries, and draft YAML. If `mq-image-analyze` is installed locally its
-output is included as context; without it the commands return deterministic
-checklists. Visual input never becomes executable router intent.
-
-## Natural-language routing
-
-`mq-hal "prompt"` routes through Ollama by default. The router now supports:
-
-- repo status and recent log
-- repo tree preview
-- safe `rg` search in configured repos
-- safe test command detection
-- opening files under the selected repo in `$EDITOR`
-- creating a git branch after preview confirmation
-- allowlisted `mqlaunch` commands
-
-Use `--raw-intent` to inspect only the JSON intent, `--explain-intent` to show
-the resolved repo/path, and `--confirm` to preview routed commands before they
-run.
-
-If Ollama is unavailable, simple prompts can fall back to deterministic local
-routing. Use `--no-ai` to force that path for smoke tests or debugging.
-
-## Repo cd helper
-
-Add to `~/.zshrc`:
-
-```bash
-mqhcd() {
-  if [ $# -ne 1 ]; then
-    echo "usage: mqhcd <repo-name>" >&2
-    return 2
-  fi
-
-  local path
-  path="$(mq-hal --cd "$1")" || return $?
-  cd "$path" || return $?
-}
-```
-
-Then:
-
-```bash
-mqhcd repo-signal
-```
-
-## Integration contract
-
-New HAL features follow the integration contract:
-
-```text
-mq-hal owns feature logic
-mqlaunch owns command surface
-hal-bridge.sh delegates only
-tests and docs required before release
-```
-
-See [docs/INTEGRATION.md](docs/INTEGRATION.md).
-
-## HAL command surface
-
-Full command reference: [docs/hal-command-surface.md](docs/hal-command-surface.md).
-
-Command registry: [docs/COMMAND_SURFACE.md](docs/COMMAND_SURFACE.md).
-
-Operator guide: [docs/mq-hal-guide.md](docs/mq-hal-guide.md).
-
-Install and update guide: [docs/INSTALL.md](docs/INSTALL.md).
-
-Intent contract: [docs/INTENT_CONTRACT.md](docs/INTENT_CONTRACT.md).
-
-Formal JSON Schema: [schemas/intent.schema.json](schemas/intent.schema.json).
-
-Terminal demo: [docs/TERMINAL_DEMO.md](docs/TERMINAL_DEMO.md).
-
-Stable formats: [docs/FORMATS.md](docs/FORMATS.md).
-
-Troubleshooting: [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md).
-
-## Proof
-
-- Model returns a JSON intent only — the Python router decides what is allowed
-- Router enforces an explicit allowlist — unknown or unsafe commands are refused
-- HAL Fix Planner prints copy-paste repair plans but executes nothing
-- Plan execution is opt-in: `mq-hal execute` dry-runs by default and requires
-  `--confirm` plus a passing critic check before running planned commands
-- Session Memory stays local in `~/.mq-hal/session.jsonl` — nothing is sent externally
-- Intent contract is machine-validated: `schemas/intent.schema.json` enum
-  must match `ALLOWED_INTENTS` in the router on every smoke run
-- Command surface is checked: `tools/check-command-docs.sh` fails if any
-  command is added without documentation
-- Smoke tests cover: doctor summary, fix planner, session memory, timeline,
-  repo ops, CI status, release brief, audit, stack status, hal router,
-  intent schema contract, router safety, install flow, visual HAL, plan,
-  critic, execute, and docs
-- README markdown guard (`tools/markdown_guard.py`) blocks flattened
-  rendering regressions on every push
-- CI runs on `macos-latest` — all smoke tests verified natively on macOS
-
-## Security
-
-The model only returns a JSON intent from a fixed schema.
-
-The router enforces an explicit allowlist. Unknown or unsafe commands are refused.
-
-`HAL Fix Planner` does not execute repairs. It only prints commands for manual review.
-
-`mq-hal execute` is explicit and local: without `--confirm` it only previews,
-and before execution it runs the deterministic critic unless explicitly skipped.
-
-Session Memory stays local in `~/.mq-hal/session.jsonl`.
-
-## Roadmap
-
-See [ROADMAP.md](ROADMAP.md) for planned features.
+When adding a command, update:
+
+* `bin/mq-hal`
+* `docs/COMMAND_SURFACE.md`
+* `docs/hal-command-surface.md`
+* smoke tests
+* release notes and version files when releasing
+
+Do not put HAL business logic in `macos-scripts`; expose it through a thin
+`mqlaunch` bridge instead.
+
+## Docs
+
+* [Guide](docs/mq-hal-guide.md)
+* [Install](docs/INSTALL.md)
+* [Command surface](docs/COMMAND_SURFACE.md)
+* [Detailed command reference](docs/hal-command-surface.md)
+* [Integration contract](docs/INTEGRATION.md)
+* [Intent contract](docs/INTENT_CONTRACT.md)
+* [Formats](docs/FORMATS.md)
+* [Terminal demo](docs/TERMINAL_DEMO.md)
+* [Troubleshooting](docs/TROUBLESHOOTING.md)
 
 ## License
 
-[MIT](LICENSE)
+MIT

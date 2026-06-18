@@ -20,8 +20,8 @@ def require(condition: bool, message: str) -> None:
 fence = chr(96) * 3
 fence_lines = [i for i, line in enumerate(lines, start=1) if line.startswith(fence)]
 
-require(len(lines) >= 180, f"README too short: {len(lines)} lines")
-require(len(fence_lines) >= 30, f"Too few fenced blocks: {len(fence_lines)} fence lines")
+require(120 <= len(lines) <= 220, f"README should be a compact front door: {len(lines)} lines")
+require(len(fence_lines) >= 10, f"Too few fenced blocks: {len(fence_lines)} fence lines")
 require(len(fence_lines) % 2 == 0, f"Unbalanced markdown fences: {len(fence_lines)}")
 
 bad_fences = [
@@ -33,23 +33,22 @@ require(not bad_fences, f"Bad fence info strings: {bad_fences[:5]}")
 
 required_strings = [
     f"version-{version}",
-    "## Proof",
-    "## HAL Brief",
-    "## HAL Release Brief",
-    "## HAL Audit",
-    "## HAL Stack Status",
-    "## HAL Repo Ops",
-    "## HAL Doctor Summary",
-    "## HAL Fix Planner",
-    "## HAL Session Memory",
-    "## HAL Timeline UI",
+    "## Operator Role",
+    "## Quick Start",
+    "## 30 Second Demo",
+    "## Main Command Groups",
+    "## Safety Boundary",
+    "## Operator Views",
     "docs/INTEGRATION.md",
+    "docs/COMMAND_SURFACE.md",
     "docs/hal-command-surface.md",
     "mq-hal release-brief",
     "mq-hal audit",
     "mq-hal stack-status",
     "mq-hal repo-status",
     "mq-hal ci",
+    "mq-hal context",
+    "mq-hal runtime",
     "mqlaunch hal audit",
 ]
 
@@ -66,14 +65,6 @@ bad_flattened_patterns = [
 
 for pattern in bad_flattened_patterns:
     require(pattern not in text, f"Flattened markdown detected: {pattern}")
-
-try:
-    start = lines.index("mqhcd() {")
-    end = lines.index("}", start)
-    helper = lines[start:end + 1]
-    require(len(helper) >= 8, "mqhcd helper is not multiline enough")
-except ValueError:
-    errors.append("mqhcd helper block not found as multiline fenced content")
 
 if errors:
     print("README markdown guard failed:", file=sys.stderr)

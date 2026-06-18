@@ -73,21 +73,24 @@ if bad:
     raise SystemExit(1)
 PY
 
-echo "[12/18] README documents current HAL commands"
+echo "[12/18] README documents current HAL command groups"
 grep -q "mq-hal release-brief" "$README"
 grep -q "mq-hal audit" "$README"
 grep -q "mq-hal stack-status" "$README"
 grep -q "mq-hal repo-status" "$README"
 grep -q "mq-hal ci" "$README"
-grep -q "mq-hal fix-doctor" "$README"
+grep -q "mq-hal context" "$README"
+grep -q "mq-hal runtime" "$README"
 grep -q "mq-hal config-check" "$README"
 
-echo "[13/18] README documents Repo Ops"
-grep -q "HAL Repo Ops" "$README"
+echo "[13/18] README documents operator front door sections"
+grep -q "## Operator Role" "$README"
+grep -q "## Safety Boundary" "$README"
+grep -q "## Operator Views" "$README"
 
-echo "[14/18] repo cd helper is multiline"
-grep -q 'mqhcd()' "$README"
-grep -q 'cd "$path" || return $?' "$README"
+echo "[14/18] README points detailed command truth to docs"
+grep -q "docs/COMMAND_SURFACE.md" "$README"
+grep -q "docs/hal-command-surface.md" "$README"
 
 echo "[15/18] command surface references audit and release-brief"
 grep -q "audit" "$SURFACE"
