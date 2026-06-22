@@ -1,4 +1,19 @@
-# Agent Instructions For mq-hal
+<!--
+mq-template-lineage: superset-v1
+Generated from mqobsidian agent-entrypoint templates for mq-hal.
+Do not hand-edit this file directly; edit the mqobsidian templates and regenerate.
+
+Ownership model:
+- mqobsidian owns the contract, templates, schemas, and generators.
+- this repo owns this committed agent surface once published.
+
+Paths use the portable $MQ_OBSIDIAN_DIR placeholder; resolve it to your local
+mqobsidian checkout. Regenerate with:
+  MQ_OBSIDIAN_DIR=<path-to-mqobsidian> \
+    python3 "$MQ_OBSIDIAN_DIR"/scripts/generate-agents-md.py --repo mq-hal --out AGENTS.md
+-->
+
+# AGENTS.md
 
 This repo is part of the MQ stack.
 
@@ -7,22 +22,21 @@ repo-specific build, test, safety, or release instructions.
 
 ## mqobsidian Location
 
-Default local vault path:
+Default local vault path: `$MQ_OBSIDIAN_DIR`. If `MQ_OBSIDIAN_DIR` is set,
+prefer that value.
 
-`$MQ_OBSIDIAN_DIR`
-
-If `MQ_OBSIDIAN_DIR` is set, prefer that value.
-
-## Read Order
+## Read First
 
 For work related to `mq-hal`:
 
-0. Read `.mq/context/task-pack.md` if it exists and matches the task.
-1. Read `$MQ_OBSIDIAN_DIR/memory/learn/agent/mq-hal.md` if it exists.
-2. Read `$MQ_OBSIDIAN_DIR/systems/mq-hal/hot.md` if it exists.
-3. Read `$MQ_OBSIDIAN_DIR/systems/mq-hal/index.md` if it exists.
-4. Read `$MQ_OBSIDIAN_DIR/memory/learn/repos/mq-hal.md` if it exists.
-5. Read individual pattern notes only if the compressed notes are insufficient.
+1. Read `.mq/context/task-pack.md` if it exists and matches the task.
+2. Read `.mq/context/repo-card.md` if it exists.
+3. Read `.mq/context/integration-map.md` if it exists.
+4. Read `$MQ_OBSIDIAN_DIR/memory/learn/agent/mq-hal.md` if it exists.
+5. Read `$MQ_OBSIDIAN_DIR/systems/mq-hal/hot.md` if it exists.
+6. Read `$MQ_OBSIDIAN_DIR/systems/mq-hal/index.md` if it exists.
+7. Read `$MQ_OBSIDIAN_DIR/memory/learn/repos/mq-hal.md` if it exists.
+8. Read individual pattern notes only if the compressed notes are insufficient.
 
 Stop reading as soon as the task is grounded.
 
@@ -34,12 +48,30 @@ Stop reading as soon as the task is grounded.
 - Do not open multiple pattern notes unless clearly needed.
 - Summarize instead of replaying long note bodies.
 
-## Source-Of-Truth Rule
+## Rules
 
-`mqobsidian` is durable memory, not live runtime truth.
+- Do not duplicate logic owned by another MQ repo.
+- Prefer JSON contracts over free-text coupling.
+- Keep repo boundaries explicit.
+- Use `mqobsidian` only as durable memory, not runtime truth.
+- Verify current code behavior, tests, contracts, and CLI behavior in this repo.
 
-If the task depends on current code behavior, tests, contracts, CLI behavior,
-or runtime state, verify in this repo before making claims.
+## Durable Memory
+
+MQ-stack memory lives in `mqobsidian`. Use generated context packs before
+reading large docs.
+
+`mqobsidian` is durable memory, not live runtime truth. If the task depends on
+current code behavior, tests, contracts, CLI behavior, or runtime state, verify
+in this repo before making claims.
+
+## Source Intelligence
+
+If `.codegraph/` exists, prefer CodeGraph for source-structure questions before
+broad file scans: symbol lookup, callers/callees, impact analysis, code-flow.
+
+Do not use CodeGraph as durable MQ memory. Use `mqobsidian` context packs and
+cards for memory, repo boundaries, and prior verified work.
 
 ## Writing Rules
 
@@ -53,6 +85,18 @@ When creating notes, summaries, or exports:
 
 Do not store or copy secrets, tokens, internal hostnames, raw enterprise logs,
 or machine-specific private paths.
+
+## MQ Skills
+
+Repo-local skills live under `.agents/skills/` (Codex) and `.claude/skills/`
+(Claude Code). Route by each skill's frontmatter `description`. A few are
+near-universal across MQ repos:
+
+- `mq-writing-plans` — before multi-step or cross-repo changes.
+- `mq-worktree-safe` — before risky branch/worktree flows.
+- `mq-secrets-public-safe` — before publishing, commit, or PR.
+
+Use any other installed skill when its description matches the task.
 
 ## Fallback Rule
 
