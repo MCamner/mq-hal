@@ -86,8 +86,10 @@ mqlaunch hal timeline
 | Operator action | `mq-hal next`, `mq-hal fix`, `mq-hal open <file>` |
 | Router | `mq-hal "prompt"`, `--raw-intent`, `--explain-intent`, `--confirm` |
 
-Full command truth lives in [docs/COMMAND_SURFACE.md](docs/COMMAND_SURFACE.md)
-and [docs/hal-command-surface.md](docs/hal-command-surface.md).
+The canonical command list is [docs/COMMAND_SURFACE.md](docs/COMMAND_SURFACE.md):
+it is the single source of truth and `release-check.sh` fails if it drifts from
+`bin/mq-hal`. [docs/hal-command-surface.md](docs/hal-command-surface.md) is a
+longer human reference and is not drift-checked.
 
 ## Safety Boundary
 
