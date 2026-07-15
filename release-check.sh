@@ -101,7 +101,9 @@ step "docs/index.html contains version $VERSION"
 grep -q "v${VERSION}" docs/index.html && pass "docs/index.html references v$VERSION" || fail "docs/index.html does not reference v$VERSION"
 
 step "GitHub release tag"
-if command -v gh &>/dev/null 2>&1; then
+if [[ "$DRY_RUN" -eq 1 ]]; then
+  printf "\033[1;33m[SKIP]\033[0m dry-run — not checking whether v%s is already released\n" "$VERSION"
+elif command -v gh &>/dev/null 2>&1; then
   if gh release view "v${VERSION}" &>/dev/null 2>&1; then
     fail "GitHub release v${VERSION} already exists — bump VERSION before releasing"
   else
