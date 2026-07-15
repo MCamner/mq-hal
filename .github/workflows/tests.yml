@@ -15,70 +15,13 @@ jobs:
       - name: Show Python version
         run: python3 --version
 
-      - name: Python syntax check
-        run: |
-          python3 -m py_compile scripts/hal.py
-          python3 -m py_compile mq_hal/tools/registry.py
-          python3 -m py_compile scripts/doctor_summary.py
-          python3 -m py_compile scripts/fix_planner.py
-          python3 -m py_compile scripts/session_memory.py
-          python3 -m py_compile scripts/timeline.py
-          python3 -m py_compile scripts/repo_status.py
-          python3 -m py_compile scripts/ci_status.py
-          python3 -m py_compile scripts/brief.py
-          python3 -m py_compile scripts/release_brief.py
-          python3 -m py_compile scripts/audit.py
-          python3 -m py_compile scripts/stack_status.py
-          python3 -m py_compile scripts/memory_status.py
-          python3 -m py_compile scripts/repo_memory.py
-          python3 -m py_compile scripts/agent_brief.py
-          python3 -m py_compile scripts/hello.py
-          python3 -m py_compile scripts/model_profiles.py
-          python3 -m py_compile scripts/model_status.py
-          python3 -m py_compile scripts/model_test.py
-          python3 -m py_compile scripts/version.py
-          python3 -m py_compile scripts/config_check.py
-          python3 -m py_compile scripts/update.py
-          python3 -m py_compile scripts/visual_hal.py
-          python3 -m py_compile scripts/tools_list.py
-          python3 -m py_compile scripts/models_list.py
-          python3 -m py_compile scripts/planner.py
-          python3 -m py_compile scripts/critic.py
-          python3 -m py_compile scripts/executor.py
-          python3 -m py_compile tools/write_readme.py
-          python3 -m py_compile tools/markdown_guard.py
-
-      - name: Run smoke tests
-        run: |
-          ./tests/smoke.sh
-          ./tests/doctor-summary-smoke.sh
-          ./tests/fix-planner-smoke.sh
-          ./tests/session-memory-smoke.sh
-          ./tests/timeline-smoke.sh
-          ./tests/brief-smoke.sh
-          ./tests/repo-status-smoke.sh
-          ./tests/ci-status-smoke.sh
-          ./tests/release-brief-smoke.sh
-          ./tests/audit-smoke.sh
-          ./tests/stack-status-smoke.sh
-          ./tests/hal-router-smoke.sh
-          ./tests/intent-schema-smoke.sh
-          ./tests/router-safety-smoke.sh
-          ./tests/memory-status-smoke.sh
-          ./tests/repo-memory-smoke.sh
-          ./tests/agent-brief-smoke.sh
-          ./tests/hello-smoke.sh
-          ./tests/tools-smoke.sh
-          ./tests/models-smoke.sh
-          ./tests/model-status-smoke.sh
-          ./tests/model-test-smoke.sh
-          ./tests/install-flow-smoke.sh
-          ./tests/visual-hal-smoke.sh
-          ./tests/prompt-regression-smoke.sh
-          ./tests/plan-smoke.sh
-          ./tests/critic-smoke.sh
-          ./tests/execute-smoke.sh
-          ./tests/docs-smoke.sh
+      - name: Release check (dry-run)
+        # Single source of truth for CI: syntax check, version sync, all smoke
+        # tests, and command-surface consistency. --dry-run skips only the
+        # "is this version already released" gate so post-release pushes stay
+        # green. Keep this in step with release-check.sh instead of maintaining
+        # a parallel list here.
+        run: ./release-check.sh --dry-run
 
       - name: Check skills consistency
         run: |
