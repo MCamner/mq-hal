@@ -179,7 +179,8 @@ Reads `~/.mq-hal/session.jsonl`. Renders a table of event type, repo, time, and 
 
 ### `history`
 
-Read-only trend view for stack score, brain growth, and release history.
+Read-only trend view for stack score, brain growth, release history, and
+approved mq-agent stack-loop execution attempts.
 
 | Property | Value |
 |---|---|
@@ -192,6 +193,13 @@ Read-only trend view for stack score, brain growth, and release history.
 Reads local history from `~/.mq-agent/` and the mqobsidian vault. It scans
 stack/cockpit JSON or JSONL files for scores, counts dated brain files, and
 lists release-related notes.
+
+For loop history it reads
+`$MQ_AGENT_STATE_DIR/stack-loop-history.jsonl` (default `~/.mq-agent`) for
+`mq_stack_loop_audit.v1` records. Invalid JSON, incomplete v1 records,
+unapproved records and unknown schema versions are ignored. JSON output adds a
+`loop_audit` array with `date`, `action`, `outcome`, `rollback_status` and an
+optional `repo`; mq-hal never writes this file.
 
 ---
 
