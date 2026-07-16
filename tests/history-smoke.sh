@@ -16,6 +16,15 @@ cat >"$AGENT_DIR/stack-history.jsonl" <<'JSONL'
 {"timestamp":"2026-06-12T10:00:00","score":92}
 JSONL
 
+cat >"$AGENT_DIR/stack-loop-history.jsonl" <<'JSONL'
+{"schema":"mq_stack_loop_audit.v1","recorded_at":"2026-07-16T10:00:00+00:00","source_schema":"mq_stack_loop_plan.v1","approved":true,"decision":"preview","dashboard_overall":"ATTENTION","next_action":"run stack truth-export","action":"truth-export","outcome":"success","execution_ok":true,"rollback":{"status":"available"}}
+not-json
+{"schema":"future_loop_audit.v2","recorded_at":"2026-07-16T10:01:00+00:00","action":"truth-export","outcome":"success","rollback":{"status":"unknown"}}
+{"schema":"mq_stack_loop_audit.v1","recorded_at":"2026-07-16T10:01:30+00:00","source_schema":"mq_stack_loop_plan.v1","approved":false,"decision":"preview","dashboard_overall":"ATTENTION","next_action":"run stack truth-export","action":"truth-export","outcome":"success","execution_ok":true,"rollback":{"status":"available"}}
+{"schema":"mq_stack_loop_audit.v1","recorded_at":"2026-07-16T10:01:45+00:00","approved":true,"action":"truth-export","outcome":"success","execution_ok":true,"rollback":{}}
+{"schema":"mq_stack_loop_audit.v1","recorded_at":"2026-07-16T10:02:00+00:00","source_schema":"mq_stack_loop_plan.v1","approved":true,"decision":"preview","dashboard_overall":"ATTENTION","next_action":"stack release --repo mq-agent","action":"stack-release","repo":"mq-agent","outcome":"failed","execution_ok":false,"rollback":{"status":"restored"}}
+JSONL
+
 cat >"$BRAIN_DIR/memory/note.md" <<'MD'
 # Note
 MD
@@ -43,15 +52,20 @@ echo "[4/7] live history from temp sources"
 ./bin/mq-hal history > /tmp/mq-hal-history.out
 grep -q "92/100" /tmp/mq-hal-history.out
 grep -q "latest-release.md" /tmp/mq-hal-history.out
+grep -q "Loop audit" /tmp/mq-hal-history.out
+grep -q "stack-release  failed  rollback=restored  repo=mq-agent" /tmp/mq-hal-history.out
 
 echo "[5/7] live json shape"
 ./bin/mq-hal history --json | python3 -c "
 import json, sys
 d = json.load(sys.stdin)
-for key in ['stack_score', 'brain_growth', 'release_history']:
+for key in ['stack_score', 'brain_growth', 'release_history', 'loop_audit']:
     assert key in d, key
 assert d['stack_score'][-1]['score'] == 92
 assert d['release_history'], 'missing release history'
+assert len(d['loop_audit']) == 2, d['loop_audit']
+assert d['loop_audit'][-1]['outcome'] == 'failed'
+assert d['loop_audit'][-1]['rollback_status'] == 'restored'
 "
 
 echo "[6/7] alerts"

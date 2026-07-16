@@ -4,6 +4,11 @@
 
 ## [Unreleased]
 
+### Added
+
+* `mq-hal history` renders approved mq-agent stack-loop audit attempts from
+  `stack-loop-history.jsonl` and ignores malformed or unknown schema records.
+
 ## [2.1.0] - 2026-06-17
 
 Context Pack Status — mq-hal gains read-only visibility into the mqobsidian

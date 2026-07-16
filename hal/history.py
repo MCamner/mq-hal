@@ -45,6 +45,14 @@ SAMPLE: dict[str, Any] = {
     "release_history": [
         {"date": "2026-06-12", "path": "truth/latest-release.md"},
     ],
+    "loop_audit": [
+        {
+            "date": "2026-07-16",
+            "action": "truth-export",
+            "outcome": "success",
+            "rollback_status": "available",
+        },
+    ],
 }
 
 
@@ -111,7 +119,7 @@ def _extract_score(item: dict[str, Any]) -> int | None:
 
 
 def _extract_date(item: dict[str, Any], fallback: Path) -> str:
-    for key in ("date", "timestamp", "created_at", "updated_at"):
+    for key in ("date", "timestamp", "created_at", "updated_at", "recorded_at"):
         value = item.get(key)
         if isinstance(value, str) and value:
             return value[:10]
@@ -158,6 +166,44 @@ def release_history(root: Path) -> list[dict[str, Any]]:
     return rows[-20:]
 
 
+def loop_audit_history(root: Path) -> list[dict[str, Any]]:
+    path = root / "stack-loop-history.jsonl"
+    rows: list[dict[str, Any]] = []
+    for item in _load_json_objects(path):
+        if item.get("schema") != "mq_stack_loop_audit.v1":
+            continue
+        action = item.get("action")
+        outcome = item.get("outcome")
+        rollback = item.get("rollback")
+        valid = (
+            item.get("source_schema") == "mq_stack_loop_plan.v1"
+            and item.get("approved") is True
+            and item.get("decision") == "preview"
+            and isinstance(item.get("recorded_at"), str)
+            and bool(item.get("recorded_at"))
+            and isinstance(item.get("dashboard_overall"), str)
+            and isinstance(item.get("next_action"), str)
+            and action in ("truth-export", "stack-release")
+            and outcome in ("success", "failed")
+            and isinstance(item.get("execution_ok"), bool)
+            and isinstance(rollback, dict)
+            and isinstance(rollback.get("status"), str)
+        )
+        if not valid:
+            continue
+        rollback_status = rollback["status"]
+        row = {
+            "date": _extract_date(item, path),
+            "action": action,
+            "outcome": outcome,
+            "rollback_status": str(rollback_status or "unknown"),
+        }
+        if isinstance(item.get("repo"), str):
+            row["repo"] = item["repo"]
+        rows.append(row)
+    return rows[-20:]
+
+
 def collect_history(
     mq_agent_root: Path | None = None,
     brain_root: Path | None = None,
@@ -173,6 +219,7 @@ def collect_history(
         "stack_score": stack_score_history(mq_agent_root),
         "brain_growth": brain_growth(brain_root),
         "release_history": release_history(brain_root),
+        "loop_audit": loop_audit_history(mq_agent_root),
     }
 
 
@@ -214,6 +261,20 @@ def render_history(data: dict[str, Any]) -> None:
             print(f"{item['date']}  {item['path']}")
     else:
         print("No release history found.")
+    print()
+
+    print("Loop audit")
+    print("----------")
+    loop_rows = data.get("loop_audit", [])
+    if loop_rows:
+        for item in loop_rows:
+            repo = f"  repo={item['repo']}" if item.get("repo") else ""
+            print(
+                f"{item['date']}  {item['action']}  {item['outcome']}  "
+                f"rollback={item['rollback_status']}{repo}"
+            )
+    else:
+        print("No loop audit history found.")
 
 
 def collect_alerts(sample: bool = False) -> dict[str, Any]:
@@ -240,7 +301,7 @@ def render_alerts(data: dict[str, Any]) -> None:
 def main(argv: list[str]) -> int:
     parser = argparse.ArgumentParser(
         prog="mq-hal history",
-        description="Show stack score, brain growth, and release history.",
+        description="Show stack score, brain growth, release history, and loop audit.",
     )
     parser.add_argument("--json", action="store_true")
     parser.add_argument("--sample", action="store_true")
