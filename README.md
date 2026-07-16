@@ -3,7 +3,7 @@
 Local operator layer for the MQ stack.
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
-[![Version](https://img.shields.io/badge/version-2.1.0-blue)](VERSION)
+[![Version](https://img.shields.io/badge/version-2.1.1-blue)](VERSION)
 
 `mq-hal` gives a human-friendly command surface for local repo status, stack
 status, release status, runtime health, mqobsidian context readiness, and safe

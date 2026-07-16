@@ -2,7 +2,16 @@
 
 <!-- markdownlint-disable MD013 -->
 
-## [Unreleased]
+## [2.1.1] - 2026-07-16
+
+### Added
+
+- Release metadata refreshed for the current mq-hal branch work.
+
+### Changed
+
+- Updated version metadata to reflect the latest mq-hal release state.
+
 
 ### Added
 
