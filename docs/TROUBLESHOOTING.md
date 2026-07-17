@@ -200,4 +200,4 @@ mq-hal search "your query"     # retry after indexing
 - `docs/COMMAND_SURFACE.md` — full command registry
 - `docs/INSTALL.md` — installation and PATH setup
 - `docs/INTENT_CONTRACT.md` — intent schema and safety classes
-- GitHub issues: https://github.com/MCamner/mq-hal/issues
+- GitHub issues: <https://github.com/MCamner/mq-hal/issues>

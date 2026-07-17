@@ -26,6 +26,7 @@ Override path with `MQ_HAL_CONFIG_PATH`.
 | `repos` | object | Yes | Map of name → path (tilde-expanded) |
 
 Rules:
+
 - `repos` must be a non-empty object.
 - Paths support `~` expansion.
 - `default_repo` must be a key in `repos` when provided.
@@ -75,7 +76,7 @@ Malformed lines are skipped silently on read.
 
 ### Text format (default)
 
-```
+```text
 <timestamp>  <type:16>        repo=<repo:14> <status or excerpt>
 ```
 
