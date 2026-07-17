@@ -100,6 +100,16 @@ grep -q "\[${VERSION}\]" CHANGELOG.md && pass "CHANGELOG references $VERSION" ||
 step "docs/index.html contains version $VERSION"
 grep -q "v${VERSION}" docs/index.html && pass "docs/index.html references v$VERSION" || fail "docs/index.html does not reference v$VERSION"
 
+# The stack contract gate compares this against VERSION across the whole stack,
+# so a stale value fails CI in mq-agent, not here. Check it where it is written.
+step ".mq/repo-contract.json contains version $VERSION"
+CONTRACT_VERSION="$(python3 -c "import json; print(json.load(open('.mq/repo-contract.json'))['version'])")"
+if [[ "$CONTRACT_VERSION" == "$VERSION" ]]; then
+  pass "repo contract references $VERSION"
+else
+  fail "repo contract version '$CONTRACT_VERSION' != VERSION '$VERSION'"
+fi
+
 step "GitHub release tag"
 if [[ "$DRY_RUN" -eq 1 ]]; then
   printf "\033[1;33m[SKIP]\033[0m dry-run — not checking whether v%s is already released\n" "$VERSION"
