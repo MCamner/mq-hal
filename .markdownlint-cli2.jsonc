@@ -1,0 +1,9 @@
+{
+  // Rule config lives in .markdownlint.json (shared with the VS Code extension).
+  "globs": ["**/*.md"],
+  "ignores": [
+    ".venv/**", "node_modules/**", "build/**", "dist/**",
+    "**/*.egg-info/**", "backups/**",
+    ".github/ISSUE_TEMPLATE/**"
+  ]
+}

@@ -118,7 +118,7 @@ Each line is a JSON object:
 ## Safety rules
 
 - Local only — no upload, no sync, no external calls
-- Secret patterns redacted before write (`api_key:`, `token:`, `bearer `,
+- Secret patterns redacted before write (`api_key:`, `token:`, `bearer`,
   `ghp_*`, `sk-*`)
 - No command execution
 - No router mutation — `ALLOWED_INTENTS` and `ALLOWED_MQLAUNCH` are never
