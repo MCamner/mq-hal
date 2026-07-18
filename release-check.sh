@@ -1,104 +1,105 @@
 #!/usr/bin/env bash
-# Release readiness check for mq-hal.
-# Run from the repository root before every release.
-set -euo pipefail
+# Release readiness check for mq-hal. Read-only.
+#
+# Human mode (no flags / --dry-run): prints [PASS]/[FAIL] per check, exits 1 on
+#   any failure. --dry-run skips the GitHub "already released" lookup.
+# Contract mode (--json): emits a repo_release_check.v1 object on stdout and
+#   exits 0 (the `status` field carries the verdict). Consumed by mq-agent's
+#   `stack release --all --preflight`. --json implies read-only and network-free
+#   (the GitHub lookup is skipped), matching --dry-run.
+set -uo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$ROOT"
 
 DRY_RUN=0
+JSON=0
 for arg in "$@"; do
   case "$arg" in
-    --dry-run)
-      DRY_RUN=1
-      ;;
-    *)
-      echo "usage: ./release-check.sh [--dry-run]" >&2
-      exit 2
-      ;;
+    --dry-run) DRY_RUN=1 ;;
+    --json) JSON=1 ;;
+    *) echo "usage: ./release-check.sh [--dry-run] [--json]" >&2; exit 2 ;;
   esac
 done
-
-pass() { printf "\033[1;32m[PASS]\033[0m %s\n" "$*"; }
-fail() { printf "\033[1;31m[FAIL]\033[0m %s\n" "$*" >&2; FAILED=1; }
-step() { printf "\033[1;34m[----]\033[0m %s\n" "$*"; }
+# --json is preflight mode: always read-only and network-free.
+[[ "$JSON" -eq 1 ]] && DRY_RUN=1
 
 FAILED=0
+BLOCKERS=()
 VERSION="$(cat VERSION)"
 
+step() { [[ "$JSON" -eq 1 ]] || printf "\033[1;34m[----]\033[0m %s\n" "$*"; }
+pass() { [[ "$JSON" -eq 1 ]] || printf "\033[1;32m[PASS]\033[0m %s\n" "$*"; }
+skip() { [[ "$JSON" -eq 1 ]] || printf "\033[1;33m[SKIP]\033[0m %s\n" "$*"; }
+fail() { FAILED=1; BLOCKERS+=("$1"); [[ "$JSON" -eq 1 ]] || printf "\033[1;31m[FAIL]\033[0m %s\n" "$*" >&2; }
+
 step "Intent contract"
-test -f "schemas/intent.schema.json" \
-  || { fail "schemas/intent.schema.json missing"; }
-test -f "docs/INTENT_CONTRACT.md" \
-  || { fail "docs/INTENT_CONTRACT.md missing"; }
-test -f "docs/COMMAND_SURFACE.md" \
-  || { fail "docs/COMMAND_SURFACE.md missing"; }
-python3 - <<'EOF' || { fail "intent schema version or enum mismatch"; }
-import sys, json
+[[ -f schemas/intent.schema.json ]] || fail "schemas/intent.schema.json missing"
+[[ -f docs/INTENT_CONTRACT.md ]] || fail "docs/INTENT_CONTRACT.md missing"
+[[ -f docs/COMMAND_SURFACE.md ]] || fail "docs/COMMAND_SURFACE.md missing"
+if python3 - >/dev/null 2>&1 <<'EOF'
+import json
+import sys
 sys.path.insert(0, "scripts")
 import hal
 schema = json.load(open("schemas/intent.schema.json"))
-const = schema["properties"]["schema"]["const"]
-assert const == hal.INTENT_SCHEMA_VERSION, \
-    f"schema const {const!r} != INTENT_SCHEMA_VERSION {hal.INTENT_SCHEMA_VERSION!r}"
-enum = set(schema["properties"]["intent"]["enum"])
-assert enum == hal.ALLOWED_INTENTS, \
-    f"schema enum differs from ALLOWED_INTENTS: {enum ^ hal.ALLOWED_INTENTS}"
+assert schema["properties"]["schema"]["const"] == hal.INTENT_SCHEMA_VERSION
+assert set(schema["properties"]["intent"]["enum"]) == hal.ALLOWED_INTENTS
 EOF
-pass "intent contract consistent"
+then
+  pass "intent contract consistent"
+else
+  fail "intent schema version or enum mismatch"
+fi
 
 step "Python syntax check"
-python3 -m py_compile scripts/hal.py
-python3 -m py_compile mq_hal/tools/registry.py
-python3 -m py_compile scripts/doctor_summary.py
-python3 -m py_compile scripts/fix_planner.py
-python3 -m py_compile scripts/session_memory.py
-python3 -m py_compile scripts/timeline.py
-python3 -m py_compile scripts/repo_status.py
-python3 -m py_compile scripts/ci_status.py
-python3 -m py_compile scripts/brief.py
-python3 -m py_compile scripts/release_brief.py
-python3 -m py_compile scripts/audit.py
-python3 -m py_compile scripts/stack_status.py
-python3 -m py_compile hal/stack.py
-python3 -m py_compile hal/status.py
-python3 -m py_compile hal/doctor.py
-python3 -m py_compile hal/brain.py
-python3 -m py_compile hal/context.py
-python3 -m py_compile hal/release.py
-python3 -m py_compile scripts/memory_status.py
-python3 -m py_compile scripts/repo_memory.py
-python3 -m py_compile scripts/agent_brief.py
-python3 -m py_compile scripts/hello.py
-python3 -m py_compile scripts/model_profiles.py
-python3 -m py_compile scripts/model_status.py
-python3 -m py_compile scripts/model_test.py
-python3 -m py_compile scripts/version.py
-python3 -m py_compile scripts/config_check.py
-python3 -m py_compile scripts/update.py
-python3 -m py_compile scripts/visual_hal.py
-python3 -m py_compile scripts/tools_list.py
-python3 -m py_compile scripts/models_list.py
-python3 -m py_compile scripts/planner.py
-python3 -m py_compile scripts/critic.py
-python3 -m py_compile scripts/executor.py
-python3 -m py_compile scripts/learn.py
-python3 -m py_compile scripts/env_status.py
-python3 -m py_compile tools/write_readme.py
-python3 -m py_compile tools/markdown_guard.py
-pass "Python syntax OK"
+_pyfiles=(
+  scripts/hal.py mq_hal/tools/registry.py scripts/doctor_summary.py
+  scripts/fix_planner.py scripts/session_memory.py scripts/timeline.py
+  scripts/repo_status.py scripts/ci_status.py scripts/brief.py
+  scripts/release_brief.py scripts/audit.py scripts/stack_status.py
+  hal/stack.py hal/status.py hal/doctor.py hal/brain.py hal/context.py
+  hal/release.py scripts/memory_status.py scripts/repo_memory.py
+  scripts/agent_brief.py scripts/hello.py scripts/model_profiles.py
+  scripts/model_status.py scripts/model_test.py scripts/version.py
+  scripts/config_check.py scripts/update.py scripts/visual_hal.py
+  scripts/tools_list.py scripts/models_list.py scripts/planner.py
+  scripts/critic.py scripts/executor.py scripts/learn.py scripts/env_status.py
+  tools/write_readme.py tools/markdown_guard.py
+)
+if (set -e; for f in "${_pyfiles[@]}"; do python3 -m py_compile "$f"; done) >/dev/null 2>&1; then
+  pass "Python syntax OK"
+else
+  fail "Python syntax check failed"
+fi
 
 step "README markdown guard"
-python3 tools/markdown_guard.py README.md && pass "README markdown guard" || fail "README markdown guard failed"
+if python3 tools/markdown_guard.py README.md >/dev/null 2>&1; then
+  pass "README markdown guard"
+else
+  fail "README markdown guard failed"
+fi
 
 step "README contains version $VERSION"
-grep -q "version-${VERSION}" README.md && pass "README badge references $VERSION" || fail "README badge does not reference $VERSION"
+if grep -q "version-${VERSION}" README.md; then
+  pass "README badge references $VERSION"
+else
+  fail "README badge does not reference $VERSION"
+fi
 
 step "CHANGELOG contains version $VERSION"
-grep -q "\[${VERSION}\]" CHANGELOG.md && pass "CHANGELOG references $VERSION" || fail "CHANGELOG does not reference $VERSION"
+if grep -q "\[${VERSION}\]" CHANGELOG.md; then
+  pass "CHANGELOG references $VERSION"
+else
+  fail "CHANGELOG does not reference $VERSION"
+fi
 
 step "docs/index.html contains version $VERSION"
-grep -q "v${VERSION}" docs/index.html && pass "docs/index.html references v$VERSION" || fail "docs/index.html does not reference v$VERSION"
+if grep -q "v${VERSION}" docs/index.html; then
+  pass "docs/index.html references v$VERSION"
+else
+  fail "docs/index.html does not reference v$VERSION"
+fi
 
 # The stack contract gate compares this against VERSION across the whole stack,
 # so a stale value fails CI in mq-agent, not here. Check it where it is written.
@@ -112,58 +113,90 @@ fi
 
 step "GitHub release tag"
 if [[ "$DRY_RUN" -eq 1 ]]; then
-  printf "\033[1;33m[SKIP]\033[0m dry-run — not checking whether v%s is already released\n" "$VERSION"
-elif command -v gh &>/dev/null 2>&1; then
-  if gh release view "v${VERSION}" &>/dev/null 2>&1; then
+  skip "dry-run — not checking whether v$VERSION is already released"
+elif command -v gh >/dev/null 2>&1; then
+  if gh release view "v${VERSION}" >/dev/null 2>&1; then
     fail "GitHub release v${VERSION} already exists — bump VERSION before releasing"
   else
     pass "v${VERSION} not yet released on GitHub"
   fi
 else
-  printf "\033[1;33m[SKIP]\033[0m gh CLI not available — skipping GitHub release check\n"
+  skip "gh CLI not available — skipping GitHub release check"
 fi
 
 step "Smoke tests"
 _smoke_start=$FAILED
-./tests/smoke.sh                          || fail "smoke.sh"
-./tests/doctor-summary-smoke.sh           || fail "doctor-summary-smoke.sh"
-./tests/fix-planner-smoke.sh              || fail "fix-planner-smoke.sh"
-./tests/session-memory-smoke.sh           || fail "session-memory-smoke.sh"
-./tests/timeline-smoke.sh                 || fail "timeline-smoke.sh"
-./tests/brief-smoke.sh                    || fail "brief-smoke.sh"
-./tests/repo-status-smoke.sh              || fail "repo-status-smoke.sh"
-./tests/ci-status-smoke.sh                || fail "ci-status-smoke.sh"
-./tests/release-brief-smoke.sh            || fail "release-brief-smoke.sh"
-./tests/release-control-smoke.sh          || fail "release-control-smoke.sh"
-./tests/audit-smoke.sh                    || fail "audit-smoke.sh"
-./tests/stack-status-smoke.sh             || fail "stack-status-smoke.sh"
-./tests/hal-router-smoke.sh               || fail "hal-router-smoke.sh"
-./tests/intent-schema-smoke.sh            || fail "intent-schema-smoke.sh"
-./tests/router-safety-smoke.sh            || fail "router-safety-smoke.sh — safety gate failed"
-./tests/memory-status-smoke.sh            || fail "memory-status-smoke.sh"
-./tests/brain-smoke.sh                    || fail "brain-smoke.sh"
-./tests/context-smoke.sh                  || fail "context-smoke.sh"
-./tests/repo-memory-smoke.sh              || fail "repo-memory-smoke.sh"
-./tests/agent-brief-smoke.sh              || fail "agent-brief-smoke.sh"
-./tests/hello-smoke.sh                    || fail "hello-smoke.sh"
-./tests/tools-smoke.sh                    || fail "tools-smoke.sh"
-./tests/models-smoke.sh                   || fail "models-smoke.sh"
-./tests/model-status-smoke.sh             || fail "model-status-smoke.sh"
-./tests/model-test-smoke.sh               || fail "model-test-smoke.sh"
-./tests/install-flow-smoke.sh             || fail "install-flow-smoke.sh"
-./tests/visual-hal-smoke.sh               || fail "visual-hal-smoke.sh"
-./tests/prompt-regression-smoke.sh        || fail "prompt-regression-smoke.sh"
-./tests/plan-smoke.sh                     || fail "plan-smoke.sh"
-./tests/critic-smoke.sh                   || fail "critic-smoke.sh"
-./tests/execute-smoke.sh                  || fail "execute-smoke.sh"
-./tests/learn-smoke.sh                    || fail "learn-smoke.sh"
-./tests/env-status-smoke.sh               || fail "env-status-smoke.sh"
-./tests/docs-smoke.sh                     || fail "docs-smoke.sh"
+_smoke() {
+  local s="$1" out
+  if out="$("./tests/$s" 2>&1)"; then
+    :
+  else
+    fail "$s"
+    [[ "$JSON" -eq 1 ]] || printf '%s\n' "$out" >&2
+  fi
+}
+_smoke smoke.sh
+_smoke doctor-summary-smoke.sh
+_smoke fix-planner-smoke.sh
+_smoke session-memory-smoke.sh
+_smoke timeline-smoke.sh
+_smoke brief-smoke.sh
+_smoke repo-status-smoke.sh
+_smoke ci-status-smoke.sh
+_smoke release-brief-smoke.sh
+_smoke release-control-smoke.sh
+_smoke audit-smoke.sh
+_smoke stack-status-smoke.sh
+_smoke hal-router-smoke.sh
+_smoke intent-schema-smoke.sh
+_smoke router-safety-smoke.sh
+_smoke memory-status-smoke.sh
+_smoke brain-smoke.sh
+_smoke context-smoke.sh
+_smoke repo-memory-smoke.sh
+_smoke agent-brief-smoke.sh
+_smoke hello-smoke.sh
+_smoke tools-smoke.sh
+_smoke models-smoke.sh
+_smoke model-status-smoke.sh
+_smoke model-test-smoke.sh
+_smoke install-flow-smoke.sh
+_smoke visual-hal-smoke.sh
+_smoke prompt-regression-smoke.sh
+_smoke plan-smoke.sh
+_smoke critic-smoke.sh
+_smoke execute-smoke.sh
+_smoke learn-smoke.sh
+_smoke env-status-smoke.sh
+_smoke docs-smoke.sh
 [[ "$FAILED" -eq "$_smoke_start" ]] && pass "all smoke tests passed"
 
 step "Command surface consistency"
-./tools/check-command-docs.sh
-pass "command surface consistent"
+if ./tools/check-command-docs.sh >/dev/null 2>&1; then
+  pass "command surface consistent"
+else
+  fail "command surface consistency check failed"
+fi
+
+if [[ "$JSON" -eq 1 ]]; then
+  status=READY
+  [[ "$FAILED" -ne 0 ]] && status=BLOCKED
+  python3 - "$status" "$VERSION" ${BLOCKERS[@]+"${BLOCKERS[@]}"} <<'PY'
+import json
+import sys
+
+status, version, *blockers = sys.argv[1:]
+print(json.dumps({
+    "schema": "repo_release_check.v1",
+    "repo": "mq-hal",
+    "status": status,
+    "blockers": blockers,
+    "warnings": [],
+    "evidence": {"version": version},
+}))
+PY
+  exit 0
+fi
 
 printf '\n'
 if [[ "$FAILED" -eq 0 ]]; then

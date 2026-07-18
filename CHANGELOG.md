@@ -2,6 +2,12 @@
 
 <!-- markdownlint-disable MD013 -->
 
+## [Unreleased]
+
+### Changed
+
+- `release-check.sh` now conforms to the `repo_release_check.v1` contract: `--json` emits the machine-readable object (`schema`, `repo`, `status`, `blockers`, `warnings`, `evidence`) on stdout and exits 0; `--json` and `--dry-run` run read-only and network-free. Human mode is unchanged. This lets mq-agent's `stack release --all --preflight` read mq-hal's release verdict.
+
 ## [2.1.1] - 2026-07-16
 
 ### Added
