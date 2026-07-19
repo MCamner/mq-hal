@@ -8,5 +8,6 @@
     "status_check.v1",
     "operator_platform.v1"
   ],
-  "next_focus": "v2.1.0 — operator platform polish"
+  "next_focus": "v2.1.0 \u2014 operator platform polish",
+  "release_mode": "direct"
 }
