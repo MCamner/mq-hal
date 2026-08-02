@@ -11,6 +11,11 @@ import sys
 from pathlib import Path
 from typing import Any
 
+try:
+    from hal.feedback import render_feedback, surface_feedback
+except ModuleNotFoundError:  # direct script execution outside the repo root
+    from feedback import render_feedback, surface_feedback
+
 MQ_AGENT_RELEASE_COMMAND = ["mq-agent", "stack", "release-check", "--json"]
 
 SAMPLE: dict[str, Any] = {
@@ -256,19 +261,21 @@ def main(argv: list[str]) -> int:
     sample = bool(getattr(args, "sample", False))
 
     if sample:
-        data = SAMPLE
+        data = surface_feedback(
+            SAMPLE, surface="Release", command="mq-hal release blockers"
+        )
     else:
         data, error, code = read_release_check()
         if data is None:
             if args.json:
-                print_json(
+                print_json(surface_feedback(
                     {
                         "status": "warn",
                         "source": "mq-agent stack release-check --json",
                         "error": error,
                         "returncode": code,
-                    }
-                )
+                    }, surface="Release", command="mq-hal release blockers",
+                    status="UNAVAILABLE", evidence=[error]))
             else:
                 print("Release Control Center")
                 print("======================")
@@ -277,6 +284,9 @@ def main(argv: list[str]) -> int:
                 print()
                 print("Expected input: mq-agent stack release-check --json")
             return 1
+        data = surface_feedback(
+            data, surface="Release", command="mq-hal release blockers"
+        )
 
     if args.json:
         print_json(data)
@@ -288,6 +298,8 @@ def main(argv: list[str]) -> int:
         render_blockers(data)
     else:
         render_summary(data)
+    print()
+    render_feedback(data["feedback"])
     return 0
 
 

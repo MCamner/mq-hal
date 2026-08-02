@@ -45,7 +45,7 @@ It should be:
 Latest stable release:
 
 ```text
-v2.1.1 — Context Pack Status
+v2.2.0 — Operator Feedback Polish
 ```
 
 Completed foundation:
@@ -73,11 +73,12 @@ Completed foundation:
 - TUI dashboard, timeline & history, operator actions (v1.7–v1.9)
 - HAL Operator Platform — unified `mq-hal` dashboard over the whole stack (v2.0)
 - Context Pack Status — read-only mqobsidian token-reduction visibility (v2.1)
+- Operator Feedback Polish — explicit dashboard and action outcomes (v2.2)
 
 Current recommended next step:
 
 ```text
-v2.2.0 — operator feedback polish
+v2.3.0 — Local-First Model Routing Control Room
 ```
 
 ---
@@ -114,7 +115,7 @@ v2.2.0 — operator feedback polish
 | v2.0.0  | HAL Operator Platform                                | Done    |
 | v2.1.0  | Context Pack Status                                  | Done    |
 | v2.1.1  | Stack-loop history compatibility                     | Done    |
-| v2.2.0  | Operator feedback polish                           | Planned |
+| v2.2.0  | Operator feedback polish                             | Done    |
 | v2.3.0  | Local-First Model Routing Control Room             | Planned |
 
 ---
@@ -538,6 +539,62 @@ mq-hal context --json
 - [x] Token budget delegates to mqobsidian on demand.
 - [x] Dashboard includes a Context panel.
 - [x] README, command docs, guide and release-check cover the command.
+
+---
+
+## v2.2.0 — Operator Feedback Polish
+
+Status: Done — the main operator surfaces share a versioned feedback contract.
+
+### Goal
+
+Standardize operator feedback before v2.3 adds more routing decisions to
+explain. Main surfaces are `stack`, `release`, `runtime`, `brain`, `context`,
+`dashboard`, `next`, `open`, and `fix`.
+
+### Step 1 — Unified status levels
+
+All main HAL surfaces use `PASS`, `WARN`, `FAIL`, `SKIPPED`, or `UNAVAILABLE`.
+Legacy input values are normalized at the presentation boundary.
+
+### Step 2 — Explanatory results
+
+Warnings and failures expose what happened, why it matters, evidence, the next
+action, and a suggested command through `mq.feedback.v1`.
+
+### Step 3 — Unified `next_action`
+
+Actionable JSON results return `text`, `command`, `safety`, and
+`requires_confirmation`. HAL displays this metadata but never executes it
+automatically.
+
+### Step 4 — Confirmation feedback
+
+Operator previews show the exact command, affected repo or owner, safety class,
+expected effect, cancellation path, and delegated exit status.
+
+### Step 5 — Surface parity
+
+CLI, JSON, dashboard panels, `mqlaunch hal`, and MCP consumers receive the same
+semantic status and advisory action metadata from the underlying command.
+
+### Step 6 — Negative tests
+
+Contract and smoke tests cover unavailable dependencies, malformed feedback,
+omitted actions for healthy results, confirmation requirements, cancellation,
+delegated exit codes, and human/JSON status parity.
+
+### Definition of Done
+
+- [x] A shared feedback model exists.
+- [x] All main commands use the same status levels.
+- [x] Warnings and errors contain a concrete next action.
+- [x] Suggested commands carry safety metadata.
+- [x] No action runs implicitly from feedback.
+- [x] CLI, JSON, and TUI are semantically consistent.
+- [x] Delegated exit codes are preserved.
+- [x] Negative tests cover failure, cancellation, and degraded modes.
+- [x] README, command surface, and guide are updated.
 
 ---
 

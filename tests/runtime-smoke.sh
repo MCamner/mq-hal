@@ -54,8 +54,8 @@ assert d['title'] == 'MQ Runtime'
 services = {item['name']: item for item in d['services']}
 for name in ['Ollama', 'mq-mcp', 'GitHub', 'brain']:
     assert name in services, name
-    assert services[name]['status'] in {'RUNNING', 'WARN', 'DOWN'}
-assert 'overall' in d and d['overall']['status'] in {'RUNNING', 'WARN', 'DOWN'}
+    assert services[name]['status'] in {'PASS', 'WARN', 'FAIL', 'SKIPPED', 'UNAVAILABLE'}
+assert 'overall' in d and d['overall']['status'] in {'PASS', 'WARN', 'FAIL', 'SKIPPED', 'UNAVAILABLE'}
 "
 
 echo "[6/6] brain health can run"

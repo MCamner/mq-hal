@@ -4,8 +4,26 @@
 
 ## [Unreleased]
 
+## [2.2.0] - 2026-08-03
+
+Operator Feedback Polish makes interactive input and confirmed action outcomes
+visible without changing mq-hal's routing or ownership boundaries.
+
+### Added
+
+- `mq.feedback.v1` and `schemas/feedback.schema.json` standardize status,
+  explanations, evidence, and advisory `next_action` metadata across the main
+  operator surfaces.
+- Dashboard feedback for refresh, back navigation, invalid choices, and exit.
+- Explicit `DONE` and `ERROR` results after confirmed `open` and `fix` actions,
+  preserving non-zero editor and mqlaunch exit codes.
+
 ### Changed
 
+- Main operator statuses now normalize to `PASS`, `WARN`, `FAIL`, `SKIPPED`,
+  or `UNAVAILABLE`; degraded dependencies include a read-only next command.
+- Operator previews expose command, repo/owner, safety class, expected effect,
+  cancellation guidance, and delegated exit status.
 - `release-check.sh` now conforms to the `repo_release_check.v1` contract: `--json` emits the machine-readable object (`schema`, `repo`, `status`, `blockers`, `warnings`, `evidence`) on stdout and exits 0; `--json` and `--dry-run` run read-only and network-free. Human mode is unchanged. This lets mq-agent's `stack release --all --preflight` read mq-hal's release verdict.
 
 ## [2.1.1] - 2026-07-16

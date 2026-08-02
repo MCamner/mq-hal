@@ -17,15 +17,15 @@ echo "SMOKE: context"
 echo "[1/9] syntax"
 python3 -m py_compile hal/context.py
 
-echo "[2/9] missing mqobsidian returns WARN (not FAIL)"
+echo "[2/9] missing mqobsidian returns UNAVAILABLE (not FAIL)"
 ./bin/mq-hal context --root "$EMPTY_DIR" --json | python3 -c "
 import json, sys
 d = json.load(sys.stdin)
 assert d['schema'] == 'mq_hal.context_status.v1', d['schema']
-assert d['status'] == 'WARN', d['status']
+assert d['status'] == 'UNAVAILABLE', d['status']
 assert d['checks']['repo_found'] is False
 assert d['latest_task_pack'] is None
-assert d['token_budget']['status'] == 'UNKNOWN'
+assert d['token_budget']['status'] == 'UNAVAILABLE'
 "
 ./bin/mq-hal context --root "$EMPTY_DIR" | grep -q "mqobsidian:.*missing"
 
@@ -98,9 +98,9 @@ rm -f "$OBS_DIR/scripts/check-token-budget.py"
 ./bin/mq-hal context --root "$OBS_DIR" budget --json | python3 -c "
 import json, sys
 d = json.load(sys.stdin)
-assert d['token_budget']['status'] == 'UNKNOWN', d['token_budget']
+assert d['token_budget']['status'] == 'UNAVAILABLE', d['token_budget']
 "
-./bin/mq-hal context --root "$OBS_DIR" budget | grep -q "status:  unknown"
+./bin/mq-hal context --root "$OBS_DIR" budget | grep -q "status:  unavailable"
 
 echo "[9/9] open only previews files inside mqobsidian path"
 ./bin/mq-hal context --root "$OBS_DIR" open ".mq/context/task-pack.md" | grep -q "schema: context-pack.v1"

@@ -15,6 +15,7 @@ BASE_DIR = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(BASE_DIR))
 
 from hal import stack as operator_stack
+from hal.feedback import render_feedback, surface_feedback
 
 CONFIG_PATH = BASE_DIR / "config" / "repos.json"
 
@@ -434,7 +435,7 @@ def render(data: dict[str, Any]) -> None:
     print("Tools")
     print("-----")
     for name, meta in data["tools"].items():
-        marker = "OK" if meta["available"] else "MISS"
+        marker = "PASS" if meta["available"] else "UNAVAILABLE"
         path = meta["path"] or "-"
         print(f"{marker:<5} {name:<12} {path}")
     print()
@@ -473,7 +474,7 @@ def render(data: dict[str, Any]) -> None:
     print("Configured repos")
     print("----------------")
     for repo in data["repos"]:
-        exists = "OK" if repo["exists"] else "MISS"
+        exists = "PASS" if repo["exists"] else "UNAVAILABLE"
         dirty = "dirty" if repo["dirty"] else "clean"
         publish = repo["publish"]
         if publish["available"]:
@@ -511,7 +512,9 @@ def main(argv: list[str]) -> int:
     args = parser.parse_args(argv)
 
     if args.sample:
-        data = operator_stack.SAMPLE_COCKPIT
+        data = surface_feedback(
+            operator_stack.SAMPLE_COCKPIT, surface="Stack", command="mq-hal stack"
+        )
         if args.json:
             operator_stack.print_json(data)
         else:
@@ -521,21 +524,27 @@ def main(argv: list[str]) -> int:
     if not args.legacy:
         cockpit = operator_stack.read_cockpit()
         if cockpit.ok and cockpit.data is not None:
+            data = surface_feedback(
+                cockpit.data, surface="Stack", command="mq-hal stack"
+            )
             if args.json:
-                operator_stack.print_json(cockpit.data)
+                operator_stack.print_json(data)
             else:
-                operator_stack.render(cockpit.data)
+                operator_stack.render(data)
+                print()
+                render_feedback(data["feedback"])
             return 0
 
         if args.json:
             print(
                 json.dumps(
-                    {
+                    surface_feedback({
                         "status": "warn",
                         "source": "mq-agent stack cockpit --json",
                         "error": cockpit.error,
                         "returncode": cockpit.returncode,
-                    },
+                    }, surface="Stack", command="mq-hal stack", status="UNAVAILABLE",
+                       evidence=[cockpit.error]),
                     indent=2,
                     ensure_ascii=False,
                 )
@@ -552,12 +561,14 @@ def main(argv: list[str]) -> int:
         print(f"Fallback: {cockpit.error}. Showing legacy local stack-status.")
         print()
 
-    data = collect()
+    data = surface_feedback(collect(), surface="Stack", command="mq-hal stack")
     if args.json:
         print(json.dumps(data, indent=2, ensure_ascii=False))
         return 0
 
     render(data)
+    print()
+    render_feedback(data["feedback"])
     return 0
 
 

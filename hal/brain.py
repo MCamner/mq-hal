@@ -14,6 +14,11 @@ from pathlib import Path
 from typing import Any
 from urllib.parse import urlparse
 
+try:
+    from hal.feedback import render_feedback, surface_feedback
+except ModuleNotFoundError:  # direct script execution outside the repo root
+    from feedback import render_feedback, surface_feedback
+
 STATE_DIR = Path(
     os.environ.get("MQ_HAL_STATE_DIR", str(Path.home() / ".mq-hal"))
 ).expanduser()
@@ -157,7 +162,7 @@ def collect(root: Path | None = None) -> dict[str, Any]:
     ]
     status = "ok" if not missing else ("warn" if root.exists() else "missing")
 
-    return {
+    return surface_feedback({
         "status": status,
         "root": str(root),
         "folders": folders,
@@ -166,7 +171,7 @@ def collect(root: Path | None = None) -> dict[str, Any]:
         "latest_release": rel(latest_release, root) if latest_release else None,
         "learn_lessons": learn_lessons,
         "collected_at": now_iso(),
-    }
+    }, surface="Brain", command="mq-hal brain health")
 
 
 def search(root: Path, query: str, limit: int) -> dict[str, Any]:
@@ -204,7 +209,7 @@ def render_health(data: dict[str, Any]) -> None:
     print(f"Root:   {data['root']}")
     print()
     for name, meta in data["folders"].items():
-        marker = "OK" if meta["exists"] else "MISS"
+        marker = "PASS" if meta["exists"] else "UNAVAILABLE"
         latest_item = meta["latest"] or "-"
         print(f"{marker:<5} {name:<8} count={meta['count']:<4} latest={latest_item}")
 
@@ -663,7 +668,7 @@ def main(argv: list[str]) -> int:
     root = Path(args.root).expanduser() if args.root else None
 
     if args.sample:
-        data = SAMPLE
+        data = surface_feedback(SAMPLE, surface="Brain", command="mq-hal brain health")
     elif args.command == "search":
         root_path = root or resolve_root()
         payload = search(root_path, " ".join(args.query), args.limit)
@@ -718,6 +723,8 @@ def main(argv: list[str]) -> int:
         render_recent(data)
     else:
         render_summary(data)
+    print()
+    render_feedback(data["feedback"])
     return 0
 
 

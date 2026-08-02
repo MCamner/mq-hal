@@ -4,6 +4,11 @@ Reference for every command exposed through `mq-hal` and `mqlaunch hal`.
 
 Each entry lists: what it does, which backend it calls, whether it is read-only, and whether it writes to session memory.
 
+Main operator commands share `mq.feedback.v1`. Human and JSON output use
+`PASS`, `WARN`, `FAIL`, `SKIPPED`, or `UNAVAILABLE`. Actionable results include
+a non-executing `next_action` with its command, safety class, and confirmation
+requirement. The schema is `schemas/feedback.schema.json`.
+
 ---
 
 ## OBSERVE
@@ -258,7 +263,8 @@ Route a blocker to the existing `mqlaunch fix` tool.
 | Flags | `--json`, `--sample`, `--confirm` |
 
 Without `--confirm`, prints the route it would use. With `--confirm`, runs
-`mqlaunch fix <blocker>`.
+`mqlaunch fix <blocker>` and reports `DONE` or the underlying non-zero exit
+status.
 
 ---
 
@@ -276,7 +282,8 @@ Open a suggested file or explicit target in the selected repo.
 
 Paths are constrained to the selected repo. Without `--confirm`, prints the
 resolved editor command. With `--confirm`, opens via `$VISUAL`, `$EDITOR`,
-`code`, `open`, or `nano`.
+`code`, `open`, or `nano`, then reports `DONE` or the editor's non-zero exit
+status.
 
 ---
 
@@ -712,11 +719,13 @@ Terminal dashboard for the HAL operator layer.
 | Read-only | Yes |
 | Memory write | No |
 | Flags | `--json`, `--sample`, `--once`, `--no-clear` |
-| Keys | `1` Stack, `2` Brain, `3` Release, `4` Runtime, `5` History, `a` Alerts, `r` Refresh, `q` Exit |
+| Keys | `1` Stack, `2` Brain, `3` Release, `4` Runtime, `5` History, `6` Context, `a` Alerts, `b` Back, `r` Refresh, `q` Exit |
 
 The dashboard summarizes Stack, Brain, Release, Runtime, History, and Alerts.
 It reuses existing HAL readers and does not introduce a new stack, release, or
-runtime contract.
+runtime contract. Its status line confirms refresh, back navigation, invalid
+choices, and exit so the operator is never left guessing whether input was
+accepted.
 
 ---
 

@@ -18,6 +18,11 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+try:
+    from hal.feedback import render_feedback, surface_feedback
+except ModuleNotFoundError:  # direct script execution outside the repo root
+    from feedback import render_feedback, surface_feedback
+
 STATUS_SCHEMA = "mq_hal.context_status.v1"
 
 # Files that make up the mqobsidian context-compression scaffold.
@@ -204,7 +209,7 @@ def collect(root: Path, run_budget: bool = True) -> dict[str, Any]:
     budget = run_token_budget(root, run=run_budget and repo_found)
     status = compute_status(checks, budget)
 
-    return {
+    return surface_feedback({
         "schema": STATUS_SCHEMA,
         "mqobsidian_path": str(root),
         "status": status,
@@ -214,7 +219,7 @@ def collect(root: Path, run_budget: bool = True) -> dict[str, Any]:
         "token_budget": budget,
         "recommendation": recommend(status, checks, budget),
         "collected_at": now_iso(),
-    }
+    }, surface="Context", command="mq-hal context status")
 
 
 def found(flag: bool) -> str:
@@ -405,7 +410,9 @@ def main(argv: list[str]) -> int:
         return 0 if payload.get("returncode", 1) == 0 else int(payload["returncode"])
 
     if args.sample:
-        data = dict(SAMPLE)
+        data = surface_feedback(
+            dict(SAMPLE), surface="Context", command="mq-hal context status"
+        )
     else:
         # `budget` always runs the check; `status`/`latest-pack`/default honour --no-budget.
         run_budget = args.command == "budget" or not args.no_budget
@@ -421,6 +428,8 @@ def main(argv: list[str]) -> int:
         render_budget(data)
     else:
         render_status(data)
+    print()
+    render_feedback(data["feedback"])
     return 0
 
 

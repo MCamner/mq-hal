@@ -3,7 +3,7 @@
 Local operator layer for the MQ stack.
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
-[![Version](https://img.shields.io/badge/version-2.1.1-blue)](VERSION)
+[![Version](https://img.shields.io/badge/version-2.2.0-blue)](VERSION)
 
 `mq-hal` gives a human-friendly command surface for local repo status, stack
 status, release status, runtime health, mqobsidian context readiness, and safe
@@ -119,6 +119,14 @@ See [docs/INTENT_CONTRACT.md](docs/INTENT_CONTRACT.md).
 * `runtime` checks local service health for Ollama, mq-mcp, GitHub, and brain.
 * `brain` previews mqobsidian and local HAL memory state.
 * `dashboard` combines stack, brain, release, runtime, timeline, and alerts.
+
+The interactive dashboard reports refresh, back, invalid-choice, and exit
+status directly. Confirmed `open` and `fix` actions report completion or the
+underlying non-zero exit status.
+
+The main operator surfaces use the versioned `mq.feedback.v1` model. Status is
+always one of `PASS`, `WARN`, `FAIL`, `SKIPPED`, or `UNAVAILABLE`; actionable
+results include an advisory `next_action` with command and safety metadata.
 
 These views summarize state; they do not publish, tag, review code, write
 semantic memory, or define new gates.

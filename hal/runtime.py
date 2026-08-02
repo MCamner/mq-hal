@@ -14,6 +14,11 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
+try:
+    from hal.feedback import render_feedback, surface_feedback
+except ModuleNotFoundError:  # direct script execution outside the repo root
+    from feedback import render_feedback, surface_feedback
+
 
 OLLAMA_URL = os.environ.get("OLLAMA_URL", "http://localhost:11434").rstrip("/")
 MQ_MCP_URL = os.environ.get("MQ_MCP_URL", "http://localhost:8765").rstrip("/")
@@ -221,11 +226,11 @@ def collect_runtime() -> dict[str, Any]:
         overall = "WARN"
     else:
         overall = "RUNNING"
-    return {
+    return surface_feedback({
         "title": "MQ Runtime",
         "services": services,
         "overall": {"status": overall, **counts},
-    }
+    }, surface="Runtime", command="mq-hal runtime services")
 
 
 def render_runtime(data: dict[str, Any], details: bool = False) -> None:
@@ -255,6 +260,8 @@ def render_runtime(data: dict[str, Any], details: bool = False) -> None:
             f"{overall.get('warn', 0)} warn, "
             f"{overall.get('down', 0)} down)"
         )
+    print()
+    render_feedback(data["feedback"])
 
 
 def main(argv: list[str]) -> int:
@@ -276,7 +283,9 @@ def main(argv: list[str]) -> int:
     )
     args = parser.parse_args(argv)
 
-    data = SAMPLE_RUNTIME if args.sample else collect_runtime()
+    data = surface_feedback(
+        SAMPLE_RUNTIME, surface="Runtime", command="mq-hal runtime services"
+    ) if args.sample else collect_runtime()
     if args.json:
         print(json.dumps(data, indent=2, ensure_ascii=False))
         return 0

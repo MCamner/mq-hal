@@ -74,6 +74,14 @@ plan steps marked `requires_confirm` ask again before running. `create_branch`
 in the router always confirms regardless. `update` previews by default and
 requires `--confirm` before running `git pull --ff-only`.
 
+## Operator feedback contract
+
+The main operator controls (`stack`, `release`, `runtime`, `brain`, `context`,
+`dashboard`, `next`, `open`, and `fix`) expose `mq.feedback.v1`. Its status is
+one of `PASS`, `WARN`, `FAIL`, `SKIPPED`, or `UNAVAILABLE`. Actionable results
+include `next_action.text`, `command`, `safety`, and `requires_confirmation`.
+Feedback is advisory and never executes the suggested command.
+
 ---
 
 ## Router commands (free prompt)

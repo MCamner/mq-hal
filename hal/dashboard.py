@@ -14,6 +14,7 @@ BASE_DIR = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(BASE_DIR))
 sys.path.append(str(BASE_DIR / "scripts"))
 
+from hal.feedback import surface_feedback  # noqa: E402
 from hal import brain as brain_control  # noqa: E402
 from hal import context as context_control  # noqa: E402
 from hal import release as release_control  # noqa: E402
@@ -54,48 +55,60 @@ def worst_status(statuses: list[str], good: str = "PASS") -> str:
         return good
     if status_rank(worst) == 1:
         return "WARN"
-    return "DOWN"
+    return "FAIL"
 
 
 def stack_data(sample: bool) -> dict[str, Any]:
     if sample:
-        return stack_control.SAMPLE_COCKPIT
+        return surface_feedback(
+            stack_control.SAMPLE_COCKPIT, surface="Stack", command="mq-hal stack"
+        )
     result = stack_control.read_cockpit(timeout=8)
     if result.data is not None:
-        return result.data
-    return {
+        return surface_feedback(result.data, surface="Stack", command="mq-hal stack")
+    return surface_feedback({
         "title": "MQ Stack",
         "components": [{"name": "mq-agent", "status": "WARN", "detail": result.error}],
         "overall": {"status": "WARN", "score": 0, "total": 100},
-    }
+    }, surface="Stack", command="mq-hal stack", status="UNAVAILABLE",
+       evidence=[result.error])
 
 
 def release_data(sample: bool) -> dict[str, Any]:
     if sample:
-        return release_control.SAMPLE
+        return surface_feedback(
+            release_control.SAMPLE, surface="Release", command="mq-hal release blockers"
+        )
     data, error, code = release_control.read_release_check(timeout=8)
     if data is not None:
-        return data
-    return {
+        return surface_feedback(data, surface="Release", command="mq-hal release blockers")
+    return surface_feedback({
         "title": "Release Control Center",
         "repos": [],
         "overall": {"ready": False, "score": 0, "blockers": 1},
         "error": error,
         "returncode": code,
-    }
+    }, surface="Release", command="mq-hal release blockers", status="UNAVAILABLE",
+       evidence=[error])
 
 
 def brain_data(sample: bool) -> dict[str, Any]:
-    return brain_control.SAMPLE if sample else brain_control.collect()
+    return surface_feedback(
+        brain_control.SAMPLE, surface="Brain", command="mq-hal brain health"
+    ) if sample else brain_control.collect()
 
 
 def runtime_data(sample: bool) -> dict[str, Any]:
-    return runtime_control.SAMPLE_RUNTIME if sample else runtime_control.collect_runtime()
+    return surface_feedback(
+        runtime_control.SAMPLE_RUNTIME, surface="Runtime", command="mq-hal runtime services"
+    ) if sample else runtime_control.collect_runtime()
 
 
 def context_data(sample: bool) -> dict[str, Any]:
     if sample:
-        return context_control.SAMPLE
+        return surface_feedback(
+            context_control.SAMPLE, surface="Context", command="mq-hal context status"
+        )
     # Keep the refresh loop cheap: skip the token-budget subprocess here. The
     # `mq-hal context budget` command runs it on demand.
     return context_control.collect(context_control.resolve_root(), run_budget=False)
@@ -118,7 +131,7 @@ def collect_dashboard(sample: bool = False) -> dict[str, Any]:
     context = context_data(sample)
     history = history_data(sample)
     alerts = build_alerts(stack, release, brain, runtime, context)
-    return {
+    return surface_feedback({
         "title": "HAL Operator Dashboard",
         "stack": stack,
         "release": release,
@@ -127,7 +140,8 @@ def collect_dashboard(sample: bool = False) -> dict[str, Any]:
         "context": context,
         "history": history,
         "alerts": alerts,
-    }
+    }, surface="Dashboard", command="mq-hal next",
+       status="WARN" if alerts else "PASS", evidence=[f"{len(alerts)} active alerts"])
 
 
 def stack_summary(data: dict[str, Any]) -> tuple[str, str]:
@@ -226,7 +240,7 @@ def dashboard_rows(
     ]
 
 
-def render_home(data: dict[str, Any]) -> None:
+def render_home(data: dict[str, Any], feedback_status: str = "ready") -> None:
     rows = dashboard_rows(
         data["stack"],
         data["release"],
@@ -243,7 +257,10 @@ def render_home(data: dict[str, Any]) -> None:
         print(f"{index} {name:<8} {status:<7} {detail}")
     print(f"A Alerts   {len(data.get('alerts', []))}")
     print()
-    print("Keys: 1 Stack  2 Brain  3 Release  4 Runtime  5 History  6 Context  r Refresh  q Exit")
+    print("Keys: 1 Stack  2 Brain  3 Release  4 Runtime  5 History  6 Context")
+    print("      a Alerts  r Refresh  q Exit")
+    print()
+    print(f"Status: {feedback_status}")
 
 
 def render_stack(data: dict[str, Any]) -> None:
@@ -295,7 +312,7 @@ def render_alerts(data: dict[str, Any]) -> None:
         print(f"- {alert}")
 
 
-def render_panel(data: dict[str, Any], key: str) -> None:
+def render_panel(data: dict[str, Any], key: str, feedback: str = "") -> None:
     if key == "1":
         render_stack(data["stack"])
     elif key == "2":
@@ -311,15 +328,24 @@ def render_panel(data: dict[str, Any], key: str) -> None:
     elif key.lower() == "a":
         render_alerts(data)
     else:
-        render_home(data)
+        render_home(data, feedback or "ready")
 
 
 def run_loop(sample: bool, once: bool, no_clear: bool) -> int:
     selected = "home"
+    feedback = ""
     while True:
         data = collect_dashboard(sample=sample)
         clear_screen(not no_clear)
-        render_panel(data, selected)
+        current_feedback = feedback
+        feedback = ""
+        render_panel(data, selected, current_feedback)
+        if selected != "home":
+            print()
+            print("Keys: b Back  r Refresh  q Exit")
+        if current_feedback and selected != "home":
+            print()
+            print(f"Status: {current_feedback}")
         if once:
             return 0
         print()
@@ -329,13 +355,29 @@ def run_loop(sample: bool, once: bool, no_clear: bool) -> int:
             print()
             return 0
         if choice.lower() in {"q", "quit", "exit"}:
+            print("Status: Dashboard closed.")
             return 0
         if choice.lower() in {"r", "refresh"}:
             selected = "home"
+            feedback = "Dashboard refreshed."
+        elif choice.lower() in {"b", "back"}:
+            selected = "home"
+            feedback = "Back to dashboard."
         elif choice in {"1", "2", "3", "4", "5", "6"} or choice.lower() == "a":
             selected = choice
+            panel_names = {
+                "1": "Stack",
+                "2": "Brain",
+                "3": "Release",
+                "4": "Runtime",
+                "5": "History",
+                "6": "Context",
+                "a": "Alerts",
+            }
+            feedback = f"Opened {panel_names[choice.lower()]}."
         else:
             selected = "home"
+            feedback = f"Unknown choice {choice!r}. Use 1-6, a, b, r, or q."
 
 
 def main(argv: list[str]) -> int:

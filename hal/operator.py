@@ -15,6 +15,13 @@ from typing import Any
 BASE_DIR = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(BASE_DIR))
 
+from hal.feedback import (  # noqa: E402
+    execution_feedback,
+    make_feedback,
+    make_next_action,
+    render_feedback,
+    surface_feedback,
+)
 from hal import dashboard as dashboard_control  # noqa: E402
 from hal import release as release_control  # noqa: E402
 
@@ -176,11 +183,13 @@ def collect_actions(sample: bool = False) -> dict[str, Any]:
     actions = release_actions(sample)
     if not actions:
         actions = alert_actions(sample)
-    return {
+    return surface_feedback({
         "title": "Operator Actions",
         "actions": actions,
         "count": len(actions),
-    }
+    }, surface="Operator actions", command="mq-hal next",
+       status="WARN" if actions else "PASS",
+       evidence=[f"{len(actions)} suggested actions"])
 
 
 def render_next(data: dict[str, Any]) -> None:
@@ -220,7 +229,23 @@ def run_open(target: str, repo: str | None, confirm: bool, json_out: bool) -> in
         "target": str(path),
         "command": command,
         "confirmed": confirm,
+        "safety": "local-process",
+        "expected_effect": "Open the selected path in the configured editor",
     }
+    payload["feedback"] = make_feedback(
+        status="SKIPPED",
+        what="Open action was previewed",
+        why="Preview and JSON modes never execute operator actions",
+        evidence=[f"repo: {repo_name}", f"target: {target}"],
+        next_action=make_next_action(
+            text="Open the selected target",
+            command=" ".join(shlex.quote(part) for part in command),
+            safety="local-process",
+            requires_confirmation=False,
+        ),
+    )
+    payload["status"] = "SKIPPED"
+    payload["next_action"] = payload["feedback"]["next_action"]
     if json_out:
         print(json.dumps(payload, indent=2, ensure_ascii=False))
         return 0
@@ -230,12 +255,20 @@ def run_open(target: str, repo: str | None, confirm: bool, json_out: bool) -> in
     print(f"repo:    {repo_name}")
     print(f"target:  {path}")
     print(f"command: {' '.join(shlex.quote(part) for part in command)}")
+    print("safety:  local-process")
+    print("effect:  open the target in the configured editor")
     if not confirm:
         print()
-        print("Preview only. Re-run with --confirm to open.")
+        print("Preview only. Re-run with --confirm to open; omit it to cancel.")
         return 0
     result = subprocess.run(command, cwd=str(repo_path), check=False)
-    return int(result.returncode)
+    code = int(result.returncode)
+    if code == 0:
+        print(f"DONE: opened {target} in {repo_name}")
+    else:
+        print(f"ERROR: editor exited with status {code}", file=sys.stderr)
+    render_feedback(execution_feedback(code, "Open action"))
+    return code
 
 
 def run_fix(blocker: str | None, sample: bool, confirm: bool, json_out: bool) -> int:
@@ -243,7 +276,27 @@ def run_fix(blocker: str | None, sample: bool, confirm: bool, json_out: bool) ->
     selected = action[0] if action else {}
     text = blocker or str(selected.get("blocker") or "operator action")
     command = ["mqlaunch", "fix", text]
-    payload = {"blocker": text, "command": command, "confirmed": confirm}
+    payload = {
+        "blocker": text,
+        "command": command,
+        "confirmed": confirm,
+        "safety": "local-write",
+        "expected_effect": "Route the blocker to mqlaunch fix",
+        "next_action": make_next_action(
+            text="Route blocker through mqlaunch fix",
+            command=" ".join(shlex.quote(part) for part in command),
+            safety="local-write",
+            requires_confirmation=True,
+        ),
+    }
+    payload["feedback"] = make_feedback(
+        status="SKIPPED",
+        what="Fix action was previewed",
+        why="Preview and JSON modes never execute operator actions",
+        evidence=[f"blocker: {text}"],
+        next_action=payload["next_action"],
+    )
+    payload["status"] = "SKIPPED"
     if json_out:
         print(json.dumps(payload, indent=2, ensure_ascii=False))
         return 0
@@ -255,15 +308,24 @@ def run_fix(blocker: str | None, sample: bool, confirm: bool, json_out: bool) ->
     print()
     print("Route:")
     print(" ".join(shlex.quote(part) for part in command))
+    print("Repo: managed by mqlaunch")
+    print("Safety: local-write")
+    print("Effect: route the blocker to mqlaunch fix")
     if not confirm:
         print()
-        print("Preview only. Re-run with --confirm to route through mqlaunch fix.")
+        print("Preview only. Re-run with --confirm to continue; omit it to cancel.")
         return 0
     if not shutil.which("mqlaunch"):
         print("ERROR: mqlaunch not found", file=sys.stderr)
         return 127
     result = subprocess.run(command, check=False)
-    return int(result.returncode)
+    code = int(result.returncode)
+    if code == 0:
+        print("DONE: routed fix through mqlaunch")
+    else:
+        print(f"ERROR: mqlaunch fix exited with status {code}", file=sys.stderr)
+    render_feedback(execution_feedback(code, "Fix action"))
+    return code
 
 
 def main(argv: list[str], command_name: str = "next") -> int:

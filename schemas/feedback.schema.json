@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mcamner.github.io/mq-hal/schemas/feedback.schema.json",
+  "title": "MQ HAL Feedback",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "status", "what_happened", "why_it_matters", "evidence", "next_action"],
+  "properties": {
+    "schema": {"const": "mq.feedback.v1"},
+    "status": {"enum": ["PASS", "WARN", "FAIL", "SKIPPED", "UNAVAILABLE"]},
+    "what_happened": {"type": "string", "minLength": 1},
+    "why_it_matters": {"type": "string", "minLength": 1},
+    "evidence": {"type": "array", "items": {"type": "string"}, "minItems": 1},
+    "next_action": {
+      "oneOf": [
+        {"type": "null"},
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["text", "command", "safety", "requires_confirmation"],
+          "properties": {
+            "text": {"type": "string", "minLength": 1},
+            "command": {"type": "string", "minLength": 1},
+            "safety": {"enum": ["read-only", "local-process", "local-write", "destructive"]},
+            "requires_confirmation": {"type": "boolean"}
+          }
+        }
+      ]
+    }
+  }
+}

@@ -18,6 +18,14 @@ What can be safely routed?
 What requires confirmation?
 ```
 
+## Feedback model
+
+`stack`, `release`, `runtime`, `brain`, `context`, `dashboard`, `next`, `open`,
+and `fix` use `mq.feedback.v1`. Status is normalized to `PASS`, `WARN`, `FAIL`,
+`SKIPPED`, or `UNAVAILABLE`. Warnings and failures explain what happened, why
+it matters, evidence, and a safe next action. Suggested commands are advisory;
+they are never executed by the feedback layer.
+
 ## Role in the MQ stack
 
 ```text
@@ -478,21 +486,16 @@ Do not let model output execute shell directly.
 
 ## Recommended next improvement
 
-Add `mqobsidian` context-pack awareness:
+Keep model-routing work read-only and blocked on upstream contracts:
 
 ```text
-mq-hal context status
-mq-hal context latest-pack
-mq-hal context budget
+mq-agent = routing policy and decisions
+mq-mcp = validated read-only tool surface
+mq-hal = status and explanation only
 ```
 
-This keeps `mq-hal` aligned with the new MQ-stack direction:
-
-```text
-mqobsidian = context compressor
-mq-agent = context generator
-mq-hal = context operator view
-```
+See `ROADMAP.md` v2.3.0. Do not add routing thresholds or execute local model
+candidates in `mq-hal`.
 
 ## Quick demo script
 
