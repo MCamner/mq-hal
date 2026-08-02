@@ -45,7 +45,7 @@ It should be:
 Latest stable release:
 
 ```text
-v2.1.0 — Context Pack Status
+v2.1.1 — Context Pack Status
 ```
 
 Completed foundation:
@@ -113,6 +113,7 @@ v2.2.0 — operator feedback polish
 | v1.9.0  | Operator Actions                                     | Done    |
 | v2.0.0  | HAL Operator Platform                                | Done    |
 | v2.1.0  | Context Pack Status                                  | Done    |
+| v2.1.1  | Stack-loop history compatibility                     | Done    |
 
 ---
 
