@@ -600,7 +600,7 @@ delegated exit codes, and human/JSON status parity.
 
 ## v2.3.0 — Local-First Model Routing Control Room
 
-Status: In progress — Phases 0–4 delivered; verified durable history remains
+Status: In progress — Phases 0–5 delivered; verified durable history remains
 unavailable, so history/explain degrade to WARN instead of inventing state.
 
 ### Goal
@@ -1024,11 +1024,11 @@ Rules:
 
 Definition of Done:
 
-- [ ] Every argument reaches `mq-agent route` unchanged.
-- [ ] Exit codes 0, 1, 2 and 127 are preserved.
-- [ ] Help identifies `mq-agent` as the owner.
-- [ ] No fallback model call exists in `macos-scripts`.
-- [ ] The command registry and generated surfaces remain synchronized.
+- [x] Every argument reaches `mq-agent route` unchanged.
+- [x] Exit codes 0, 1, 2 and 127 are preserved.
+- [x] Help identifies `mq-agent` as the owner.
+- [x] No fallback model call exists in `macos-scripts`.
+- [x] The command registry and generated surfaces remain synchronized.
 
 ### Evidence gate before automatic routing
 
