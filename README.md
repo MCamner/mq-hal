@@ -6,7 +6,7 @@ Local operator layer for the MQ stack.
 [![Version](https://img.shields.io/badge/version-2.2.0-blue)](VERSION)
 
 `mq-hal` gives a human-friendly command surface for local repo status, stack
-status, release status, runtime health, mqobsidian context readiness, and safe
+status, release status, runtime health, model-routing evidence, mqobsidian context readiness, and safe
 natural-language routing through Ollama.
 
 Live site: <https://mcamner.github.io/mq-hal/>
@@ -40,6 +40,7 @@ mq-hal config-check
 mq-hal brief
 mq-hal stack
 mq-hal dashboard
+mq-hal route
 ```
 
 Optional local model setup:
@@ -57,6 +58,7 @@ mq-hal brief                       # repo operator brief
 mq-hal stack --json                # stack cockpit summary from mq-agent
 mq-hal context                     # mqobsidian context-pack readiness
 mq-hal runtime                     # local service health
+mq-hal route inspect "Review docs" # read-only mq-agent routing decision
 mq-hal --explain-intent "kör tester i mq-hal"
 mq-hal --confirm "kör doctor"      # confirmation-gated routing
 ```
@@ -81,6 +83,7 @@ mqlaunch hal timeline
 | Release | `mq-hal release`, `mq-hal release-brief` |
 | Brain/context | `mq-hal brain`, `mq-hal context` |
 | Runtime | `mq-hal runtime`, `mq-hal models`, `mq-hal model-status` |
+| Model routing | `mq-hal route`, `mq-hal route inspect`, `mq-hal route accuracy` |
 | Dashboard | `mq-hal`, `mq-hal dashboard` |
 | Session memory | `mq-hal session`, `mq-hal last`, `mq-hal timeline` |
 | Operator action | `mq-hal next`, `mq-hal fix`, `mq-hal open <file>` |
@@ -117,8 +120,9 @@ See [docs/INTENT_CONTRACT.md](docs/INTENT_CONTRACT.md).
 * `release` reads `mq-agent stack release-check --json`.
 * `context` reads the local `mqobsidian` context-pack scaffold.
 * `runtime` checks local service health for Ollama, mq-mcp, GitHub, and brain.
+* `route` reads decisions and verified aggregate evidence from `mq-agent`.
 * `brain` previews mqobsidian and local HAL memory state.
-* `dashboard` combines stack, brain, release, runtime, timeline, and alerts.
+* `dashboard` combines stack, brain, release, runtime, routing, timeline, and alerts.
 
 The interactive dashboard reports refresh, back, invalid-choice, and exit
 status directly. Confirmed `open` and `fix` actions report completion or the

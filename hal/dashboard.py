@@ -18,6 +18,7 @@ from hal.feedback import surface_feedback  # noqa: E402
 from hal import brain as brain_control  # noqa: E402
 from hal import context as context_control  # noqa: E402
 from hal import release as release_control  # noqa: E402
+from hal import route as route_control  # noqa: E402
 from hal import runtime as runtime_control  # noqa: E402
 from hal import stack as stack_control  # noqa: E402
 from session_memory import read_events  # noqa: E402
@@ -114,6 +115,14 @@ def context_data(sample: bool) -> dict[str, Any]:
     return context_control.collect(context_control.resolve_root(), run_budget=False)
 
 
+def route_data(sample: bool) -> dict[str, Any]:
+    if sample:
+        return surface_feedback(
+            route_control.SAMPLE_STATUS, surface="Model Routing", command="mq-hal route"
+        )
+    return route_control.collect_status()
+
+
 def history_data(sample: bool) -> dict[str, Any]:
     if sample:
         return SAMPLE_HISTORY
@@ -129,8 +138,9 @@ def collect_dashboard(sample: bool = False) -> dict[str, Any]:
     brain = brain_data(sample)
     runtime = runtime_data(sample)
     context = context_data(sample)
+    route = route_data(sample)
     history = history_data(sample)
-    alerts = build_alerts(stack, release, brain, runtime, context)
+    alerts = build_alerts(stack, release, brain, runtime, context, route)
     return surface_feedback({
         "title": "HAL Operator Dashboard",
         "stack": stack,
@@ -138,6 +148,7 @@ def collect_dashboard(sample: bool = False) -> dict[str, Any]:
         "brain": brain,
         "runtime": runtime,
         "context": context,
+        "route": route,
         "history": history,
         "alerts": alerts,
     }, surface="Dashboard", command="mq-hal next",
@@ -197,16 +208,23 @@ def context_summary(data: dict[str, Any]) -> tuple[str, str]:
     return status, f"budget={budget_status} pack={pack}"
 
 
+def route_summary(data: dict[str, Any]) -> tuple[str, str]:
+    return str(data.get("status", "WARN")), (
+        f"mode={data.get('mode', '-')} verified={data.get('metrics', {}).get('verified', 0)}"
+    )
+
+
 def build_alerts(
     stack: dict[str, Any],
     release: dict[str, Any],
     brain: dict[str, Any],
     runtime: dict[str, Any],
     context: dict[str, Any],
+    route: dict[str, Any],
 ) -> list[str]:
     alerts: list[str] = []
     for name, status, detail in dashboard_rows(
-        stack, release, brain, runtime, context, {"events": [], "summary": {}}
+        stack, release, brain, runtime, context, route, {"events": [], "summary": {}}
     ):
         if status_rank(status) > 0:
             alerts.append(f"{name}: {status} {detail}")
@@ -222,6 +240,7 @@ def dashboard_rows(
     brain: dict[str, Any],
     runtime: dict[str, Any],
     context: dict[str, Any],
+    route: dict[str, Any],
     history: dict[str, Any],
 ) -> list[tuple[str, str, str]]:
     stack_status, stack_detail = stack_summary(stack)
@@ -230,6 +249,7 @@ def dashboard_rows(
     runtime_status, runtime_detail = runtime_summary(runtime)
     history_status, history_detail = history_summary(history)
     context_status, context_detail = context_summary(context)
+    route_status, route_detail = route_summary(route)
     return [
         ("Stack", stack_status, stack_detail),
         ("Brain", brain_status, brain_detail),
@@ -237,6 +257,7 @@ def dashboard_rows(
         ("Runtime", runtime_status, runtime_detail),
         ("History", history_status, history_detail),
         ("Context", context_status, context_detail),
+        ("Routing", route_status, route_detail),
     ]
 
 
@@ -247,6 +268,7 @@ def render_home(data: dict[str, Any], feedback_status: str = "ready") -> None:
         data["brain"],
         data["runtime"],
         data["context"],
+        data["route"],
         data["history"],
     )
     print("+------------------------------+")
@@ -257,7 +279,7 @@ def render_home(data: dict[str, Any], feedback_status: str = "ready") -> None:
         print(f"{index} {name:<8} {status:<7} {detail}")
     print(f"A Alerts   {len(data.get('alerts', []))}")
     print()
-    print("Keys: 1 Stack  2 Brain  3 Release  4 Runtime  5 History  6 Context")
+    print("Keys: 1 Stack  2 Brain  3 Release  4 Runtime  5 History  6 Context  7 Routing")
     print("      a Alerts  r Refresh  q Exit")
     print()
     print(f"Status: {feedback_status}")
@@ -281,6 +303,10 @@ def render_runtime(data: dict[str, Any]) -> None:
 
 def render_context(data: dict[str, Any]) -> None:
     context_control.render_status(data)
+
+
+def render_route(data: dict[str, Any]) -> None:
+    route_control.render_status(data)
 
 
 def render_history(data: dict[str, Any]) -> None:
@@ -325,6 +351,8 @@ def render_panel(data: dict[str, Any], key: str, feedback: str = "") -> None:
         render_history(data["history"])
     elif key == "6":
         render_context(data["context"])
+    elif key == "7":
+        render_route(data["route"])
     elif key.lower() == "a":
         render_alerts(data)
     else:
@@ -363,7 +391,7 @@ def run_loop(sample: bool, once: bool, no_clear: bool) -> int:
         elif choice.lower() in {"b", "back"}:
             selected = "home"
             feedback = "Back to dashboard."
-        elif choice in {"1", "2", "3", "4", "5", "6"} or choice.lower() == "a":
+        elif choice in {"1", "2", "3", "4", "5", "6", "7"} or choice.lower() == "a":
             selected = choice
             panel_names = {
                 "1": "Stack",
@@ -372,12 +400,13 @@ def run_loop(sample: bool, once: bool, no_clear: bool) -> int:
                 "4": "Runtime",
                 "5": "History",
                 "6": "Context",
+                "7": "Routing",
                 "a": "Alerts",
             }
             feedback = f"Opened {panel_names[choice.lower()]}."
         else:
             selected = "home"
-            feedback = f"Unknown choice {choice!r}. Use 1-6, a, b, r, or q."
+            feedback = f"Unknown choice {choice!r}. Use 1-7, a, b, r, or q."
 
 
 def main(argv: list[str]) -> int:

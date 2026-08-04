@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mq.local/schemas/mq_hal_model_route_status.schema.json",
+  "title": "MQ HAL model routing status",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "title",
+    "status",
+    "router",
+    "mode",
+    "ollama",
+    "local_model",
+    "authoritative_agent",
+    "decision",
+    "metrics",
+    "escalation_reasons",
+    "feedback"
+  ],
+  "properties": {
+    "schema": {"const": "mq_hal.model_route.v1"},
+    "title": {"const": "MQ Model Routing"},
+    "status": {"enum": ["PASS", "WARN", "FAIL", "SKIPPED", "UNAVAILABLE"]},
+    "router": {"enum": ["PASS", "UNAVAILABLE"]},
+    "mode": {"enum": ["SHADOW", "CLOUD_REQUIRED", "APPROVED_LOCAL", "UNAVAILABLE"]},
+    "ollama": {"enum": ["PASS", "WARN", "UNAVAILABLE"]},
+    "local_model": {"type": ["string", "null"]},
+    "authoritative_agent": {"type": ["string", "null"]},
+    "decision": {"type": ["object", "null"]},
+    "metrics": {"type": "object"},
+    "escalation_reasons": {"type": "array", "items": {"type": "string"}},
+    "feedback": {"type": "object"}
+  }
+}

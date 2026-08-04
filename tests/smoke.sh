@@ -5,7 +5,7 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
 echo "SMOKE: mq-hal"
 
-echo "[1/27] wrapper exists"
+echo "[1/28] wrapper exists"
 test -x "$ROOT/bin/mq-hal"
 
 echo "[2/27] python script exists"
@@ -83,7 +83,10 @@ echo "[25/27] dashboard smoke works"
 echo "[26/27] history smoke works"
 "$ROOT/tests/history-smoke.sh" >/dev/null
 
-echo "[27/27] operator actions smoke works"
+echo "[27/28] operator actions smoke works"
 "$ROOT/tests/operator-smoke.sh" >/dev/null
+
+echo "[28/28] model routing control room smoke works"
+"$ROOT/tests/route-control-smoke.sh" >/dev/null
 
 echo "OK: smoke test passed"

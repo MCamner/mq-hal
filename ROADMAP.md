@@ -600,8 +600,8 @@ delegated exit codes, and human/JSON status parity.
 
 ## v2.3.0 — Local-First Model Routing Control Room
 
-Status: Planned — blocked on the read-only router contract in `mq-agent` and
-the MCP tool surface in `mq-mcp`.
+Status: In progress — Phases 0–4 delivered; verified durable history remains
+unavailable, so history/explain degrade to WARN instead of inventing state.
 
 ### Goal
 
@@ -633,12 +633,12 @@ when local Ollama is sufficient and when a stronger coding agent is required.
 
 Expected benefits:
 
-* use Ollama for proven low-risk tasks
-* reserve Codex and Claude for complex or high-risk work
-* reduce unnecessary cloud context and model calls
-* provide the same MQ context to Codex and Claude in VS Code
-* measure local model quality instead of assuming it
-* make every routing and escalation decision visible to the operator
+- use Ollama for proven low-risk tasks
+- reserve Codex and Claude for complex or high-risk work
+- reduce unnecessary cloud context and model calls
+- provide the same MQ context to Codex and Claude in VS Code
+- measure local model quality instead of assuming it
+- make every routing and escalation decision visible to the operator
 
 ### Architecture boundary
 
@@ -683,13 +683,13 @@ Ownership remains:
 
 Boundary rules:
 
-* `mq-hal` must not calculate the authoritative routing decision.
-* `mq-hal` must not execute Ollama candidates.
-* `mq-hal` must not store routing history.
-* `mq-hal` reads structured state from `mq-agent`.
-* `mq-hal` explains the decision and routes the operator.
-* Ollama output is evidence to verify, never authority.
-* Codex and Claude remain authoritative for medium/high-risk work.
+- `mq-hal` must not calculate the authoritative routing decision.
+- `mq-hal` must not execute Ollama candidates.
+- `mq-hal` must not store routing history.
+- `mq-hal` reads structured state from `mq-agent`.
+- `mq-hal` explains the decision and routes the operator.
+- Ollama output is evidence to verify, never authority.
+- Codex and Claude remain authoritative for medium/high-risk work.
 
 ### Program phases
 
@@ -740,11 +740,11 @@ Instructions:
 
 Definition of Done:
 
-* [ ] Decision and outcome schemas are versioned.
-* [ ] Invalid task classes and routes are rejected.
-* [ ] Every decision names its reason and escalation conditions.
-* [ ] No model call is required to validate the contract.
-* [ ] Unit tests cover valid and malformed decisions.
+- [x] Decision and outcome schemas are versioned.
+- [x] Invalid task classes and routes are rejected.
+- [x] Every decision names its reason and escalation conditions.
+- [x] No model call is required to validate the contract.
+- [x] Unit tests cover valid and malformed decisions.
 
 #### Phase 1 — Build shadow routing in mq-agent
 
@@ -781,30 +781,30 @@ route report
 
 Initial local task candidates:
 
-* diff summarization
-* documentation review
-* repository-health summarization
-* test-area suggestions
-* review-finding classification
-* context-pack summarization
+- diff summarization
+- documentation review
+- repository-health summarization
+- test-area suggestions
+- review-finding classification
+- context-pack summarization
 
 Initial cloud-required task classes:
 
-* cross-repository architecture
-* security-critical review
-* destructive operations
-* release decisions
-* schema or contract migration
-* changes without deterministic verification
+- cross-repository architecture
+- security-critical review
+- destructive operations
+- release decisions
+- schema or contract migration
+- changes without deterministic verification
 
 Definition of Done:
 
-* [ ] Inspect mode performs no model call and no write.
-* [ ] Shadow mode cannot replace the authoritative agent.
-* [ ] Missing Ollama returns a structured degraded result.
-* [ ] Failed or malformed Ollama output causes escalation.
-* [ ] Routing reports distinguish attempted, verified and accepted outcomes.
-* [ ] No automatic execution exists.
+- [x] Inspect mode performs no model call and no write.
+- [x] Shadow mode cannot replace the authoritative agent.
+- [x] Missing Ollama returns a structured degraded result.
+- [x] Failed or malformed Ollama output causes escalation.
+- [x] Routing reports distinguish attempted, verified and accepted outcomes.
+- [x] No automatic execution exists.
 
 #### Phase 2 — Expose the router through mq-mcp
 
@@ -832,23 +832,23 @@ Tool responsibilities:
 
 Safety requirements:
 
-* All first-release tools are read-only.
-* Model output is treated as untrusted input.
-* Tools return versioned structured output.
-* No tool executes model-produced shell commands.
-* No tool writes to a repository.
-* No tool stores an outcome before verification.
-* Missing dependencies degrade gracefully.
-* Secrets and environment values are redacted.
+- All first-release tools are read-only.
+- Model output is treated as untrusted input.
+- Tools return versioned structured output.
+- No tool executes model-produced shell commands.
+- No tool writes to a repository.
+- No tool stores an outcome before verification.
+- Missing dependencies degrade gracefully.
+- Secrets and environment values are redacted.
 
 Definition of Done:
 
-* [ ] Every tool is classified in the mq-mcp safety map.
-* [ ] Input and output schemas are validated.
-* [ ] Ollama failures return structured unavailable results.
-* [ ] Contract tests pass without a running Ollama server.
-* [ ] Live Ollama tests remain optional.
-* [ ] Codex and Claude can call the same MCP tools.
+- [x] Every tool is classified in the mq-mcp safety map.
+- [x] Input and output schemas are validated.
+- [x] Ollama failures return structured unavailable results.
+- [x] Contract tests pass without a running Ollama server.
+- [x] Live Ollama tests remain optional.
+- [x] Codex and Claude can call the same MCP tools.
 
 #### Phase 3 — Integrate with Codex and Claude in VS Code
 
@@ -893,19 +893,19 @@ operator describes task
 
 Non-goals:
 
-* Do not replace the Codex or Claude model backend.
-* Do not route Claude through a non-Claude LLM gateway.
-* Do not intercept every editor prompt.
-* Do not require the operator to leave VS Code.
-* Do not create separate routing implementations for each agent.
+- Do not replace the Codex or Claude model backend.
+- Do not route Claude through a non-Claude LLM gateway.
+- Do not intercept every editor prompt.
+- Do not require the operator to leave VS Code.
+- Do not create separate routing implementations for each agent.
 
 Definition of Done:
 
-* [ ] Codex can discover and call the routing tools.
-* [ ] Claude Code can discover and call the same tools.
-* [ ] Both agents receive equivalent structured context.
-* [ ] Repository instructions describe advisory versus authoritative output.
-* [ ] A documented example covers one Codex and one Claude workflow.
+- [x] Codex can discover and call the routing tools.
+- [x] Claude Code can discover and call the same tools.
+- [x] Both agents receive equivalent structured context.
+- [x] Repository instructions describe advisory versus authoritative output.
+- [x] A documented example covers one Codex and one Claude workflow.
 
 #### Phase 4 — Add the mq-hal operator surface
 
@@ -978,23 +978,23 @@ model_route_explain
 
 Each new intent must be:
 
-* represented in the intent schema
-* explicitly allowlisted
-* mapped to a read-only handler
-* covered by positive and negative routing tests
-* documented in the command surface
+- represented in the intent schema
+- explicitly allowlisted
+- mapped to a read-only handler
+- covered by positive and negative routing tests
+- documented in the command surface
 
 Definition of Done:
 
-* [ ] `mq-hal route` shows mode, health and current model.
-* [ ] Status is sourced from `mq-agent`, not recomputed.
-* [ ] Accuracy includes verified outcomes only.
-* [ ] Escalation reasons are visible.
-* [ ] `--json` output validates against a schema.
-* [ ] Dashboard includes a Model Routing panel.
-* [ ] Unknown route subcommands are rejected.
-* [ ] Missing router dependencies degrade to WARN.
-* [ ] README, command docs, guide and release-check cover the surface.
+- [x] `mq-hal route` shows mode, health and current model.
+- [x] Status is sourced from `mq-agent`, not recomputed.
+- [x] Accuracy includes verified outcomes only.
+- [x] Escalation reasons are visible.
+- [x] `--json` output validates against a schema.
+- [x] Dashboard includes a Model Routing panel.
+- [x] Unknown route subcommands are rejected.
+- [x] Missing router dependencies degrade to WARN.
+- [x] README, command docs, guide and release-check cover the surface.
 
 #### Phase 5 — Add the mqlaunch thin entrypoint
 
@@ -1015,20 +1015,20 @@ mqlaunch route ...
 
 Rules:
 
-* No routing logic in shell.
-* No local confidence thresholds in the command registry.
-* Preserve all arguments and exit codes.
-* Classify the command as a `thin-entrypoint`.
-* Do not modify `ask`, `fix` or `chat`.
-* Add a behavior test proving lossless delegation.
+- No routing logic in shell.
+- No local confidence thresholds in the command registry.
+- Preserve all arguments and exit codes.
+- Classify the command as a `thin-entrypoint`.
+- Do not modify `ask`, `fix` or `chat`.
+- Add a behavior test proving lossless delegation.
 
 Definition of Done:
 
-* [ ] Every argument reaches `mq-agent route` unchanged.
-* [ ] Exit codes 0, 1, 2 and 127 are preserved.
-* [ ] Help identifies `mq-agent` as the owner.
-* [ ] No fallback model call exists in `macos-scripts`.
-* [ ] The command registry and generated surfaces remain synchronized.
+- [ ] Every argument reaches `mq-agent route` unchanged.
+- [ ] Exit codes 0, 1, 2 and 127 are preserved.
+- [ ] Help identifies `mq-agent` as the owner.
+- [ ] No fallback model call exists in `macos-scripts`.
+- [ ] The command registry and generated surfaces remain synchronized.
 
 ### Evidence gate before automatic routing
 
@@ -1079,15 +1079,15 @@ Ollama candidate
 
 Permanent rules:
 
-* Ollama never approves its own output.
-* Confidence text from a model is not a confidence score.
-* Verification failure always escalates.
-* Missing evidence never becomes implicit approval.
-* Routing history must not contain secrets or raw credentials.
-* Destructive actions remain outside automatic local routing.
-* Release and security decisions require an authoritative agent and operator
+- Ollama never approves its own output.
+- Confidence text from a model is not a confidence score.
+- Verification failure always escalates.
+- Missing evidence never becomes implicit approval.
+- Routing history must not contain secrets or raw credentials.
+- Destructive actions remain outside automatic local routing.
+- Release and security decisions require an authoritative agent and operator
   confirmation.
-* HAL explains decisions but never weakens them.
+- HAL explains decisions but never weakens them.
 
 ### Observability
 
@@ -1139,17 +1139,17 @@ unavailable.
 
 ### Final Definition of Done
 
-* [ ] `mq-agent` owns one versioned routing policy.
-* [ ] `mq-mcp` exposes validated read-only routing tools.
-* [ ] Codex and Claude use the same MCP contract in VS Code.
-* [ ] Ollama runs only as an advisory local candidate.
-* [ ] `mqobsidian` stores verified outcomes, not raw model claims.
-* [ ] `repo-signal` supplies risk evidence without owning routing.
-* [ ] `mq-hal` shows status, reasons, history and escalation.
-* [ ] `mqlaunch` is a lossless thin entrypoint.
-* [ ] Automatic routing remains disabled until the evidence gate passes.
-* [ ] The full stack works when Ollama is unavailable.
-* [ ] No component duplicates another repository's authority.
+- [ ] `mq-agent` owns one versioned routing policy.
+- [ ] `mq-mcp` exposes validated read-only routing tools.
+- [ ] Codex and Claude use the same MCP contract in VS Code.
+- [ ] Ollama runs only as an advisory local candidate.
+- [ ] `mqobsidian` stores verified outcomes, not raw model claims.
+- [ ] `repo-signal` supplies risk evidence without owning routing.
+- [ ] `mq-hal` shows status, reasons, history and escalation.
+- [ ] `mqlaunch` is a lossless thin entrypoint.
+- [ ] Automatic routing remains disabled until the evidence gate passes.
+- [ ] The full stack works when Ollama is unavailable.
+- [ ] No component duplicates another repository's authority.
 
 ### Recommended implementation order
 
@@ -1166,6 +1166,7 @@ PR 8  evidence review: decide whether one task class may leave shadow mode
 
 Do not combine these into one cross-repository PR. Each repository must remain
 independently releasable and revertible.
+
 ## Completed
 
 ### v0.1.x — Public baseline and local routing foundation

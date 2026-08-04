@@ -23,6 +23,7 @@ The detailed reference with flags, examples, and backend notes is in
 | `release-brief` | — | Yes | Yes | No | `hal release-brief` |
 | `release` | — | No | No | No | — |
 | `runtime` | — | No | No | No | — |
+| `route` | — | No | No | No | — |
 | `dashboard` | no-argument `mq-hal` | No | No | No | — |
 | `repo-status` | `repo` | No | No | No | `hal repo-status` |
 | `ci` | `ci-status` | No | No | No | `hal ci` |
@@ -76,7 +77,7 @@ requires `--confirm` before running `git pull --ff-only`.
 
 ## Operator feedback contract
 
-The main operator controls (`stack`, `release`, `runtime`, `brain`, `context`,
+The main operator controls (`stack`, `release`, `runtime`, `route`, `brain`, `context`,
 `dashboard`, `next`, `open`, and `fix`) expose `mq.feedback.v1`. Its status is
 one of `PASS`, `WARN`, `FAIL`, `SKIPPED`, or `UNAVAILABLE`. Actionable results
 include `next_action.text`, `command`, `safety`, and `requires_confirmation`.
