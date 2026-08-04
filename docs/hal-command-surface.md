@@ -689,6 +689,30 @@ and token-budget rules belong to `mqobsidian`.
 
 ---
 
+### `route`
+
+Read-only control room for the `mq-agent` local-first model router.
+
+| Property | Value |
+|---|---|
+| `mq-hal` | `mq-hal route [status|inspect|history|accuracy|explain]` |
+| Backend | `hal/route.py` |
+| Read-only | Yes |
+| Memory write | No |
+| JSON schema | `schemas/model_route_status.schema.json` |
+
+`status` reads versioned decision and aggregate report contracts from
+`mq-agent`; it also reads `mq-agent models doctor --no-smoke --json` for
+Ollama availability. `inspect "<task>"` exposes mq-agent reason codes and
+escalation conditions without calling a model. `accuracy` divides accepted
+outcomes by verified outcomes only and applies no local promotion threshold.
+
+`history` and `explain <decision-id>` return structured `WARN` until a verified
+history owner exposes those records. HAL never reads mq-agent storage directly,
+never stores routing history, and never presents shadow output as approved.
+
+---
+
 ### `runtime`
 
 Read-only control center for local runtime services.

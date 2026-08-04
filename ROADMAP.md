@@ -600,8 +600,8 @@ delegated exit codes, and human/JSON status parity.
 
 ## v2.3.0 — Local-First Model Routing Control Room
 
-Status: Planned — blocked on the read-only router contract in `mq-agent` and
-the MCP tool surface in `mq-mcp`.
+Status: In progress — Phases 0–4 delivered; verified durable history remains
+unavailable, so history/explain degrade to WARN instead of inventing state.
 
 ### Goal
 
@@ -740,11 +740,11 @@ Instructions:
 
 Definition of Done:
 
-* [ ] Decision and outcome schemas are versioned.
-* [ ] Invalid task classes and routes are rejected.
-* [ ] Every decision names its reason and escalation conditions.
-* [ ] No model call is required to validate the contract.
-* [ ] Unit tests cover valid and malformed decisions.
+* [x] Decision and outcome schemas are versioned.
+* [x] Invalid task classes and routes are rejected.
+* [x] Every decision names its reason and escalation conditions.
+* [x] No model call is required to validate the contract.
+* [x] Unit tests cover valid and malformed decisions.
 
 #### Phase 1 — Build shadow routing in mq-agent
 
@@ -799,12 +799,12 @@ Initial cloud-required task classes:
 
 Definition of Done:
 
-* [ ] Inspect mode performs no model call and no write.
-* [ ] Shadow mode cannot replace the authoritative agent.
-* [ ] Missing Ollama returns a structured degraded result.
-* [ ] Failed or malformed Ollama output causes escalation.
-* [ ] Routing reports distinguish attempted, verified and accepted outcomes.
-* [ ] No automatic execution exists.
+* [x] Inspect mode performs no model call and no write.
+* [x] Shadow mode cannot replace the authoritative agent.
+* [x] Missing Ollama returns a structured degraded result.
+* [x] Failed or malformed Ollama output causes escalation.
+* [x] Routing reports distinguish attempted, verified and accepted outcomes.
+* [x] No automatic execution exists.
 
 #### Phase 2 — Expose the router through mq-mcp
 
@@ -843,12 +843,12 @@ Safety requirements:
 
 Definition of Done:
 
-* [ ] Every tool is classified in the mq-mcp safety map.
-* [ ] Input and output schemas are validated.
-* [ ] Ollama failures return structured unavailable results.
-* [ ] Contract tests pass without a running Ollama server.
-* [ ] Live Ollama tests remain optional.
-* [ ] Codex and Claude can call the same MCP tools.
+* [x] Every tool is classified in the mq-mcp safety map.
+* [x] Input and output schemas are validated.
+* [x] Ollama failures return structured unavailable results.
+* [x] Contract tests pass without a running Ollama server.
+* [x] Live Ollama tests remain optional.
+* [x] Codex and Claude can call the same MCP tools.
 
 #### Phase 3 — Integrate with Codex and Claude in VS Code
 
@@ -901,11 +901,11 @@ Non-goals:
 
 Definition of Done:
 
-* [ ] Codex can discover and call the routing tools.
-* [ ] Claude Code can discover and call the same tools.
-* [ ] Both agents receive equivalent structured context.
-* [ ] Repository instructions describe advisory versus authoritative output.
-* [ ] A documented example covers one Codex and one Claude workflow.
+* [x] Codex can discover and call the routing tools.
+* [x] Claude Code can discover and call the same tools.
+* [x] Both agents receive equivalent structured context.
+* [x] Repository instructions describe advisory versus authoritative output.
+* [x] A documented example covers one Codex and one Claude workflow.
 
 #### Phase 4 — Add the mq-hal operator surface
 
@@ -986,15 +986,15 @@ Each new intent must be:
 
 Definition of Done:
 
-* [ ] `mq-hal route` shows mode, health and current model.
-* [ ] Status is sourced from `mq-agent`, not recomputed.
-* [ ] Accuracy includes verified outcomes only.
-* [ ] Escalation reasons are visible.
-* [ ] `--json` output validates against a schema.
-* [ ] Dashboard includes a Model Routing panel.
-* [ ] Unknown route subcommands are rejected.
-* [ ] Missing router dependencies degrade to WARN.
-* [ ] README, command docs, guide and release-check cover the surface.
+* [x] `mq-hal route` shows mode, health and current model.
+* [x] Status is sourced from `mq-agent`, not recomputed.
+* [x] Accuracy includes verified outcomes only.
+* [x] Escalation reasons are visible.
+* [x] `--json` output validates against a schema.
+* [x] Dashboard includes a Model Routing panel.
+* [x] Unknown route subcommands are rejected.
+* [x] Missing router dependencies degrade to WARN.
+* [x] README, command docs, guide and release-check cover the surface.
 
 #### Phase 5 — Add the mqlaunch thin entrypoint
 
