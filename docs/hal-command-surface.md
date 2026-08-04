@@ -695,7 +695,7 @@ Read-only control room for the `mq-agent` local-first model router.
 
 | Property | Value |
 |---|---|
-| `mq-hal` | `mq-hal route [status|inspect|history|accuracy|explain]` |
+| `mq-hal` | `mq-hal route [status, inspect, history, accuracy, explain]` |
 | Backend | `hal/route.py` |
 | Read-only | Yes |
 | Memory write | No |
