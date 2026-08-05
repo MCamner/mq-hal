@@ -600,8 +600,9 @@ delegated exit codes, and human/JSON status parity.
 
 ## v2.3.0 — Local-First Model Routing Control Room
 
-Status: In progress — Phases 0–5 delivered; verified durable history remains
-unavailable, so history/explain degrade to WARN instead of inventing state.
+Status: In progress — Phases 0–5 and durable outcome storage are delivered.
+History/explain still degrade to WARN until verified records exist and an
+authoritative history producer exposes them.
 
 ### Goal
 
@@ -1143,7 +1144,7 @@ unavailable.
 - [ ] `mq-mcp` exposes validated read-only routing tools.
 - [ ] Codex and Claude use the same MCP contract in VS Code.
 - [ ] Ollama runs only as an advisory local candidate.
-- [ ] `mqobsidian` stores verified outcomes, not raw model claims.
+- [x] `mqobsidian` stores verified outcomes, not raw model claims.
 - [ ] `repo-signal` supplies risk evidence without owning routing.
 - [ ] `mq-hal` shows status, reasons, history and escalation.
 - [ ] `mqlaunch` is a lossless thin entrypoint.
