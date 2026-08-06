@@ -92,7 +92,7 @@ Escalate: schema-invalid, verification-failed, confidence-below-threshold, polic
 Rendered from live command output by
 [tools/generate_screenshots.py](tools/generate_screenshots.py), never edited by hand.
 
-![mq-hal runtime — service health; a degraded dependency yields WARN plus an advisory next action](docs/screenshots/runtime.png)
+![mq-hal runtime — local service health, one line per dependency plus a normalized overall status](docs/screenshots/runtime.png)
 
 ![mq-hal route — model-routing state read from mq-agent contracts](docs/screenshots/route.png)
 

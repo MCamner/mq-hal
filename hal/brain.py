@@ -24,6 +24,17 @@ STATE_DIR = Path(
 ).expanduser()
 
 BRAIN_FOLDERS = ("memory", "learn", "truth", "reviews")
+
+# Where each category actually lives in the vault, in priority order. mq-agent
+# writes stack truth exports to memory/stack-truth/ and the vault has no
+# top-level truth/ folder, so probing for one reported an empty truth category
+# while the same view listed the exports under recent notes.
+BRAIN_FOLDER_SOURCES: dict[str, tuple[str, ...]] = {
+    "memory": ("memory",),
+    "learn": ("learn",),
+    "truth": ("truth", "memory/stack-truth"),
+    "reviews": ("reviews",),
+}
 TEXT_SUFFIXES = {".md", ".txt", ".json", ".jsonl", ".yaml", ".yml"}
 
 SAMPLE: dict[str, Any] = {
@@ -119,12 +130,12 @@ def collect(root: Path | None = None) -> dict[str, Any]:
     all_files: dict[str, list[Path]] = {}
 
     for name in BRAIN_FOLDERS:
-        folder = root / name
-        files = iter_text_files(folder)
+        sources = [root / source for source in BRAIN_FOLDER_SOURCES[name]]
+        files = [path for folder in sources for path in iter_text_files(folder)]
         all_files[name] = files
         newest = latest(files)
         folders[name] = {
-            "exists": folder.exists() and folder.is_dir(),
+            "exists": any(folder.is_dir() for folder in sources),
             "count": len(files),
             "latest": rel(newest, root) if newest else None,
         }

@@ -55,34 +55,34 @@ export PATH="$TMPBIN:$PATH"
 
 echo "SMOKE: brain"
 
-echo "[1/10] syntax"
+echo "[1/11] syntax"
 python3 -m py_compile hal/brain.py
 
-echo "[2/10] summary output"
+echo "[2/11] summary output"
 ./bin/mq-hal brain | grep -q "Brain Control Center"
 ./bin/mq-hal brain | grep -q "brain notes"
 ./bin/mq-hal brain | grep -q "Latest release"
 
-echo "[3/10] health output"
+echo "[3/11] health output"
 ./bin/mq-hal brain health | grep -q "Brain Health"
 ./bin/mq-hal brain health | grep -q "memory"
 
-echo "[4/10] recent output"
+echo "[4/11] recent output"
 ./bin/mq-hal brain recent | grep -q "Brain Recent"
 ./bin/mq-hal brain recent | grep -q "latest-release.md"
 
-echo "[5/10] search output"
+echo "[5/11] search output"
 ./bin/mq-hal brain search release | grep -q "Brain Search"
 ./bin/mq-hal brain search release | grep -q "latest-release.md"
 
-echo "[6/10] json output"
+echo "[6/11] json output"
 ./bin/mq-hal brain --json | python3 -m json.tool >/dev/null
 ./bin/mq-hal brain search release --json | python3 -m json.tool >/dev/null
 
-echo "[7/10] sample output"
+echo "[7/11] sample output"
 ./bin/mq-hal brain --sample | grep -q "Brain Control Center"
 
-echo "[8/10] defuddle ingest bridge"
+echo "[8/11] defuddle ingest bridge"
 ./bin/mq-hal brain ingest-url "https://example.com/docs/page" --root "$BRAIN_DIR" | grep -q "preview"
 ./bin/mq-hal brain ingest-url "https://example.com/docs/page" --root "$BRAIN_DIR" --confirm | grep -q "captured"
 test -f "$BRAIN_DIR/inbox/defuddled-page.md"
@@ -94,14 +94,25 @@ if ./bin/mq-hal brain ingest-url "https://example.com/readme.md" --root "$BRAIN_
 fi
 python3 -m json.tool /tmp/mq-hal-md-url.json >/dev/null
 
-echo "[9/10] obsidian open bridge"
+echo "[9/11] obsidian open bridge"
 ./bin/mq-hal brain open memory/note.md | grep -q "read:path=memory/note.md"
 ./bin/mq-hal brain open "Note Title" --json | python3 -m json.tool >/dev/null
 grep -q "read path=memory/note.md" "$STATE_DIR/obsidian-calls.log"
 
-echo "[10/10] obsidian status sync requires confirm"
+echo "[10/11] obsidian status sync requires confirm"
 ./bin/mq-hal brain sync-status memory/note.md --status active | grep -q "Preview only"
 ./bin/mq-hal brain sync-status memory/note.md --status active --confirm | grep -q "property-set:"
 grep -q "property:set name=status value=active path=memory/note.md" "$STATE_DIR/obsidian-calls.log"
+
+echo "[11/11] truth exports are counted from memory/stack-truth"
+VAULT="$(mktemp -d)"
+mkdir -p "$VAULT/memory/stack-truth"
+printf '# truth\n' > "$VAULT/memory/stack-truth/2026-08-06-mq-stack-truth.md"
+MQ_HAL_BRAIN_DIR="$VAULT" ./bin/mq-hal brain --json | python3 -c "
+import json, sys
+folders = json.load(sys.stdin)['folders']
+assert folders['truth']['count'] == 1, f\"truth exports counted: {folders['truth']}\"
+"
+rm -rf "$VAULT"
 
 echo "OK: brain smoke test passed"
