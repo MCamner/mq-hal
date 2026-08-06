@@ -58,7 +58,6 @@ mq-hal brief                       # repo operator brief
 mq-hal stack --json                # stack cockpit summary from mq-agent
 mq-hal context                     # mqobsidian context-pack readiness
 mq-hal runtime                     # local service health
-mq-hal route inspect "Review docs" # read-only mq-agent routing decision
 mq-hal --explain-intent "kör tester i mq-hal"
 mq-hal --confirm "kör doctor"      # confirmation-gated routing
 ```
@@ -68,10 +67,36 @@ Through mqlaunch:
 ```bash
 mqlaunch hal
 mqlaunch hal brief
-mqlaunch hal release-brief
 mqlaunch hal audit
-mqlaunch hal repo-status
 mqlaunch hal timeline
+```
+
+## Examples
+
+`mq-hal route inspect` — read-only routing decision, owned by `mq-agent`:
+
+```text
+$ mq-hal route inspect "Review docs"
+Decision: route-c0ba572d8331a155
+Task class: docs-review
+Risk: low
+Route: local-shadow
+Reasons: read-only, deterministic-verification-available
+Escalate: schema-invalid, verification-failed, confidence-below-threshold, policy-requires-cloud
+```
+
+`mq-hal runtime` — local health; a degraded dependency yields WARN and a next action:
+
+```text
+$ mq-hal runtime
+Ollama   PASS     http://localhost:11434/api/tags reachable
+mq-mcp   PASS     http://localhost:8765/tools reachable, 125 tools
+GitHub   PASS     authenticated
+brain    WARN     missing: truth
+
+Overall: WARN (3 running, 1 warn, 0 down)
+Next: Inspect Runtime details
+Command: mq-hal runtime services
 ```
 
 ## Main Command Groups
@@ -169,6 +194,13 @@ When adding a command, update:
 
 Do not put HAL business logic in `macos-scripts`; expose it through a thin
 `mqlaunch` bridge instead.
+
+## Roadmap
+
+Current release is v2.2.0 (Operator Feedback Polish). In progress is v2.3.0,
+Local-First Model Routing Control Room: making the local-vs-cloud routing
+decision visible from the operator layer without moving routing ownership into
+`mq-hal`. Full release map: [ROADMAP.md](ROADMAP.md).
 
 ## Docs
 
