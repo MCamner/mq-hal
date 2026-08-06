@@ -67,7 +67,9 @@ Through mqlaunch:
 ```bash
 mqlaunch hal
 mqlaunch hal brief
+mqlaunch hal release-brief
 mqlaunch hal audit
+mqlaunch hal repo-status
 mqlaunch hal timeline
 ```
 
@@ -85,19 +87,16 @@ Reasons: read-only, deterministic-verification-available
 Escalate: schema-invalid, verification-failed, confidence-below-threshold, policy-requires-cloud
 ```
 
-`mq-hal runtime` — local health; a degraded dependency yields WARN and a next action:
+## Screenshots
 
-```text
-$ mq-hal runtime
-Ollama   PASS     http://localhost:11434/api/tags reachable
-mq-mcp   PASS     http://localhost:8765/tools reachable, 125 tools
-GitHub   PASS     authenticated
-brain    WARN     missing: truth
+Rendered from live command output by
+[tools/generate_screenshots.py](tools/generate_screenshots.py), never edited by hand.
 
-Overall: WARN (3 running, 1 warn, 0 down)
-Next: Inspect Runtime details
-Command: mq-hal runtime services
-```
+![mq-hal runtime — service health; a degraded dependency yields WARN plus an advisory next action](docs/screenshots/runtime.png)
+
+![mq-hal route — model-routing state read from mq-agent contracts](docs/screenshots/route.png)
+
+![mq-hal context — mqobsidian context-pack readiness](docs/screenshots/context.png)
 
 ## Main Command Groups
 
