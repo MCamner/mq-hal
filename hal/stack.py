@@ -136,8 +136,23 @@ def read_cockpit(timeout: int = 20) -> CockpitResult:
     )
 
 
+PLACEHOLDERS = {"", "-", "--", "—", "–", "n/a", "none"}
+
+
+def _clean(value: Any) -> str | None:
+    """Return a printable value, or None for cockpit placeholders.
+
+    mq-agent fills unknown fields with an em dash. Rendering that as a status
+    tells the operator nothing, so treat it as absent and keep looking.
+    """
+    if value is None or isinstance(value, bool):
+        return None
+    text = str(value).strip()
+    return None if text.lower() in PLACEHOLDERS else text
+
+
 def _items(data: dict[str, Any]) -> list[dict[str, Any]]:
-    for key in ("components", "stack", "services", "checks", "items"):
+    for key in ("repos", "components", "stack", "services", "checks", "items"):
         value = data.get(key)
         if isinstance(value, list):
             return [item for item in value if isinstance(item, dict)]
@@ -153,18 +168,18 @@ def _items(data: dict[str, Any]) -> list[dict[str, Any]]:
 
 
 def _name(item: dict[str, Any]) -> str:
-    for key in ("name", "id", "component", "service", "tool"):
-        value = item.get(key)
+    for key in ("repo", "name", "id", "component", "service", "tool"):
+        value = _clean(item.get(key))
         if value:
-            return str(value)
+            return value
     return "unknown"
 
 
 def _status(item: dict[str, Any]) -> str:
-    for key in ("status", "state", "health", "result"):
-        value = item.get(key)
+    for key in ("status", "state", "health", "result", "gate", "contract"):
+        value = _clean(item.get(key))
         if value:
-            return str(value).upper()
+            return value.upper()
 
     ok = item.get("ok")
     if isinstance(ok, bool):
@@ -190,7 +205,12 @@ def _overall(data: dict[str, Any]) -> str:
             total = data.get("total", 100)
             return f"{score}/{total}"
 
-    return str(data.get("status") or "unknown")
+    for key in ("overall_gate", "overall_contract", "status"):
+        value = _clean(data.get(key))
+        if value:
+            return value
+
+    return "unknown"
 
 
 def render(data: dict[str, Any]) -> None:
