@@ -12,7 +12,7 @@ from typing import Any
 
 try:
     from hal.feedback import attach_feedback, make_next_action, render_feedback
-except ModuleNotFoundError:  # run as a script: hal/ is on sys.path, the package is not
+except ModuleNotFoundError:  # direct script execution outside the repo root
     from feedback import (  # type: ignore[no-redef, import-not-found]
         attach_feedback,
         make_next_action,

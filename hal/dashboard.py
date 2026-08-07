@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import os
 import sys
 from collections import Counter
 from pathlib import Path
@@ -21,7 +20,7 @@ from hal import release as release_control  # noqa: E402
 from hal import route as route_control  # noqa: E402
 from hal import runtime as runtime_control  # noqa: E402
 from hal import stack as stack_control  # noqa: E402
-from session_memory import read_events  # noqa: E402
+from session_memory import read_events  # type: ignore[import-not-found]  # noqa: E402
 
 
 SAMPLE_HISTORY: dict[str, Any] = {

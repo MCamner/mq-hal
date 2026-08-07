@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """Operator stack view backed by mq-agent cockpit JSON."""
 from __future__ import annotations
 
