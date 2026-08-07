@@ -604,6 +604,11 @@ Status: In progress — Phases 0–5 and durable outcome storage are delivered.
 History/explain still degrade to WARN until verified records exist and an
 authoritative history producer exposes them.
 
+The evidence gate has been run once and returned `NOT_ELIGIBLE`. One gate
+fails, `verification-success-rate`, and it is a local-model capability
+limit rather than a missing-evidence problem. Automatic routing stays
+disabled. See "First evidence review" below.
+
 ### Goal
 
 Make local-first model routing visible and understandable from the HAL operator
@@ -1062,6 +1067,44 @@ architecture:
 
 A strong result for one task class must never authorize another class.
 
+#### First evidence review — 2026-08-07, diff-summary
+
+PR 8 has been executed once. 130 `route shadow` runs against 129 distinct real
+commit diffs from `mq-agent`, `mq-hal`, `mq-mcp`, `repo-signal` and
+`macos-scripts`, every run supplying material via `--context-file`, plus one run
+against a dead Ollama endpoint to exercise the unavailable path.
+
+```text
+mq-agent route evidence-review diff-summary
+  local model    qwen3:4b-instruct
+  valid outcomes 130      responded 129
+  verified        56      distinct verified tasks 56
+  grounded        56/56   malformed escalated 1/1
+  decision       NOT_ELIGIBLE
+  failed gates   verification-success-rate (0.434, requires >= 0.9)
+  vacuous gates  zero-unauthorized-writes
+```
+
+Eight of nine gates pass. The single blocker is verification success rate, and
+it is not a volume problem: more runs reproduce the same rate. `qwen3:4b-instruct`
+fails the `evidence-grounded` check introduced in mq-agent #182 on roughly half
+of the runs that the model answered.
+
+Two causes, measured separately:
+
+- The model stitches non-adjacent source lines into one evidence entry, and
+  drops whitespace inside quotes. Part of this is the check's own
+  normalization: `_normalize` collapses whitespace runs but does not remove
+  them, and it flattens the material into a single string, which enforces
+  contiguity as a side effect rather than as a stated rule.
+- The remainder is genuine copying failure by a 4B model.
+
+Promotion of `diff-summary` therefore stays blocked. The open decisions are
+recorded in `mq-agent`, not here: whether to make the grounding comparison
+consistent with its own intent, whether to replace verbatim copying with line
+citation plus a single-line quote, and whether a larger local model clears the
+rate without moving the bar. `mq-hal` reports this state; it does not weaken it.
+
 ### Security and trust model
 
 Trust order:
@@ -1164,6 +1207,10 @@ PR 6  macos-scripts: add the thin mqlaunch route entrypoint
 PR 7  mqobsidian: persist verified routing outcomes
 PR 8  evidence review: decide whether one task class may leave shadow mode
 ```
+
+PR 1-7 are delivered. PR 8 ran on 2026-08-07 and returned `NOT_ELIGIBLE` for
+`diff-summary`; see "First evidence review" above. No task class has left
+shadow mode.
 
 Do not combine these into one cross-repository PR. Each repository must remain
 independently releasable and revertible.
