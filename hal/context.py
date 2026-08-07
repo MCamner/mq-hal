@@ -21,7 +21,10 @@ from typing import Any
 try:
     from hal.feedback import render_feedback, surface_feedback
 except ModuleNotFoundError:  # direct script execution outside the repo root
-    from feedback import render_feedback, surface_feedback
+    from feedback import (  # type: ignore[no-redef, import-not-found]
+        render_feedback,
+        surface_feedback,
+    )
 
 STATUS_SCHEMA = "mq_hal.context_status.v1"
 

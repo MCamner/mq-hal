@@ -17,7 +17,10 @@ from urllib.parse import urlparse
 try:
     from hal.feedback import render_feedback, surface_feedback
 except ModuleNotFoundError:  # direct script execution outside the repo root
-    from feedback import render_feedback, surface_feedback
+    from feedback import (  # type: ignore[no-redef, import-not-found]
+        render_feedback,
+        surface_feedback,
+    )
 
 STATE_DIR = Path(
     os.environ.get("MQ_HAL_STATE_DIR", str(Path.home() / ".mq-hal"))

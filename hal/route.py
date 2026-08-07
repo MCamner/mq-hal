@@ -7,18 +7,23 @@ import json
 import os
 import shutil
 import subprocess
-import sys
 from pathlib import Path
 from typing import Any
 
 try:
     from hal.feedback import attach_feedback, make_next_action, render_feedback
-except ModuleNotFoundError:
-    from feedback import attach_feedback, make_next_action, render_feedback
+except ModuleNotFoundError:  # direct script execution outside the repo root
+    from feedback import (  # type: ignore[no-redef, import-not-found]
+        attach_feedback,
+        make_next_action,
+        render_feedback,
+    )
 
 SCHEMA = "mq_hal.model_route.v1"
 DECISION_SCHEMA = "mq.model-route-decision.v1"
 REPORT_SCHEMA = "mq.model-route-report.v1"
+HISTORY_SCHEMA = "mq.model-route-history.v1"
+HISTORY_LIMIT = 20
 STATUSES = {"PASS", "WARN", "FAIL", "SKIPPED", "UNAVAILABLE"}
 MODE_MAP = {
     "local-shadow": "SHADOW",
@@ -254,9 +259,27 @@ def collect_accuracy() -> dict[str, Any]:
     )
 
 
-def unavailable_history(decision_id: str | None = None) -> dict[str, Any]:
+def history_schema(decision_id: str | None) -> str:
+    return "mq_hal.model_route_explain.v1" if decision_id else "mq_hal.model_route_history.v1"
+
+
+def history_data(decision_id: str | None = None) -> tuple[dict[str, Any] | None, str | None]:
+    args = ["route", "history", "--limit", str(HISTORY_LIMIT)]
+    if decision_id:
+        args.extend(["--decision-id", decision_id])
+    history, error = run_agent([*args, "--json"])
+    if error:
+        return None, error
+    if history is None or history.get("schema") != HISTORY_SCHEMA:
+        return None, "history-contract-invalid"
+    if not isinstance(history.get("entries"), list):
+        return None, "history-contract-invalid"
+    return history, None
+
+
+def unavailable_history(decision_id: str | None = None, error: str | None = None) -> dict[str, Any]:
     payload: dict[str, Any] = {
-        "schema": "mq_hal.model_route_explain.v1" if decision_id else "mq_hal.model_route_history.v1",
+        "schema": history_schema(decision_id),
         "status": "WARN", "history": [],
         "reason": "verified-routing-history-unavailable",
     }
@@ -265,11 +288,48 @@ def unavailable_history(decision_id: str | None = None) -> dict[str, Any]:
     return attach_feedback(
         payload, status="WARN", what="Verified routing history is unavailable",
         why="HAL does not read or create mq-agent history directly",
-        evidence=["mq-agent exposes aggregate report data only"],
+        evidence=[error or "mq-agent did not return the routing history contract"],
         next_action=make_next_action(
-            text="Inspect aggregate routing evidence", command="mq-agent route report --json",
+            text="Inspect routing history", command="mq-agent route history --json",
             safety="read-only", requires_confirmation=False,
         ),
+    )
+
+
+def collect_history(decision_id: str | None = None) -> dict[str, Any]:
+    history, error = history_data(decision_id)
+    if history is None:
+        return unavailable_history(decision_id, error)
+    entries = history["entries"]
+    status = "PASS" if entries else "WARN"
+    payload: dict[str, Any] = {
+        "schema": history_schema(decision_id),
+        "status": status, "history": entries,
+        "matched": int(history.get("matched", len(entries))),
+        "returned": int(history.get("returned", len(entries))),
+    }
+    if decision_id:
+        payload["decision_id"] = decision_id
+    if not entries:
+        payload["reason"] = (
+            "routing-decision-not-found" if decision_id else "no-verified-routing-history"
+        )
+        return attach_feedback(
+            payload, status="WARN",
+            what="No routing decision matches" if decision_id else "No routing outcomes recorded",
+            why="HAL shows only outcomes mq-agent has recorded",
+            evidence=[HISTORY_SCHEMA, f"source: {history.get('source', '-')}"],
+            next_action=make_next_action(
+                text="Run an advisory shadow route",
+                command="mq-agent route shadow \"<task>\" --json",
+                safety="local-write", requires_confirmation=True,
+            ),
+        )
+    return attach_feedback(
+        payload, status=status,
+        what="Routing history loaded",
+        why="Outcomes stay owned and recorded by mq-agent",
+        evidence=[HISTORY_SCHEMA, f"{payload['returned']} of {payload['matched']} outcomes"],
     )
 
 
@@ -301,6 +361,31 @@ def render_inspect(data: dict[str, Any]) -> None:
     render_feedback(data["feedback"])
 
 
+def render_history(data: dict[str, Any]) -> None:
+    for entry in data["history"]:
+        verification = entry.get("verification", {})
+        print(f"{entry.get('recorded_at', '-')}  {entry.get('decision_id', '-')}")
+        print(f"  run:          {entry.get('run_id', '-')}")
+        print(f"  task class:   {entry.get('task_class', '-')}")
+        print(f"  route:        {entry.get('selected_route', '-')}")
+        print(
+            "  stages:       "
+            f"attempted={_flag(entry.get('attempted'))} "
+            f"answered={_flag(entry.get('model_output_received'))} "
+            f"schema-valid={_flag(entry.get('schema_valid'))} "
+            f"verified={_flag(verification.get('status') == 'PASS')}"
+        )
+        print(f"  verification: {verification.get('status', '-')}")
+        print(f"  escalation:   {entry.get('escalation_reason') or '-'}")
+        print()
+    print(f"Showing {data['returned']} of {data['matched']} outcomes")
+    print()
+
+
+def _flag(value: Any) -> str:
+    return "yes" if value else "no"
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="mq-hal route", description="Read-only model routing control room")
     parser.add_argument("command", nargs="?", default="status",
@@ -316,11 +401,11 @@ def main(argv: list[str] | None = None) -> int:
     elif args.command == "accuracy":
         data = collect_accuracy()
     elif args.command == "history":
-        data = unavailable_history()
+        data = collect_history()
     elif args.command == "explain":
         if not args.value:
             parser.error("explain requires a decision id")
-        data = unavailable_history(args.value)
+        data = collect_history(args.value)
     else:
         data = collect_status()
     if args.json:
@@ -333,6 +418,8 @@ def main(argv: list[str] | None = None) -> int:
             print(f"Verified outcomes: {data['verified_outcomes']}")
             for name, values in data["by_task_class"].items():
                 print(f"{name}: verified={values['verified']} acceptance={values['acceptance_rate']}")
+        elif data["history"]:
+            render_history(data)
         render_feedback(data["feedback"])
     else:
         render_status(data)
