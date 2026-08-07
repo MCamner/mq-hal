@@ -7,14 +7,17 @@ import json
 import os
 import shutil
 import subprocess
-import sys
 from pathlib import Path
 from typing import Any
 
 try:
     from hal.feedback import attach_feedback, make_next_action, render_feedback
-except ModuleNotFoundError:
-    from feedback import attach_feedback, make_next_action, render_feedback
+except ModuleNotFoundError:  # run as a script: hal/ is on sys.path, the package is not
+    from feedback import (  # type: ignore[no-redef, import-not-found]
+        attach_feedback,
+        make_next_action,
+        render_feedback,
+    )
 
 SCHEMA = "mq_hal.model_route.v1"
 DECISION_SCHEMA = "mq.model-route-decision.v1"
