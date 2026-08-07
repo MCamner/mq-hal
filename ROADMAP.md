@@ -604,6 +604,12 @@ Status: In progress — Phases 0–5 and durable outcome storage are delivered.
 History/explain still degrade to WARN until verified records exist and an
 authoritative history producer exposes them.
 
+The evidence gate has been run and returned `NOT_ELIGIBLE`. One gate fails,
+`verification-success-rate`, and it is a local-model capability limit rather
+than a missing-evidence problem. PR 8 is closed on that verdict: the gate
+works, the model does not reach it. Automatic routing stays disabled and
+`diff-summary` stays in shadow mode. See "Evidence review" below.
+
 ### Goal
 
 Make local-first model routing visible and understandable from the HAL operator
@@ -1062,6 +1068,64 @@ architecture:
 
 A strong result for one task class must never authorize another class.
 
+#### Evidence review — 2026-08-07, diff-summary — closed
+
+PR 8 is closed with the verdict **the gate works, the model does not reach it**.
+`diff-summary` stays in shadow mode. No task class has been promoted. Reopen
+this only with a different local model and a fresh evidence set; the decision
+below is not a backlog item waiting on more runs.
+
+PR 8 was executed once. 130 `route shadow` runs against 129 distinct real
+commit diffs from `mq-agent`, `mq-hal`, `mq-mcp`, `repo-signal` and
+`macos-scripts`, every run supplying material via `--context-file`, plus one run
+against a dead Ollama endpoint to exercise the unavailable path.
+
+```text
+mq-agent route evidence-review diff-summary
+  local model    qwen3:4b-instruct
+  valid outcomes 130      responded 129
+  verified        56      distinct verified tasks 56
+  grounded        56/56   malformed escalated 1/1
+  decision       NOT_ELIGIBLE
+  failed gates   verification-success-rate (0.434, requires >= 0.9)
+  vacuous gates  zero-unauthorized-writes
+```
+
+Eight of nine gates pass. The single blocker is verification success rate, and
+it is not a volume problem: more runs reproduce the same rate. `qwen3:4b-instruct`
+fails the `evidence-grounded` check introduced in mq-agent #182 on roughly half
+of the runs that the model answered.
+
+The cause is fabrication, not a strict comparison. Across 97 evidence entries,
+82.5% are verbatim, 2.1% fall below the minimum quote length, and 15.5% are
+text that appears nowhere in the material under any normalization. No entry
+failed on whitespace differences alone, and none consisted of real lines
+stitched out of order. The check is catching invented citations, which is what
+it is for.
+
+Because grounding is all-or-nothing across roughly 4.4 entries per run, 82.5%
+per entry becomes a 43% run rate. Reaching a 90% run rate would require per
+entry accuracy of 0.90 at one citation and 0.98 at five.
+
+Four alternative comparisons were evaluated offline against identical model
+output: the current one, splitting entries on line breaks, matching without
+whitespace, and both plus diff-marker stripping. All four score 9/22. Three
+evidence-count caps were then measured with real calls on the same material:
+`maxItems` 1, 2 and 5 give run rates of 0.36, 0.50 and 0.41, and per-entry
+accuracy *falls* from 0.83 to 0.70 when the cap drops to 2, because the model
+selects longer and less accurate quotes rather than keeping its best ones.
+
+No verification rule or schema constant in `mq-agent` moves the rate near the
+gate. This is a capability limit of `qwen3:4b-instruct`. A larger local model
+is the only untried path and was not measured, because the host has 5 GiB free.
+
+Lowering the bar was considered and rejected: 15.5% of citations are invented,
+so any partial-credit rule would admit fabricated evidence into a promotion
+decision. The gate is left exactly as `mq-agent` #182 defined it.
+
+The 130 outcomes remain in the local evidence store as read-only history, per
+the rollback rules below. `mq-hal` reports this state; it does not weaken it.
+
 ### Security and trust model
 
 Trust order:
@@ -1148,7 +1212,9 @@ unavailable.
 - [ ] `repo-signal` supplies risk evidence without owning routing.
 - [ ] `mq-hal` shows status, reasons, history and escalation.
 - [ ] `mqlaunch` is a lossless thin entrypoint.
-- [ ] Automatic routing remains disabled until the evidence gate passes.
+- [x] Automatic routing remains disabled until the evidence gate passes.
+      Demonstrated 2026-08-07: the gate ran, returned `NOT_ELIGIBLE`, and
+      nothing was promoted.
 - [ ] The full stack works when Ollama is unavailable.
 - [ ] No component duplicates another repository's authority.
 
@@ -1164,6 +1230,10 @@ PR 6  macos-scripts: add the thin mqlaunch route entrypoint
 PR 7  mqobsidian: persist verified routing outcomes
 PR 8  evidence review: decide whether one task class may leave shadow mode
 ```
+
+PR 1-7 are delivered. PR 8 ran on 2026-08-07, returned `NOT_ELIGIBLE` for
+`diff-summary`, and is closed: the gate works, the local model does not reach
+it. See "Evidence review" above. No task class has left shadow mode.
 
 Do not combine these into one cross-repository PR. Each repository must remain
 independently releasable and revertible.
