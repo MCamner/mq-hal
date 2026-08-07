@@ -604,10 +604,11 @@ Status: In progress — Phases 0–5 and durable outcome storage are delivered.
 History/explain still degrade to WARN until verified records exist and an
 authoritative history producer exposes them.
 
-The evidence gate has been run once and returned `NOT_ELIGIBLE`. One gate
-fails, `verification-success-rate`, and it is a local-model capability
-limit rather than a missing-evidence problem. Automatic routing stays
-disabled. See "First evidence review" below.
+The evidence gate has been run and returned `NOT_ELIGIBLE`. One gate fails,
+`verification-success-rate`, and it is a local-model capability limit rather
+than a missing-evidence problem. PR 8 is closed on that verdict: the gate
+works, the model does not reach it. Automatic routing stays disabled and
+`diff-summary` stays in shadow mode. See "Evidence review" below.
 
 ### Goal
 
@@ -1067,9 +1068,14 @@ architecture:
 
 A strong result for one task class must never authorize another class.
 
-#### First evidence review — 2026-08-07, diff-summary
+#### Evidence review — 2026-08-07, diff-summary — closed
 
-PR 8 has been executed once. 130 `route shadow` runs against 129 distinct real
+PR 8 is closed with the verdict **the gate works, the model does not reach it**.
+`diff-summary` stays in shadow mode. No task class has been promoted. Reopen
+this only with a different local model and a fresh evidence set; the decision
+below is not a backlog item waiting on more runs.
+
+PR 8 was executed once. 130 `route shadow` runs against 129 distinct real
 commit diffs from `mq-agent`, `mq-hal`, `mq-mcp`, `repo-signal` and
 `macos-scripts`, every run supplying material via `--context-file`, plus one run
 against a dead Ollama endpoint to exercise the unavailable path.
@@ -1110,12 +1116,15 @@ accuracy *falls* from 0.83 to 0.70 when the cap drops to 2, because the model
 selects longer and less accurate quotes rather than keeping its best ones.
 
 No verification rule or schema constant in `mq-agent` moves the rate near the
-gate. This is a capability limit of `qwen3:4b-instruct`. Promotion of
-`diff-summary` stays blocked, and the outstanding decision is whether a larger
-local model clears the rate — untested here, because the host has 5 GiB free.
-Lowering the bar is not on the list: 15.5% of citations are invented, so any
-partial-credit rule would admit fabricated evidence into a promotion decision.
-`mq-hal` reports this state; it does not weaken it.
+gate. This is a capability limit of `qwen3:4b-instruct`. A larger local model
+is the only untried path and was not measured, because the host has 5 GiB free.
+
+Lowering the bar was considered and rejected: 15.5% of citations are invented,
+so any partial-credit rule would admit fabricated evidence into a promotion
+decision. The gate is left exactly as `mq-agent` #182 defined it.
+
+The 130 outcomes remain in the local evidence store as read-only history, per
+the rollback rules below. `mq-hal` reports this state; it does not weaken it.
 
 ### Security and trust model
 
@@ -1203,7 +1212,9 @@ unavailable.
 - [ ] `repo-signal` supplies risk evidence without owning routing.
 - [ ] `mq-hal` shows status, reasons, history and escalation.
 - [ ] `mqlaunch` is a lossless thin entrypoint.
-- [ ] Automatic routing remains disabled until the evidence gate passes.
+- [x] Automatic routing remains disabled until the evidence gate passes.
+      Demonstrated 2026-08-07: the gate ran, returned `NOT_ELIGIBLE`, and
+      nothing was promoted.
 - [ ] The full stack works when Ollama is unavailable.
 - [ ] No component duplicates another repository's authority.
 
@@ -1220,9 +1231,9 @@ PR 7  mqobsidian: persist verified routing outcomes
 PR 8  evidence review: decide whether one task class may leave shadow mode
 ```
 
-PR 1-7 are delivered. PR 8 ran on 2026-08-07 and returned `NOT_ELIGIBLE` for
-`diff-summary`; see "First evidence review" above. No task class has left
-shadow mode.
+PR 1-7 are delivered. PR 8 ran on 2026-08-07, returned `NOT_ELIGIBLE` for
+`diff-summary`, and is closed: the gate works, the local model does not reach
+it. See "Evidence review" above. No task class has left shadow mode.
 
 Do not combine these into one cross-repository PR. Each repository must remain
 independently releasable and revertible.
