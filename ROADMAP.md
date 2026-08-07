@@ -1090,20 +1090,32 @@ it is not a volume problem: more runs reproduce the same rate. `qwen3:4b-instruc
 fails the `evidence-grounded` check introduced in mq-agent #182 on roughly half
 of the runs that the model answered.
 
-Two causes, measured separately:
+The cause is fabrication, not a strict comparison. Across 97 evidence entries,
+82.5% are verbatim, 2.1% fall below the minimum quote length, and 15.5% are
+text that appears nowhere in the material under any normalization. No entry
+failed on whitespace differences alone, and none consisted of real lines
+stitched out of order. The check is catching invented citations, which is what
+it is for.
 
-- The model stitches non-adjacent source lines into one evidence entry, and
-  drops whitespace inside quotes. Part of this is the check's own
-  normalization: `_normalize` collapses whitespace runs but does not remove
-  them, and it flattens the material into a single string, which enforces
-  contiguity as a side effect rather than as a stated rule.
-- The remainder is genuine copying failure by a 4B model.
+Because grounding is all-or-nothing across roughly 4.4 entries per run, 82.5%
+per entry becomes a 43% run rate. Reaching a 90% run rate would require per
+entry accuracy of 0.90 at one citation and 0.98 at five.
 
-Promotion of `diff-summary` therefore stays blocked. The open decisions are
-recorded in `mq-agent`, not here: whether to make the grounding comparison
-consistent with its own intent, whether to replace verbatim copying with line
-citation plus a single-line quote, and whether a larger local model clears the
-rate without moving the bar. `mq-hal` reports this state; it does not weaken it.
+Four alternative comparisons were evaluated offline against identical model
+output: the current one, splitting entries on line breaks, matching without
+whitespace, and both plus diff-marker stripping. All four score 9/22. Three
+evidence-count caps were then measured with real calls on the same material:
+`maxItems` 1, 2 and 5 give run rates of 0.36, 0.50 and 0.41, and per-entry
+accuracy *falls* from 0.83 to 0.70 when the cap drops to 2, because the model
+selects longer and less accurate quotes rather than keeping its best ones.
+
+No verification rule or schema constant in `mq-agent` moves the rate near the
+gate. This is a capability limit of `qwen3:4b-instruct`. Promotion of
+`diff-summary` stays blocked, and the outstanding decision is whether a larger
+local model clears the rate — untested here, because the host has 5 GiB free.
+Lowering the bar is not on the list: 15.5% of citations are invented, so any
+partial-credit rule would admit fabricated evidence into a promotion decision.
+`mq-hal` reports this state; it does not weaken it.
 
 ### Security and trust model
 
