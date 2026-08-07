@@ -707,9 +707,14 @@ Ollama availability. `inspect "<task>"` exposes mq-agent reason codes and
 escalation conditions without calling a model. `accuracy` divides accepted
 outcomes by verified outcomes only and applies no local promotion threshold.
 
-`history` and `explain <decision-id>` return structured `WARN` until a verified
-history owner exposes those records. HAL never reads mq-agent storage directly,
-never stores routing history, and never presents shadow output as approved.
+`history` lists the newest 20 recorded outcomes from
+`mq-agent route history --json`, keeping attempted, answered, schema-valid and
+verified separate per run. `explain <decision-id>` filters the same contract to
+one decision; a decision id can cover several runs, and `run_id` tells them
+apart. Both return structured `WARN` when mq-agent does not serve
+`mq.model-route-history.v1`, and when nothing matches. HAL never reads mq-agent
+storage directly, never stores routing history, and never presents shadow
+output as approved.
 
 ---
 

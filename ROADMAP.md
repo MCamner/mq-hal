@@ -600,9 +600,10 @@ delegated exit codes, and human/JSON status parity.
 
 ## v2.3.0 — Local-First Model Routing Control Room
 
-Status: In progress — Phases 0–5 and durable outcome storage are delivered.
-History/explain still degrade to WARN until verified records exist and an
-authoritative history producer exposes them.
+Status: In progress — Phases 0–5, durable outcome storage, and per-decision
+history are delivered. `mq-agent route history` is the authoritative producer;
+`mq-hal route history` and `route explain <decision-id>` read it and degrade to
+WARN only when mq-agent does not serve the contract or nothing matches.
 
 The evidence gate has been run and returned `NOT_ELIGIBLE`. One gate fails,
 `verification-success-rate`, and it is a local-model capability limit rather
@@ -1210,12 +1211,18 @@ unavailable.
 - [ ] Ollama runs only as an advisory local candidate.
 - [x] `mqobsidian` stores verified outcomes, not raw model claims.
 - [ ] `repo-signal` supplies risk evidence without owning routing.
-- [ ] `mq-hal` shows status, reasons, history and escalation.
+- [x] `mq-hal` shows status, reasons, history and escalation.
+      `route history` and `route explain <decision-id>` read
+      `mq.model-route-history.v1` from mq-agent; HAL stores nothing.
 - [ ] `mqlaunch` is a lossless thin entrypoint.
 - [x] Automatic routing remains disabled until the evidence gate passes.
       Demonstrated 2026-08-07: the gate ran, returned `NOT_ELIGIBLE`, and
       nothing was promoted.
-- [ ] The full stack works when Ollama is unavailable.
+- [x] The full stack works when Ollama is unavailable.
+      Verified 2026-08-07 at every layer: `mq-agent route shadow` records a
+      structured `model-unavailable` outcome, `mq_route_shadow` propagates it,
+      `mqlaunch route` preserves exit codes, and `mq-hal route status`
+      degrades to WARN while `history`, `accuracy` and `dashboard` stay PASS.
 - [ ] No component duplicates another repository's authority.
 
 ### Recommended implementation order
