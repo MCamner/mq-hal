@@ -10,6 +10,9 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
+from model_profiles import profile_for_name
+from openai_client import generate_structured
+
 BASE_DIR = Path(__file__).resolve().parents[1]
 CONFIG_PATH = BASE_DIR / "config" / "repos.json"
 
@@ -68,6 +71,24 @@ _TEST_KEYWORDS = re.compile(
     r"\b(test|smoke|pytest|jest|spec|assert|verify|check|ci|pass|validate)\b",
     re.IGNORECASE,
 )
+
+ADVISORY_SCHEMA: dict[str, Any] = {
+    "type": "object",
+    "properties": {
+        "summary": {"type": "string"},
+        "concerns": {"type": "array", "items": {"type": "string"}},
+        "recommendations": {"type": "array", "items": {"type": "string"}},
+    },
+    "required": ["summary", "concerns", "recommendations"],
+    "additionalProperties": False,
+}
+
+ADVISORY_PROMPT = """\
+Review the supplied execution plan for ambiguity, missing assumptions, incomplete
+validation, and rollback weaknesses. Return advisory observations only. Never
+approve execution, weaken confirmation requirements, or override deterministic
+safety checks. Keep concerns and recommendations concise.
+"""
 
 
 @dataclass
@@ -206,10 +227,34 @@ def verdict(findings: list[Finding]) -> str:
     return "PASS"
 
 
+def ai_advisory(plan: dict[str, Any], profile_name: str = "critic") -> dict[str, Any] | None:
+    """Return non-authoritative model advice; deterministic checks own the verdict."""
+    try:
+        profile = profile_for_name(profile_name, default_profile="critic")
+    except ValueError:
+        return None
+    raw = generate_structured(
+        model=profile["model"],
+        reasoning_effort=profile["reasoning_effort"],
+        instructions=ADVISORY_PROMPT,
+        input_text=json.dumps(plan, ensure_ascii=False, indent=2),
+        schema=ADVISORY_SCHEMA,
+        schema_name="mq_hal_critic_advisory",
+    )
+    if not raw:
+        return None
+    try:
+        parsed = json.loads(raw)
+    except json.JSONDecodeError:
+        return None
+    return parsed if isinstance(parsed, dict) else None
+
+
 def render(
     plan: dict[str, Any],
     findings: list[Finding],
     plan_file: str,
+    advisory: dict[str, Any] | None,
 ) -> None:
     v = verdict(findings)
     fail_n = sum(1 for f in findings if f.level == "fail")
@@ -239,6 +284,16 @@ def render(
     print(f"Verdict: {v}{summary}")
     print()
 
+    if advisory:
+        print("AI advisory (non-authoritative)")
+        print("-------------------------------")
+        print(advisory.get("summary", ""))
+        for item in advisory.get("concerns", []):
+            print(f"- Concern: {item}")
+        for item in advisory.get("recommendations", []):
+            print(f"- Recommendation: {item}")
+        print()
+
     if v != "FAIL":
         print("Next:  mq-hal execute plan.json --confirm")
 
@@ -257,6 +312,14 @@ def main(argv: list[str]) -> int:
     parser.add_argument(
         "--sample", action="store_true",
         help="Critique a built-in sample plan",
+    )
+    parser.add_argument(
+        "--no-ai", action="store_true",
+        help="Run only the authoritative deterministic safety checks",
+    )
+    parser.add_argument(
+        "--model", default="critic",
+        help="Advisory model profile (default: critic)",
     )
     args = parser.parse_args(argv)
 
@@ -288,6 +351,7 @@ def main(argv: list[str]) -> int:
 
     findings = run_checks(plan)
     v = verdict(findings)
+    advisory = None if args.no_ai else ai_advisory(plan, args.model)
 
     if args.json_out:
         fail_n = sum(1 for f in findings if f.level == "fail")
@@ -301,12 +365,14 @@ def main(argv: list[str]) -> int:
                 {"level": f.level, "check": f.check, "message": f.message}
                 for f in findings
             ],
+            "used_ai": advisory is not None,
+            "ai_advisory": advisory,
             "fail_count": fail_n,
             "warn_count": warn_n,
         }, indent=2, ensure_ascii=False))
         return 0
 
-    render(plan, findings, plan_label)
+    render(plan, findings, plan_label, advisory)
     return 1 if v == "FAIL" else 0
 
 

@@ -18,15 +18,15 @@
       "provider": "openai",
       "model": "gpt-5.4-mini",
       "reasoning_effort": "high",
-      "description": "Critical analysis and review of plans.",
-      "use_for": ["mq-hal critic", "plan review"]
+      "description": "Advisory analysis layered after deterministic plan checks.",
+      "use_for": ["mq-hal critic", "plan advisory"]
     },
     "code": {
       "provider": "openai",
       "model": "gpt-5.4-mini",
       "reasoning_effort": "medium",
-      "description": "Code-aware reasoning for repo and diff analysis.",
-      "use_for": ["code review", "repo analysis"]
+      "description": "Code-aware implementation planning without execution.",
+      "use_for": ["mq-hal code-plan", "implementation planning"]
     }
   },
   "default": "router"

@@ -299,10 +299,19 @@
     },
     {
       "name": "critic",
-      "description": "Review a saved plan for safety and completeness",
+      "description": "Deterministic plan safety gate with optional OpenAI advisory",
       "risk_level": "read-only",
       "requires_confirm": false,
-      "uses_ai": false,
+      "uses_ai": true,
+      "writes_memory": false,
+      "mqlaunch_alias": null
+    },
+    {
+      "name": "code-plan",
+      "description": "Generate a read-only implementation plan with the code profile",
+      "risk_level": "plan-only",
+      "requires_confirm": false,
+      "uses_ai": true,
       "writes_memory": false,
       "mqlaunch_alias": null
     },

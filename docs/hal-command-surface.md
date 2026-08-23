@@ -415,6 +415,23 @@ unavailable.
 
 ---
 
+### `code-plan`
+
+Generate a read-only implementation plan with the OpenAI `code` profile.
+
+| Property | Value |
+|---|---|
+| `mq-hal` | `mq-hal code-plan "goal"` |
+| Backend | `scripts/planner.py --model code` |
+| Read-only | Yes |
+| Memory write | No |
+| Flags | Same as `plan` |
+
+This command plans only. It does not inspect files automatically, review a
+diff, or execute commands. Use `--no-ai` for a deterministic stub.
+
+---
+
 ### `critic`
 
 Review a saved plan for safety and completeness.
@@ -425,11 +442,14 @@ Review a saved plan for safety and completeness.
 | Backend | `scripts/critic.py` |
 | Read-only | Yes |
 | Memory write | No |
-| Flags | `--json`, `--sample` |
+| Flags | `--json`, `--sample`, `--no-ai`, `--model <profile>` |
 
 Checks rollback, validation, confirmation flags, dangerous commands, known
 repos, scope, step count, and visible test/validation coverage. Returns non-zero
-when the verdict is `FAIL`.
+when the deterministic verdict is `FAIL`. By default it also asks the OpenAI
+`critic` profile for non-authoritative concerns and recommendations. The model
+cannot change the verdict or weaken confirmation requirements. `--no-ai` keeps
+the plan fully local; otherwise the supplied plan JSON is sent to OpenAI.
 
 ---
 

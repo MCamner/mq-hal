@@ -59,7 +59,8 @@ The detailed reference with flags, examples, and backend notes is in
 | `review-ui` | — | No | No | No | — |
 | `architecture-brief` | — | No | No | No | — |
 | `plan` | — | Yes | No | No | — |
-| `critic` | — | No | No | No | — |
+| `code-plan` | — | Yes | No | No | — |
+| `critic` | — | Yes | No | No | — |
 | `execute` | — | No | No | Yes | — |
 | `learn` | — | No | Yes | No | — |
 | `env-status` | `env` | No | No | No | — |

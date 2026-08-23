@@ -230,6 +230,11 @@ case "${1:-}" in
     exec python3 "$ROOT/scripts/planner.py" "$@"
     ;;
 
+  code-plan)
+    shift || true
+    exec python3 "$ROOT/scripts/planner.py" --model code "$@"
+    ;;
+
   critic)
     shift || true
     exec python3 "$ROOT/scripts/critic.py" "$@"
