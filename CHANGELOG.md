@@ -4,6 +4,31 @@
 
 ## [Unreleased]
 
+## [2.3.0] - 2026-08-23
+
+Local-First Model Routing Control Room makes mq-agent's advisory local-model
+routing decisions, verified outcomes, and escalation reasons visible in HAL
+without transferring routing or history ownership to mq-hal.
+
+### Added
+
+- `mq-hal route`, `route status`, `route inspect`, `route history`,
+  `route accuracy`, and `route explain` as a read-only operator surface over
+  versioned mq-agent routing contracts.
+- A Model Routing panel in the operator dashboard, including degraded WARN
+  behavior when mq-agent or Ollama is unavailable.
+- Closed JSON status schema, command-surface documentation, and positive and
+  negative routing smoke coverage.
+
+### Changed
+
+- The v2.3.0 evidence review is closed as `NOT_ELIGIBLE`: automatic local
+  routing remains disabled and `diff-summary` remains in shadow mode because
+  the configured local model did not meet the verification-success gate.
+- ROADMAP now marks the cross-repository routing initiative complete while
+  preserving mq-agent as policy authority and mqobsidian as durable-history
+  owner.
+
 ## [2.2.0] - 2026-08-03
 
 Operator Feedback Polish makes interactive input and confirmed action outcomes

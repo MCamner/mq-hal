@@ -1,13 +1,13 @@
 {
   "repo": "mq-hal",
   "role": "operator-shell",
-  "version": "2.2.0",
+  "version": "2.3.0",
   "status": "active",
   "contracts": [
     "operator_routing.v1",
     "status_check.v1",
     "operator_platform.v1"
   ],
-  "next_focus": "v2.3.0 \u2014 Local-First Model Routing Control Room",
+  "next_focus": "maintenance \u2014 evidence-gated model routing observability",
   "release_mode": "direct"
 }

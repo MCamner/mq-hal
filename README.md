@@ -3,7 +3,7 @@
 Local operator layer for the MQ stack.
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
-[![Version](https://img.shields.io/badge/version-2.2.0-blue)](VERSION)
+[![Version](https://img.shields.io/badge/version-2.3.0-blue)](VERSION)
 
 `mq-hal` gives a human-friendly command surface for local repo status, stack
 status, release status, runtime health, model-routing evidence, mqobsidian context readiness, and safe
@@ -107,7 +107,7 @@ Rendered from live command output by
 | Release | `mq-hal release`, `mq-hal release-brief` |
 | Brain/context | `mq-hal brain`, `mq-hal context` |
 | Runtime | `mq-hal runtime`, `mq-hal models`, `mq-hal model-status` |
-| Model routing | `mq-hal route`, `mq-hal route inspect`, `mq-hal route accuracy` |
+| Model routing | `mq-hal route`, `mq-hal route inspect`, `mq-hal route history`, `mq-hal route accuracy`, `mq-hal route explain` |
 | Dashboard | `mq-hal`, `mq-hal dashboard` |
 | Session memory | `mq-hal session`, `mq-hal last`, `mq-hal timeline` |
 | Operator action | `mq-hal next`, `mq-hal fix`, `mq-hal open <file>` |
@@ -196,10 +196,11 @@ Do not put HAL business logic in `macos-scripts`; expose it through a thin
 
 ## Roadmap
 
-Current release is v2.2.0 (Operator Feedback Polish). In progress is v2.3.0,
-Local-First Model Routing Control Room: making the local-vs-cloud routing
-decision visible from the operator layer without moving routing ownership into
-`mq-hal`. Full release map: [ROADMAP.md](ROADMAP.md).
+Current release is v2.3.0 (Local-First Model Routing Control Room). It makes
+the local-vs-cloud routing decision visible from the operator layer without
+moving routing ownership into `mq-hal`; automatic local routing remains
+disabled after the evidence gate returned `NOT_ELIGIBLE`. Full release map:
+[ROADMAP.md](ROADMAP.md).
 
 ## Docs
 

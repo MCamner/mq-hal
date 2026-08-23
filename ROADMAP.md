@@ -45,7 +45,7 @@ It should be:
 Latest stable release:
 
 ```text
-v2.2.0 — Operator Feedback Polish
+v2.3.0 — Local-First Model Routing Control Room
 ```
 
 Completed foundation:
@@ -74,11 +74,12 @@ Completed foundation:
 - HAL Operator Platform — unified `mq-hal` dashboard over the whole stack (v2.0)
 - Context Pack Status — read-only mqobsidian token-reduction visibility (v2.1)
 - Operator Feedback Polish — explicit dashboard and action outcomes (v2.2)
+- Local-First Model Routing Control Room — advisory routing visibility (v2.3)
 
 Current recommended next step:
 
 ```text
-v2.3.0 — Local-First Model Routing Control Room
+Maintenance — keep routing advisory until a fresh evidence set passes the gate
 ```
 
 ---
@@ -116,7 +117,7 @@ v2.3.0 — Local-First Model Routing Control Room
 | v2.1.0  | Context Pack Status                                  | Done    |
 | v2.1.1  | Stack-loop history compatibility                     | Done    |
 | v2.2.0  | Operator feedback polish                             | Done    |
-| v2.3.0  | Local-First Model Routing Control Room             | Planned |
+| v2.3.0  | Local-First Model Routing Control Room               | Done    |
 
 ---
 
@@ -600,8 +601,9 @@ delegated exit codes, and human/JSON status parity.
 
 ## v2.3.0 — Local-First Model Routing Control Room
 
-Status: In progress — Phases 0–5, durable outcome storage, and per-decision
-history are delivered. `mq-agent route history` is the authoritative producer;
+Status: Done — Phases 0–5, durable outcome storage, per-decision history, and
+the evidence review are delivered. `mq-agent route history` is the
+authoritative producer;
 `mq-hal route history` and `route explain <decision-id>` read it and degrade to
 WARN only when mq-agent does not serve the contract or nothing matches.
 
@@ -1205,16 +1207,16 @@ unavailable.
 
 ### Final Definition of Done
 
-- [ ] `mq-agent` owns one versioned routing policy.
-- [ ] `mq-mcp` exposes validated read-only routing tools.
-- [ ] Codex and Claude use the same MCP contract in VS Code.
-- [ ] Ollama runs only as an advisory local candidate.
+- [x] `mq-agent` owns one versioned routing policy.
+- [x] `mq-mcp` exposes validated read-only routing tools.
+- [x] Codex and Claude use the same MCP contract in VS Code.
+- [x] Ollama runs only as an advisory local candidate.
 - [x] `mqobsidian` stores verified outcomes, not raw model claims.
-- [ ] `repo-signal` supplies risk evidence without owning routing.
+- [x] `repo-signal` supplies risk evidence without owning routing.
 - [x] `mq-hal` shows status, reasons, history and escalation.
       `route history` and `route explain <decision-id>` read
       `mq.model-route-history.v1` from mq-agent; HAL stores nothing.
-- [ ] `mqlaunch` is a lossless thin entrypoint.
+- [x] `mqlaunch` is a lossless thin entrypoint.
 - [x] Automatic routing remains disabled until the evidence gate passes.
       Demonstrated 2026-08-07: the gate ran, returned `NOT_ELIGIBLE`, and
       nothing was promoted.
@@ -1223,7 +1225,7 @@ unavailable.
       structured `model-unavailable` outcome, `mq_route_shadow` propagates it,
       `mqlaunch route` preserves exit codes, and `mq-hal route status`
       degrades to WARN while `history`, `accuracy` and `dashboard` stay PASS.
-- [ ] No component duplicates another repository's authority.
+- [x] No component duplicates another repository's authority.
 
 ### Recommended implementation order
 
