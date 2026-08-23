@@ -6,20 +6,17 @@ import json
 import os
 import subprocess
 import sys
-import urllib.error
-import urllib.request
 from pathlib import Path
 from typing import Any
 
 sys.path.insert(0, str(Path(__file__).parent))
 from session_memory import append_event  # noqa: E402
+from model_profiles import profile_for_name  # noqa: E402
+from openai_client import generate_structured  # noqa: E402
 
 BASE_DIR = Path(__file__).resolve().parents[1]
 DOCTOR_SUMMARY_SCRIPT = BASE_DIR / "scripts" / "doctor_summary.py"
 PROMPT_PATH = BASE_DIR / "prompts" / "fix-planner.txt"
-
-OLLAMA_URL = os.environ.get("OLLAMA_URL", "http://localhost:11434")
-OLLAMA_MODEL = os.environ.get("OLLAMA_MODEL", "qwen3:4b-instruct")
 
 PLAN_SCHEMA: dict[str, Any] = {
     "type": "object",
@@ -226,30 +223,19 @@ def fallback_plan(summary_envelope: dict[str, Any]) -> dict[str, Any]:
     }
 
 
-def call_ollama_plan(summary_envelope: dict[str, Any]) -> dict[str, Any] | None:
-    payload = {
-        "model": OLLAMA_MODEL,
-        "system": prompt_text(),
-        "prompt": json.dumps(summary_envelope, indent=2, ensure_ascii=False),
-        "format": PLAN_SCHEMA,
-        "stream": False,
-        "options": {"temperature": 0},
-    }
-
-    request = urllib.request.Request(
-        f"{OLLAMA_URL.rstrip('/')}/api/generate",
-        data=json.dumps(payload).encode("utf-8"),
-        headers={"Content-Type": "application/json"},
-        method="POST",
-    )
-
+def call_model_plan(summary_envelope: dict[str, Any]) -> dict[str, Any] | None:
     try:
-        with urllib.request.urlopen(request, timeout=120) as response:
-            envelope = json.loads(response.read().decode("utf-8"))
-    except (urllib.error.URLError, TimeoutError, json.JSONDecodeError):
+        profile = profile_for_name("planner", default_profile="planner")
+    except ValueError:
         return None
-
-    raw = envelope.get("response")
+    raw = generate_structured(
+        model=profile["model"],
+        reasoning_effort=profile["reasoning_effort"],
+        instructions=prompt_text(),
+        input_text=json.dumps(summary_envelope, indent=2, ensure_ascii=False),
+        schema=PLAN_SCHEMA,
+        schema_name="mq_hal_fix_plan",
+    )
     if not isinstance(raw, str) or not raw.strip():
         return None
 
@@ -276,7 +262,7 @@ def call_ollama_plan(summary_envelope: dict[str, Any]) -> dict[str, Any] | None:
 
 
 def render_plan(plan: dict[str, Any], used_ai: bool, summary_envelope: dict[str, Any]) -> None:
-    source = "Ollama" if used_ai else "deterministic fallback"
+    source = "OpenAI" if used_ai else "deterministic fallback"
 
     print("HAL Fix Planner")
     print("===============")
@@ -334,7 +320,7 @@ def main(argv: list[str]) -> int:
     args = parser.parse_args(argv)
 
     summary_envelope = run_doctor_summary(args.repo, sample=args.sample)
-    ai_plan = None if args.no_ai else call_ollama_plan(summary_envelope)
+    ai_plan = None if args.no_ai else call_model_plan(summary_envelope)
     plan = ai_plan or fallback_plan(summary_envelope)
     used_ai = ai_plan is not None
 
@@ -355,7 +341,7 @@ def main(argv: list[str]) -> int:
             "fix_plan",
             payload=envelope,
             repo=repo_name,
-            source="ollama" if used_ai else "deterministic",
+            source="openai" if used_ai else "deterministic",
         )
 
     if args.json:

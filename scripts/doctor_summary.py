@@ -6,21 +6,18 @@ import json
 import os
 import subprocess
 import sys
-import urllib.error
-import urllib.request
 from json import JSONDecoder
 from pathlib import Path
 from typing import Any
 
 sys.path.insert(0, str(Path(__file__).parent))
 from session_memory import append_event  # noqa: E402
+from model_profiles import profile_for_name  # noqa: E402
+from openai_client import generate_structured  # noqa: E402
 
 BASE_DIR = Path(__file__).resolve().parents[1]
 CONFIG_PATH = BASE_DIR / "config" / "repos.json"
 PROMPT_PATH = BASE_DIR / "prompts" / "doctor-summary.txt"
-
-OLLAMA_URL = os.environ.get("OLLAMA_URL", "http://localhost:11434")
-OLLAMA_MODEL = os.environ.get("OLLAMA_MODEL", "qwen3:4b-instruct")
 
 SUMMARY_SCHEMA: dict[str, Any] = {
     "type": "object",
@@ -275,7 +272,7 @@ def prompt_text() -> str:
     return "Summarize mqlaunch doctor JSON output. Recommend safe next steps only."
 
 
-def call_ollama_summary(data: Any, repo_name: str, command: str) -> dict[str, Any] | None:
+def call_model_summary(data: Any, repo_name: str, command: str) -> dict[str, Any] | None:
     compact_json = json.dumps(data, ensure_ascii=False, indent=2)
 
     if len(compact_json) > 18000:
@@ -283,29 +280,18 @@ def call_ollama_summary(data: Any, repo_name: str, command: str) -> dict[str, An
 
     user_prompt = f"Repo: {repo_name}\nDoctor command: {command}\n\nDoctor JSON:\n{compact_json}\n"
 
-    payload = {
-        "model": OLLAMA_MODEL,
-        "system": prompt_text(),
-        "prompt": user_prompt,
-        "format": SUMMARY_SCHEMA,
-        "stream": False,
-        "options": {"temperature": 0},
-    }
-
-    request = urllib.request.Request(
-        f"{OLLAMA_URL.rstrip('/')}/api/generate",
-        data=json.dumps(payload).encode("utf-8"),
-        headers={"Content-Type": "application/json"},
-        method="POST",
-    )
-
     try:
-        with urllib.request.urlopen(request, timeout=120) as response:
-            envelope = json.loads(response.read().decode("utf-8"))
-    except (urllib.error.URLError, TimeoutError, json.JSONDecodeError):
+        profile = profile_for_name("planner", default_profile="planner")
+    except ValueError:
         return None
-
-    raw = envelope.get("response")
+    raw = generate_structured(
+        model=profile["model"],
+        reasoning_effort=profile["reasoning_effort"],
+        instructions=prompt_text(),
+        input_text=user_prompt,
+        schema=SUMMARY_SCHEMA,
+        schema_name="mq_hal_doctor_summary",
+    )
     if not isinstance(raw, str) or not raw.strip():
         return None
 
@@ -318,7 +304,7 @@ def call_ollama_summary(data: Any, repo_name: str, command: str) -> dict[str, An
 
 
 def render(summary: dict[str, Any], repo_name: str, repo_path: Path, command: str, used_ai: bool) -> None:
-    source = "Ollama" if used_ai else "deterministic fallback"
+    source = "OpenAI" if used_ai else "deterministic fallback"
 
     print("HAL Doctor Summary")
     print("==================")
@@ -368,7 +354,7 @@ def main(argv: list[str]) -> int:
     )
     parser.add_argument("--repo", help="Configured repo name. Defaults to config default_repo.")
     parser.add_argument("--json", action="store_true", help="Print machine-readable summary JSON.")
-    parser.add_argument("--no-ai", action="store_true", help="Skip Ollama and use deterministic fallback.")
+    parser.add_argument("--no-ai", action="store_true", help="Skip OpenAI and use deterministic fallback.")
     parser.add_argument("--sample", action="store_true", help="Use embedded sample doctor JSON for smoke tests.")
     parser.add_argument("--no-memory", action="store_true", help="Do not save result to HAL Session Memory.")
 
@@ -384,7 +370,7 @@ def main(argv: list[str]) -> int:
         data, _raw, command = run_doctor(repo_path)
 
     fallback = deterministic_summary(data)
-    ai_summary = None if args.no_ai else call_ollama_summary(data, repo_name, command)
+    ai_summary = None if args.no_ai else call_model_summary(data, repo_name, command)
     summary = ai_summary or fallback
     used_ai = ai_summary is not None
 
@@ -400,7 +386,7 @@ def main(argv: list[str]) -> int:
             "doctor_summary",
             payload=envelope,
             repo=repo_name,
-            source="ollama" if used_ai else "deterministic",
+            source="openai" if used_ai else "deterministic",
         )
 
     if args.json:

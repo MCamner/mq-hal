@@ -77,7 +77,7 @@ ollama serve           # start the Ollama daemon
 mq-hal model-status    # check which models are available
 ```
 
-All HAL commands work without Ollama — they use deterministic fallback output.
+The intent router works without Ollama through deterministic fallback routing.
 Pass `--no-ai` to force the fallback explicitly:
 
 ```bash
@@ -89,15 +89,16 @@ mq-hal brief --no-ai
 
 ## Model not found / unknown model profile
 
-**Cause:** The requested Ollama model is not pulled locally, or the profile
-name is wrong.
+**Cause:** A local Ollama model is not pulled, an OpenAI key is unavailable,
+or the profile name is wrong.
 
 **Fix:**
 
 ```bash
 mq-hal models          # list configured profiles
-ollama pull qwen3:4b   # pull the missing model
-mq-hal model-test      # verify all configured models respond
+ollama pull qwen3:4b-instruct       # router only
+mq-hal model-test --profile router  # verify local routing model
+mq-hal model-test --profile planner # verify OpenAI planner
 ```
 
 ---

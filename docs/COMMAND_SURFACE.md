@@ -64,7 +64,8 @@ The detailed reference with flags, examples, and backend notes is in
 | `learn` | — | No | Yes | No | — |
 | `env-status` | `env` | No | No | No | — |
 
-**AI** — calls Ollama when available; falls back to deterministic output.
+**AI** — the intent router calls local Ollama. Planning and AI summaries use
+OpenAI. Both paths fall back to deterministic output where supported.
 Visual commands can include local `mq-image-analyze` output when that tool is
 installed, but remain read-only and deterministic without it.
 **Memory** — writes to `~/.mq-hal/session.jsonl` (session events) or

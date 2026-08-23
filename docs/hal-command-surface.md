@@ -409,8 +409,9 @@ Create a structured local plan for a goal.
 | Memory write | No |
 | Flags | `--json`, `--out <file>`, `--no-ai`, `--sample`, `--model <profile>` |
 
-Uses Ollama when available and falls back to a deterministic stub plan with
-`--no-ai` or when the model is unavailable.
+Uses the configured planner profile (`openai/gpt-5.4-mini` by default) and
+falls back to a deterministic stub plan with `--no-ai` or when OpenAI is
+unavailable.
 
 ---
 
@@ -454,7 +455,7 @@ for local debugging; command-level shell-operator checks still apply.
 
 ### `model-status`
 
-Check configured Ollama model availability and latency.
+Check configured Ollama and OpenAI profile availability.
 
 | Property | Value |
 |---|---|
@@ -464,15 +465,15 @@ Check configured Ollama model availability and latency.
 | Memory write | No |
 | Flags | `--json`, `--sample`, `--profile <name>` |
 
-Calls Ollama's local `/api/tags` endpoint, reports reachability, response
-latency, and whether each configured profile model is installed. `--sample`
-uses deterministic data for smoke tests.
+Calls Ollama's local `/api/tags` endpoint for local profiles and checks whether
+OpenAI credentials are configured for cloud profiles. It never prints the API
+key. `--sample` uses deterministic data for smoke tests.
 
 ---
 
 ### `model-test`
 
-Run a tiny structured generation test against Ollama.
+Run a tiny structured generation test against the selected profile provider.
 
 | Property | Value |
 |---|---|

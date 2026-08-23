@@ -12,7 +12,8 @@ import urllib.request
 from pathlib import Path
 from typing import Any
 
-from model_profiles import model_for_profile
+from model_profiles import profile_for_name
+from openai_client import generate_structured
 
 BASE_DIR = Path(__file__).resolve().parents[1]
 CONFIG_PATH = BASE_DIR / "config" / "repos.json"
@@ -23,8 +24,6 @@ STATE_DIR = Path(
 STATE_PATH = STATE_DIR / "state.json"
 
 OLLAMA_URL = os.environ.get("OLLAMA_URL", "http://localhost:11434")
-DEFAULT_OLLAMA_MODEL = "qwen3:8b"
-OLLAMA_MODEL = os.environ.get("OLLAMA_MODEL", DEFAULT_OLLAMA_MODEL)
 
 PLAN_SCHEMA: dict[str, Any] = {
     "type": "object",
@@ -120,7 +119,7 @@ def active_repo(config: dict[str, Any]) -> str:
     return str(config.get("default_repo", ""))
 
 
-def call_ollama(goal: str, config: dict[str, Any], model: str = OLLAMA_MODEL) -> str | None:
+def call_model(goal: str, config: dict[str, Any], profile: dict[str, str]) -> str | None:
     system = PLANNER_PROMPT_PATH.read_text(encoding="utf-8")
     context = {
         "active_repo": active_repo(config),
@@ -133,13 +132,20 @@ def call_ollama(goal: str, config: dict[str, Any], model: str = OLLAMA_MODEL) ->
         "Goal:\n"
         f"{goal}"
     )
+    if profile["provider"] == "openai":
+        return generate_structured(
+            model=profile["model"],
+            reasoning_effort=profile["reasoning_effort"],
+            instructions=system,
+            input_text=prompt,
+            schema=PLAN_SCHEMA,
+            schema_name="mq_hal_plan",
+            timeout=180,
+        )
+
     payload = {
-        "model": model,
-        "system": system,
-        "prompt": prompt,
-        "format": PLAN_SCHEMA,
-        "stream": False,
-        "options": {"temperature": 0},
+        "model": profile["model"], "system": system, "prompt": prompt,
+        "format": PLAN_SCHEMA, "stream": False, "options": {"temperature": 0},
     }
     data = json.dumps(payload).encode("utf-8")
     url = f"{OLLAMA_URL.rstrip('/')}/api/generate"
@@ -155,7 +161,7 @@ def call_ollama(goal: str, config: dict[str, Any], model: str = OLLAMA_MODEL) ->
     except urllib.error.URLError as exc:
         print(
             f"WARN: could not reach Ollama ({exc}). "
-            f"Start Ollama: ollama pull {model}",
+            f"Start Ollama: ollama pull {profile['model']}",
             file=sys.stderr,
         )
         return None
@@ -331,11 +337,11 @@ def main(argv: list[str]) -> int:
     )
     parser.add_argument(
         "--no-ai", action="store_true",
-        help="Return a stub plan without calling Ollama",
+        help="Return a stub plan without calling the configured provider",
     )
     parser.add_argument(
         "--sample", action="store_true",
-        help="Print sample plan output without calling Ollama",
+        help="Print sample plan output without calling a model provider",
     )
     parser.add_argument(
         "--model",
@@ -354,25 +360,21 @@ def main(argv: list[str]) -> int:
         plan = stub_plan(goal)
         print(
             "INFO: --no-ai mode — returning stub plan. "
-            "Run without --no-ai to generate with Ollama.",
+            "Run without --no-ai to generate with the configured provider.",
             file=sys.stderr,
         )
     else:
         config = load_config()
         try:
-            model, _profile = model_for_profile(
-                args.model,
-                default_profile="planner",
-                env_default=DEFAULT_OLLAMA_MODEL,
-            )
+            profile = profile_for_name(args.model, default_profile="planner")
         except ValueError as exc:
             print(f"ERROR: {exc}", file=sys.stderr)
             return 1
-        raw = call_ollama(goal, config, model=model)
+        raw = call_model(goal, config, profile)
         if raw is None:
             plan = stub_plan(goal)
             print(
-                "WARN: Ollama unavailable — returning stub plan.",
+                f"WARN: {profile['provider']} unavailable — returning stub plan.",
                 file=sys.stderr,
             )
         else:

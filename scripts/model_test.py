@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""mq-hal model-test: run a tiny structured Ollama generation test."""
+"""mq-hal model-test: run a tiny structured provider generation test."""
 from __future__ import annotations
 
 import argparse
@@ -11,7 +11,8 @@ import urllib.error
 import urllib.request
 from typing import Any
 
-from model_profiles import model_for_profile
+from model_profiles import profile_for_name
+from openai_client import generate_structured
 
 OLLAMA_URL = os.environ.get("OLLAMA_URL", "http://localhost:11434")
 
@@ -35,11 +36,39 @@ SAMPLE_RESULT: dict[str, Any] = {
 
 
 def call_model(profile: str) -> dict[str, Any]:
-    model, selected = model_for_profile(
-        profile,
-        default_profile="router",
-        env_default="qwen3:4b-instruct",
-    )
+    selected_profile = profile_for_name(profile, default_profile="router")
+    model = selected_profile["model"]
+    selected = selected_profile["name"]
+    provider = selected_profile["provider"]
+    if provider == "openai":
+        started = time.perf_counter()
+        raw = generate_structured(
+            model=model,
+            reasoning_effort=selected_profile["reasoning_effort"],
+            instructions="Return only JSON matching the requested schema.",
+            input_text="Return status ok and message ready.",
+            schema=TEST_SCHEMA,
+            schema_name="mq_hal_model_test",
+            timeout=30,
+            max_output_tokens=256,
+        )
+        latency_ms = int((time.perf_counter() - started) * 1000)
+        try:
+            parsed = json.loads(raw) if isinstance(raw, str) else None
+        except json.JSONDecodeError:
+            parsed = None
+        ok = isinstance(parsed, dict) and parsed.get("status") == "ok"
+        result: dict[str, Any] = {
+            "profile": selected,
+            "provider": provider,
+            "model": model,
+            "ok": ok,
+            "latency_ms": latency_ms,
+            "response": parsed,
+        }
+        if not ok:
+            result["error"] = "OpenAI unavailable or response did not match schema"
+        return result
     payload = {
         "model": model,
         "system": "Return only JSON matching the requested schema.",
@@ -62,6 +91,7 @@ def call_model(profile: str) -> dict[str, Any]:
     except urllib.error.URLError as exc:
         return {
             "profile": selected,
+            "provider": provider,
             "model": model,
             "ok": False,
             "latency_ms": None,
@@ -70,6 +100,7 @@ def call_model(profile: str) -> dict[str, Any]:
     except (OSError, json.JSONDecodeError) as exc:
         return {
             "profile": selected,
+            "provider": provider,
             "model": model,
             "ok": False,
             "latency_ms": None,
@@ -89,6 +120,7 @@ def call_model(profile: str) -> dict[str, Any]:
     )
     result: dict[str, Any] = {
         "profile": selected,
+        "provider": provider,
         "model": model,
         "ok": ok,
         "latency_ms": latency_ms,
@@ -115,7 +147,7 @@ def render(result: dict[str, Any]) -> None:
 def main(argv: list[str]) -> int:
     parser = argparse.ArgumentParser(
         prog="mq-hal model-test",
-        description="Run a tiny structured generation test against Ollama.",
+        description="Run a tiny structured generation test against a configured provider.",
     )
     parser.add_argument("--profile", default="router")
     parser.add_argument("--json", dest="json_out", action="store_true")

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""mq-hal model-status: check configured Ollama model availability."""
+"""mq-hal model-status: check configured Ollama and OpenAI profiles."""
 from __future__ import annotations
 
 import argparse
@@ -11,7 +11,7 @@ import urllib.error
 import urllib.request
 from typing import Any
 
-from model_profiles import load_model_profiles, model_for_profile
+from model_profiles import load_model_profiles, profile_for_name
 
 OLLAMA_URL = os.environ.get("OLLAMA_URL", "http://localhost:11434")
 
@@ -22,22 +22,26 @@ SAMPLE_STATUS: dict[str, Any] = {
     "latency_ms": 12,
     "profiles": {
         "router": {
+            "provider": "ollama",
             "model": "qwen3:4b-instruct",
             "available": True,
             "reasoning_effort": "low",
         },
         "planner": {
-            "model": "qwen3:8b",
+            "provider": "openai",
+            "model": "gpt-5.4-mini",
             "available": True,
             "reasoning_effort": "medium",
         },
         "critic": {
-            "model": "qwen3:8b",
+            "provider": "openai",
+            "model": "gpt-5.4-mini",
             "available": True,
             "reasoning_effort": "high",
         },
         "code": {
-            "model": "qwen2.5-coder:7b",
+            "provider": "openai",
+            "model": "gpt-5.4-mini",
             "available": False,
             "reasoning_effort": "medium",
         },
@@ -88,10 +92,9 @@ def build_status(sample: bool = False, profile_name: str | None = None) -> dict[
     selected_profiles = profiles
     if profile_name:
         try:
-            model_for_profile(
+            profile_for_name(
                 profile_name,
                 default_profile=str(profiles_data.get("default", "router")),
-                env_default="",
             )
         except ValueError as exc:
             raise ValueError(str(exc)) from exc
@@ -103,10 +106,17 @@ def build_status(sample: bool = False, profile_name: str | None = None) -> dict[
     for name, profile in selected_profiles.items():
         if not isinstance(profile, dict):
             continue
-        model = str(profile.get("model", ""))
+        resolved = profile_for_name(name, default_profile=name)
+        provider = resolved["provider"]
+        model = resolved["model"]
         profile_status[name] = {
+            "provider": provider,
             "model": model,
-            "available": reachable and model in available_models,
+            "available": (
+                reachable and model in available_models
+                if provider == "ollama"
+                else bool(os.environ.get("OPENAI_API_KEY"))
+            ),
             "reasoning_effort": profile.get("reasoning_effort", "unknown"),
         }
 
@@ -115,6 +125,7 @@ def build_status(sample: bool = False, profile_name: str | None = None) -> dict[
         "reachable": reachable,
         "latency_ms": latency_ms,
         "profiles": profile_status,
+        "openai_configured": bool(os.environ.get("OPENAI_API_KEY")),
     }
     if error:
         result["error"] = error
@@ -135,19 +146,20 @@ def render(data: dict[str, Any]) -> None:
     if data.get("error"):
         print(f"Error:     {data['error']}")
     print()
-    print(f"{'PROFILE':<10}  {'MODEL':<28}  {'AVAILABLE':<9}  EFFORT")
-    print(f"{'-' * 10}  {'-' * 28}  {'-' * 9}  {'-' * 8}")
+    print(f"{'PROFILE':<10}  {'PROVIDER':<9}  {'MODEL':<28}  {'AVAILABLE':<9}  EFFORT")
+    print(f"{'-' * 10}  {'-' * 9}  {'-' * 28}  {'-' * 9}  {'-' * 8}")
     for name, profile in data.get("profiles", {}).items():
         available = "yes" if profile.get("available") else "no"
         model = str(profile.get("model", "-"))
+        provider = str(profile.get("provider", "-"))
         effort = str(profile.get("reasoning_effort", "-"))
-        print(f"{name:<10}  {model:<28}  {available:<9}  {effort}")
+        print(f"{name:<10}  {provider:<9}  {model:<28}  {available:<9}  {effort}")
 
 
 def main(argv: list[str]) -> int:
     parser = argparse.ArgumentParser(
         prog="mq-hal model-status",
-        description="Check configured Ollama model availability.",
+        description="Check configured Ollama and OpenAI profile availability.",
     )
     parser.add_argument("--json", dest="json_out", action="store_true")
     parser.add_argument("--sample", action="store_true")

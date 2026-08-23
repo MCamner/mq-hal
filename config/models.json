@@ -1,25 +1,29 @@
 {
   "profiles": {
     "router": {
+      "provider": "ollama",
       "model": "qwen3:4b-instruct",
       "reasoning_effort": "low",
       "description": "Fast routing for simple intents. Default profile.",
       "use_for": ["intent routing", "quick commands"]
     },
     "planner": {
-      "model": "qwen3:8b",
+      "provider": "openai",
+      "model": "gpt-5.4-mini",
       "reasoning_effort": "medium",
       "description": "Multi-step planning with broader context.",
       "use_for": ["mq-hal plan", "release planning"]
     },
     "critic": {
-      "model": "qwen3:8b",
+      "provider": "openai",
+      "model": "gpt-5.4-mini",
       "reasoning_effort": "high",
       "description": "Critical analysis and review of plans.",
       "use_for": ["mq-hal critic", "plan review"]
     },
     "code": {
-      "model": "qwen2.5-coder:7b",
+      "provider": "openai",
+      "model": "gpt-5.4-mini",
       "reasoning_effort": "medium",
       "description": "Code-aware reasoning for repo and diff analysis.",
       "use_for": ["code review", "repo analysis"]

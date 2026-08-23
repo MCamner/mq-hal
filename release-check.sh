@@ -61,6 +61,7 @@ _pyfiles=(
   hal/stack.py hal/status.py hal/doctor.py hal/brain.py hal/context.py hal/route.py
   hal/release.py scripts/memory_status.py scripts/repo_memory.py
   scripts/agent_brief.py scripts/hello.py scripts/model_profiles.py
+  scripts/openai_client.py
   scripts/model_status.py scripts/model_test.py scripts/version.py
   scripts/config_check.py scripts/update.py scripts/visual_hal.py
   scripts/tools_list.py scripts/models_list.py scripts/planner.py
@@ -159,6 +160,7 @@ _smoke agent-brief-smoke.sh
 _smoke hello-smoke.sh
 _smoke tools-smoke.sh
 _smoke models-smoke.sh
+_smoke provider-routing-smoke.sh
 _smoke model-status-smoke.sh
 _smoke model-test-smoke.sh
 _smoke install-flow-smoke.sh

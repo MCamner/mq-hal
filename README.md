@@ -43,13 +43,12 @@ mq-hal dashboard
 mq-hal route
 ```
 
-Optional local model setup:
+Local router setup: `brew install ollama && brew services start ollama`, then
+`ollama pull qwen3:4b-instruct`.
 
-```bash
-brew install ollama
-brew services start ollama
-ollama pull qwen3:4b-instruct
-```
+The router uses local `qwen3:4b-instruct`; planner/critic/code profiles use
+OpenAI `gpt-5.4-mini`. Cloud commands require `OPENAI_API_KEY`; HAL never
+includes the key in output or session memory.
 
 ## 30 Second Demo
 

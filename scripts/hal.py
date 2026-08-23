@@ -13,7 +13,7 @@ import urllib.request
 from pathlib import Path
 from typing import Any
 
-from model_profiles import model_for_profile
+from model_profiles import profile_for_name
 
 BASE_DIR = Path(__file__).resolve().parents[1]
 CONFIG_PATH = BASE_DIR / "config" / "repos.json"
@@ -762,11 +762,13 @@ def main(argv: list[str]) -> int:
         return 0
 
     try:
-        model, _profile = model_for_profile(
-            args.model,
-            default_profile="router",
-            env_default=DEFAULT_OLLAMA_MODEL,
-        )
+        router_profile = profile_for_name(args.model, default_profile="router")
+        if router_profile["provider"] != "ollama":
+            die(
+                f"profile {router_profile['name']!r} uses "
+                f"{router_profile['provider']}; intent routing requires an Ollama profile"
+            )
+        model = router_profile["model"]
     except ValueError as exc:
         die(str(exc))
 

@@ -218,7 +218,7 @@
     },
     {
       "name": "model-status",
-      "description": "Check configured Ollama model availability and latency",
+      "description": "Check configured Ollama and OpenAI profile availability",
       "risk_level": "read-only",
       "requires_confirm": false,
       "uses_ai": false,
@@ -227,7 +227,7 @@
     },
     {
       "name": "model-test",
-      "description": "Run a tiny structured generation test against Ollama",
+      "description": "Run a structured generation test against a model profile",
       "risk_level": "read-only",
       "requires_confirm": false,
       "uses_ai": true,
