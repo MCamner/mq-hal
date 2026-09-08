@@ -8,6 +8,11 @@
     "status_check.v1",
     "operator_platform.v1"
   ],
-  "next_focus": "maintenance \u2014 evidence-gated model routing observability",
+  "compatibility": {
+    "consumes": [
+      "mq.stack-provenance.v1"
+    ]
+  },
+  "next_focus": "maintenance — evidence-gated model routing observability",
   "release_mode": "direct"
 }

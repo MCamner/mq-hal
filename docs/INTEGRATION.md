@@ -167,6 +167,65 @@ mq-hal must not:
 - implement review, risk scoring, or semantic-memory logic
 - route execution around the allowlist for any reason
 
+### Runtime provenance
+
+`mq-agent` owns `mq.stack-provenance.v1` — the observations, the comparisons
+between layers, the reason codes, the status and the remediation. `mq-hal`
+consumes it and shows it.
+
+> **mq-hal may choose its presentation, but it must preserve every epistemic
+> distinction already present in the provenance record, and may derive no new
+> one.**
+
+The record separates four absences, and they mean different things. Collapsing
+any two of them into one phrase invents a claim nobody observed:
+
+| In the record | Means |
+| --- | --- |
+| `installed` is null | nobody looked — the ordinary state for a component in another environment |
+| `installed.identity_quality` is `unknown` | a layer was observed and could not be identified |
+| `running_probe` absent, or `attempted` false | this component has no process to ask |
+| `attempted` true, `reachable` false | it was asked and nothing answered |
+
+The wording is `mq-hal`'s to choose. The distinctions are not.
+
+`status`, `reasons` and `summary.next_action` are shown as supplied. `mq-hal`
+does not recompute a remedy from the facts beside it: the causal reasoning that
+decides between "restart" and "verify the installation, then restart" lives in
+`mq-agent`'s reducer, and a second implementation would be free to disagree
+with the first.
+
+An unfamiliar reason code must render unchanged. Any colour or severity map
+keys on `status`, never on a reason code — otherwise a code added in `mq-agent`
+becomes a crash or a silent drop here.
+
+#### Contract, and the transport that carries it
+
+```text
+Semantic contract    mq.stack-provenance.v1
+Current transport    mq-agent stack provenance --json
+```
+
+The command is transport. The contract is the record. Declaring the command in
+`.mq/repo-contract.json` would tie the stack graph to one CLI spelling; what is
+declared there is `compatibility.consumes: ["mq.stack-provenance.v1"]`.
+
+Transport failure is an `mq-hal` availability problem and never a provenance
+result:
+
+```text
+mq-agent missing, timing out, exiting non-zero,
+or returning output that is not the expected record
+        ↓
+provenance integration unavailable
+
+        not ↓
+a component finding, a status, or a reason code
+```
+
+A failed subprocess says something about this machine. It says nothing about
+which code the stack is running.
+
 ## Tool policy
 
 HAL may inspect and summarize.
