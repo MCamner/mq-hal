@@ -169,6 +169,7 @@ _smoke critic-smoke.sh
 _smoke execute-smoke.sh
 _smoke learn-smoke.sh
 _smoke env-status-smoke.sh
+_smoke provenance-transport-smoke.sh
 _smoke docs-smoke.sh
 [[ "$FAILED" -eq "$_smoke_start" ]] && pass "all smoke tests passed"
 

@@ -1251,8 +1251,8 @@ independently releasable and revertible.
 
 ## v2.4.0 — Runtime Provenance Presentation
 
-Status: In progress. The consumer boundary is declared; transport and
-presentation are not built.
+Status: In progress. The consumer boundary is declared and transport is
+built; presentation is not.
 
 ### Goal
 
@@ -1271,11 +1271,24 @@ is given.
   producing half first — declared in the other order, the compatibility engine
   reports `MQC013_CONTRACT_UNPRODUCED` against `mq-hal` and builds no edge at
   all.
-- [ ] **5.4b — transport and its failure boundary.** `mq-agent stack
-  provenance --json`, along the same lines `hal/stack.py` already uses for the
-  cockpit: missing binary, timeout, non-zero exit, unparseable output and a
-  wrong top-level shape are `mq-hal` availability errors. None of them is a
-  provenance finding.
+- [x] **5.4b — transport and its failure boundary.** `hal/provenance.py` runs
+  `mq-agent stack provenance --json` along the same lines `hal/stack.py`
+  already uses for the cockpit: missing binary, timeout, `OSError`, non-zero
+  exit, unparseable output and a wrong top-level shape are `mq-hal`
+  availability errors. Every one of them returns `data=None`. None of them is
+  a provenance finding.
+
+  Transport does one thing the cockpit reader does not: it checks that the
+  record identifies itself as `mq.stack-provenance.v1`. That is not reducer
+  logic — it is the transport's version of confirming the parcel is the one
+  that was ordered. The full JSON schema is deliberately **not** vendored
+  here; validating it in `mq-hal` would create a second version coupling to
+  something `mq-agent` owns.
+
+  A record that passes those checks is handed on **unchanged**. The proof is
+  a record carrying `RTP999_FUTURE_REASON` and a sentinel `next_action`,
+  asserted equal to what the producer emitted: transport does not know that
+  `RTP999` is unfamiliar, and must not learn.
 - [ ] **5.4c — presentation and conformance.** Render the record, and prove by
   test that nothing is derived from it.
 
