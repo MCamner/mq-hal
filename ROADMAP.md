@@ -1247,6 +1247,52 @@ it. See "Evidence review" above. No task class has left shadow mode.
 Do not combine these into one cross-repository PR. Each repository must remain
 independently releasable and revertible.
 
+---
+
+## v2.4.0 — Runtime Provenance Presentation
+
+Status: In progress. The consumer boundary is declared; transport and
+presentation are not built.
+
+### Goal
+
+Show the operator which code the stack is actually running, without moving any
+part of runtime-provenance ownership into `mq-hal`.
+
+`mq-agent` owns `mq.stack-provenance.v1`: the observations, the comparisons,
+the reason codes, the status and the remediation. `mq-hal` shows the record it
+is given.
+
+### The consumer boundary
+
+- [x] **5.4a — declare what is consumed.** `.mq/repo-contract.json` declares
+  `mq.stack-provenance.v1` under `compatibility.consumes`. This is the first
+  consumption edge `mq-hal` has declared. It follows `mq-agent` declaring the
+  producing half first — declared in the other order, the compatibility engine
+  reports `MQC013_CONTRACT_UNPRODUCED` against `mq-hal` and builds no edge at
+  all.
+- [ ] **5.4b — transport and its failure boundary.** `mq-agent stack
+  provenance --json`, along the same lines `hal/stack.py` already uses for the
+  cockpit: missing binary, timeout, non-zero exit, unparseable output and a
+  wrong top-level shape are `mq-hal` availability errors. None of them is a
+  provenance finding.
+- [ ] **5.4c — presentation and conformance.** Render the record, and prove by
+  test that nothing is derived from it.
+
+### What `mq-hal` does not own
+
+```text
+reason codes        comparisons        status        remediation
+```
+
+An unfamiliar future reason code must reach the screen unchanged. Colour maps
+on `status`, never on a reason code, or a new code from `mq-agent` becomes a
+crash or a silent drop in `mq-hal`.
+
+See `docs/INTEGRATION.md` for the durable rule.
+
+---
+
 ## Completed
 
 ### v0.1.x — Public baseline and local routing foundation
