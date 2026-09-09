@@ -45,7 +45,7 @@ It should be:
 Latest stable release:
 
 ```text
-v2.3.0 — Local-First Model Routing Control Room
+v2.4.0 — Runtime Provenance Presentation
 ```
 
 Completed foundation:
@@ -75,6 +75,7 @@ Completed foundation:
 - Context Pack Status — read-only mqobsidian token-reduction visibility (v2.1)
 - Operator Feedback Polish — explicit dashboard and action outcomes (v2.2)
 - Local-First Model Routing Control Room — advisory routing visibility (v2.3)
+- Runtime Provenance Presentation — show which code the stack runs (v2.4)
 
 Current recommended next step:
 
@@ -118,6 +119,7 @@ Maintenance — keep routing advisory until a fresh evidence set passes the gate
 | v2.1.1  | Stack-loop history compatibility                     | Done    |
 | v2.2.0  | Operator feedback polish                             | Done    |
 | v2.3.0  | Local-First Model Routing Control Room               | Done    |
+| v2.4.0  | Runtime Provenance Presentation                      | Done    |
 
 ---
 

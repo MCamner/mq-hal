@@ -4,6 +4,41 @@
 
 ## [Unreleased]
 
+## [2.4.0] - 2026-09-09
+
+Runtime Provenance Presentation shows which code the MQ stack is actually
+running. `mq-agent` owns `mq.stack-provenance.v1` — the observations, the
+comparisons, the reason codes, the status and the remediation. `mq-hal` shows
+the record it is given and concludes nothing from it.
+
+### Added
+
+- `mq-hal provenance` renders the runtime provenance record produced by
+  `mq-agent stack provenance --json`, and `mq-hal provenance --json` prints the
+  producer's own bytes unchanged.
+- `hal/provenance.py` carries the record and its transport failures. A missing
+  binary, a timeout, a non-zero exit, unparseable output, an unexpected shape,
+  or a document that is not `mq.stack-provenance.v1` all yield no record — never
+  a synthesized finding.
+- `hal/provenance_view.py` presents the record. Colour keys on the supplied
+  status only, so an unfamiliar future status or reason code from `mq-agent`
+  reaches the screen verbatim instead of being crashed on, dropped, or
+  translated into vocabulary `mq-hal` already knows.
+- `.mq/repo-contract.json` declares `mq.stack-provenance.v1` under
+  `compatibility.consumes` — the first consumption edge `mq-hal` declares.
+- Transport and presentation smoke coverage, including the seven ways
+  transport can fail to obtain a record, the four kinds of absence that must
+  not collapse, and AST invariants holding the two modules to opposite rules.
+
+### Changed
+
+- Exit codes separate transport from verdict: any obtained record exits 0
+  whatever its status, and only a failure to obtain one exits non-zero.
+  `mq-hal provenance` is a view, not a gate.
+- ROADMAP records v2.4.0 as complete and `docs/INTEGRATION.md` carries the
+  durable rule that reason codes, comparisons, status and remediation stay with
+  `mq-agent`.
+
 ## [2.3.0] - 2026-08-23
 
 Local-First Model Routing Control Room makes mq-agent's advisory local-model
