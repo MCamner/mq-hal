@@ -167,6 +167,18 @@ mq-hal must not:
 - implement review, risk scoring, or semantic-memory logic
 - route execution around the allowlist for any reason
 
+### Cloud providers
+
+`mq-hal` is local-first: every model call it makes today goes to a local
+Ollama endpoint. The terms under which any part of it may talk to an external
+model provider are fixed in
+[docs/CLOUD_PROVIDER_BOUNDARY.md](CLOUD_PROVIDER_BOUNDARY.md).
+
+> **Network egress is a command-surface decision, not a model-profile side
+> effect.**
+>
+> **A failed provider never silently becomes another provider.**
+
 ### Runtime provenance
 
 `mq-agent` owns `mq.stack-provenance.v1` — the observations, the comparisons
