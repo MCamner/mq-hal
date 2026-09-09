@@ -737,6 +737,50 @@ individual health checks behind each service.
 
 ---
 
+### `provenance`
+
+Shows the runtime provenance record produced by `mq-agent`: which code each
+component of the stack is actually running.
+
+| Property | Value |
+|---|---|
+| `mq-hal` | `mq-hal provenance` |
+| Backend | `hal/provenance_view.py` (transport: `hal/provenance.py`) |
+| Read-only | Yes |
+| Memory write | No |
+| Flags | `--json` |
+| Subcommands | — |
+
+`mq-agent` owns `mq.stack-provenance.v1` — the observations, the comparisons,
+the reason codes, the status and the remediation. This command shows that
+record and derives nothing from it. There is no reason-to-status map, no
+reason-to-action map, and no severity table keyed on reason codes in `mq-hal`.
+
+Colour keys on the `status` the record supplies, never on a reason code. An
+unfamiliar future status prints verbatim with neutral styling, and an
+unfamiliar future reason code prints verbatim, so new vocabulary from
+`mq-agent` degrades to plain text instead of crashing or being translated.
+
+Four kinds of absence are kept apart, because they are different answers:
+
+| Record | Shown as |
+|---|---|
+| `installed` is `null` | `not observed` |
+| `identity_quality` is `unknown` | `identity unknown` |
+| probe not attempted | `not asked` |
+| probe attempted, not reachable | `asked — unreachable` |
+
+Exit code is `0` whenever a record was obtained, whatever it says. `WARN`,
+`FAIL` and `UNAVAILABLE` are `mq-agent`'s conclusions to report, not a gate
+`mq-hal` invents; this is a view, not a check. Only a transport failure —
+`mq-agent` missing, a timeout, a crash, unusable output — exits non-zero, and
+it prints to stderr so the `--json` surface never carries an invented record.
+
+`--json` prints the producer's own bytes unchanged rather than re-serializing
+a document `mq-hal` does not own.
+
+---
+
 ### `dashboard`
 
 Terminal dashboard for the HAL operator layer.

@@ -50,6 +50,11 @@ case "${1:-}" in
     exec python3 "$ROOT/hal/runtime.py" "$@"
     ;;
 
+  provenance)
+    shift || true
+    exec python3 "$ROOT/hal/provenance_view.py" "$@"
+    ;;
+
   route)
     shift || true
     exec python3 "$ROOT/hal/route.py" "$@"
