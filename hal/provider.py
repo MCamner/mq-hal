@@ -160,14 +160,44 @@ _JSON_TYPES: dict[str, Any] = {
     "number": (int, float),
     "integer": int,
     "boolean": bool,
+    "null": type(None),
 }
 
 
 # The keywords `conforms` implements, plus two that constrain nothing and so
 # cost nothing to allow through.
 SCHEMA_KEYWORDS = frozenset(
-    {"type", "properties", "required", "additionalProperties", "title", "description"}
+    {
+        "type",
+        "properties",
+        "required",
+        "additionalProperties",
+        "items",
+        "enum",
+        "title",
+        "description",
+    }
 )
+
+
+def _check_type(declared: Any, path: str) -> set[str]:
+    """Return the type names a subschema declares, or refuse the declaration.
+
+    A union is a list of names — `["string", "null"]` is the one the plan
+    format needs. Every member must be a type `conforms` can test, because a
+    name it does not hold would be skipped and the union would widen silently
+    to whatever the response happened to carry.
+    """
+    names = declared if isinstance(declared, list) else [declared]
+    if isinstance(declared, list) and not names:
+        raise ValueError(f"{path}.type is an empty union, which nothing satisfies")
+    for name in names:
+        if not isinstance(name, str) or name not in _JSON_TYPES:
+            raise ValueError(
+                f"{path}.type is {declared!r}, which this module cannot check. "
+                f"Supported types: {', '.join(sorted(_JSON_TYPES))}"
+            )
+    return set(names)
 
 
 def _check_schema(schema: Any, path: str = "schema") -> None:
@@ -178,12 +208,11 @@ def _check_schema(schema: Any, path: str = "schema") -> None:
     array or a string could succeed and still have nowhere to put its answer.
 
     Every keyword must be one `conforms` implements, and so must every keyword
-    *value*. A schema carrying `items`, or a `type` of `"null"`, reads as a
-    constraint the module never checks: the request would claim an enforcement
-    that does not happen and a violating response would come back marked valid.
-    Permitting a keyword is not the same as understanding what was written in
-    it, and the gap is the same either way. Refusing both keeps the request and
-    the check in step — what is asked for is what is verified.
+    *value*. Permitting a keyword is not the same as understanding what was
+    written in it: a `type` name `conforms` never tests, or an `items` sitting
+    where no array can appear, reads as a constraint the module enforces and is
+    not. Refusing both keeps the request and the check in step — what is asked
+    for is what is verified.
     """
     if not isinstance(schema, dict):
         raise ValueError(f"{path} must be a JSON Schema object, got {type(schema).__name__}")
@@ -195,15 +224,11 @@ def _check_schema(schema: Any, path: str = "schema") -> None:
             f"{', '.join(unsupported)}. Supported: {', '.join(sorted(SCHEMA_KEYWORDS))}"
         )
 
-    # `conforms` looks its type up in _JSON_TYPES and silently checks nothing
-    # when the lookup misses, so a type it does not hold must not get this far.
+    # `conforms` looks each type name up in _JSON_TYPES and treats a miss as
+    # "no match", so a name it does not hold must not get this far.
+    declared_types: set[str] = set()
     if "type" in schema:
-        declared = schema["type"]
-        if not isinstance(declared, str) or declared not in _JSON_TYPES:
-            raise ValueError(
-                f"{path}.type is {declared!r}, which this module cannot check. "
-                f"Supported types: {', '.join(sorted(_JSON_TYPES))}"
-            )
+        declared_types = _check_type(schema["type"], path)
 
     # A string here would be iterated character by character, requiring keys
     # nobody asked for; a non-string entry could never match one.
@@ -221,6 +246,38 @@ def _check_schema(schema: Any, path: str = "schema") -> None:
                 f"a subschema there is not enforced"
             )
 
+    # `conforms` compares enum members with `==`, which is total for JSON
+    # scalars and nothing else here needs more. A container member would be
+    # compared structurally, which is a different question than the one the
+    # plan format asks.
+    if "enum" in schema:
+        allowed = schema["enum"]
+        if not isinstance(allowed, list) or not allowed:
+            raise ValueError(f"{path}.enum must be a non-empty list of allowed values")
+        for value in allowed:
+            if not isinstance(value, (str, int, float, bool, type(None))):
+                raise ValueError(
+                    f"{path}.enum holds a {type(value).__name__}; this module "
+                    f"compares enum members as JSON scalars"
+                )
+
+    # `conforms` applies `items` to the elements of an array and to nothing
+    # else. Written anywhere an array cannot appear it constrains nothing, so
+    # it is refused rather than accepted and ignored.
+    if "items" in schema:
+        if "array" not in declared_types:
+            raise ValueError(
+                f"{path}.items is checked only for arrays, but {path}.type is "
+                f"{schema.get('type')!r}; declare array where items is used"
+            )
+        items = schema["items"]
+        if not isinstance(items, dict):
+            raise ValueError(
+                f"{path}.items must be one subschema for every element; a "
+                f"per-position list is not applied"
+            )
+        _check_schema(items, f"{path}.items")
+
     if path == "schema" and schema.get("type") != "object":
         raise ValueError(
             f"schema must describe a top-level object, got type="
@@ -234,24 +291,59 @@ def _check_schema(schema: Any, path: str = "schema") -> None:
         _check_schema(subschema, f"{path}.properties.{name}")
 
 
+def _is_json_type(document: Any, name: str) -> bool:
+    expected = _JSON_TYPES.get(name)
+    if expected is None:
+        return False
+    # JSON has no boolean/number overlap; Python does, and `True` would pass an
+    # `integer` check unchallenged.
+    if name == "boolean":
+        return isinstance(document, bool)
+    if name in {"number", "integer"}:
+        return not isinstance(document, bool) and isinstance(document, expected)
+    return isinstance(document, expected)
+
+
+def _type_matches(document: Any, declared: Any) -> bool:
+    names = declared if isinstance(declared, list) else [declared]
+    return any(_is_json_type(document, name) for name in names)
+
+
+def _enum_allows(document: Any, allowed: list[Any]) -> bool:
+    for value in allowed:
+        # `True == 1` in Python but not in JSON, so a boolean must not satisfy
+        # a numeric member, nor a number a boolean one.
+        if isinstance(value, bool) != isinstance(document, bool):
+            continue
+        if value == document:
+            return True
+    return False
+
+
+def _items_conform(document: list[Any], schema: dict[str, Any]) -> bool:
+    items = schema.get("items")
+    if not isinstance(items, dict):
+        return True
+    return all(conforms(element, items) for element in document)
+
+
 def conforms(document: Any, schema: dict[str, Any]) -> bool:
     """Check a document against the subset of JSON Schema this module requests.
 
-    Not a general validator: it covers `type`, `properties`, `required` and
-    `additionalProperties`. Requests are held to that same subset by
+    Not a general validator: it covers `type` (including a union such as
+    `["string", "null"]`), `properties`, `required`, `additionalProperties`,
+    `items` and `enum`. Requests are held to that same subset by
     `_check_schema`, so a schema reaching here never expresses more than this
     function checks.
     """
-    expected = schema.get("type")
-    if expected in _JSON_TYPES:
-        if expected == "boolean":
-            if not isinstance(document, bool):
-                return False
-        elif expected in {"number", "integer"}:
-            if isinstance(document, bool) or not isinstance(document, _JSON_TYPES[expected]):
-                return False
-        elif not isinstance(document, _JSON_TYPES[expected]):
-            return False
+    if "type" in schema and not _type_matches(document, schema["type"]):
+        return False
+
+    if "enum" in schema and not _enum_allows(document, schema["enum"]):
+        return False
+
+    if isinstance(document, list):
+        return _items_conform(document, schema)
 
     if not isinstance(document, dict):
         return True
@@ -269,7 +361,6 @@ def conforms(document: Any, schema: dict[str, Any]) -> bool:
         if isinstance(subschema, dict) and not conforms(value, subschema):
             return False
     return True
-
 
 def run_request(
     selection: Selection,
