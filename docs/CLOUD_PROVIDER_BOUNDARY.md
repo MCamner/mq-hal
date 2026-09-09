@@ -3,9 +3,10 @@
 `mq-hal` is a local-first operator layer. This document fixes the terms under
 which any part of it may talk to an external model provider.
 
-It is written before the implementation exists. Today `mq-hal` makes no
-external provider request at all: every model call goes to a local Ollama
-endpoint. The contract below governs the work that adds one.
+It was written before the implementation existed. That work is now done:
+`mq-hal code-plan` is the one command that reaches a provider, built to these
+terms in #33, #34 and #35. Every other model call still goes to a local Ollama
+endpoint, and the contract below is what keeps it that way.
 
 Two rules carry the rest:
 
@@ -16,10 +17,14 @@ Two rules carry the rest:
 
 ## Why this exists
 
-An earlier implementation of cloud planning was built on the branch
-`mq/update-shell-scripts-20260824-001140` and never merged. It is kept as
-reference material. Reading it produced this contract, because it demonstrated
-the failure modes concretely rather than hypothetically:
+An earlier implementation of cloud planning was built and never merged. It is
+kept as reference material, archived at the tag
+`archive/cloud-provider-reference-20260824` (commit `f6534da`); the branch it
+was written on is gone. A tag rather than a branch on purpose — a branch reads
+as work in progress, and this is evidence. It is to be read, not built on.
+
+Reading it produced this contract, because it demonstrated the failure modes
+concretely rather than hypothetically:
 
 - It moved the trust boundary into configuration. Flipping `provider` in
   `config/models.json` from `ollama` to `openai` made `mq-hal plan` and
@@ -33,8 +38,8 @@ the failure modes concretely rather than hypothetically:
   indistinguishable from a normal local answer.
 
 The transport itself was sound — no credential in argv, `store: false`,
-strict JSON-schema responses — and that part is worth re-deriving. The
-boundary around it was not.
+strict JSON-schema responses — and that part was worth re-deriving. It was, in
+`hal/provider.py`. The boundary around it was not, and was not.
 
 ## The contract
 
