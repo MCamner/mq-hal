@@ -1251,8 +1251,8 @@ independently releasable and revertible.
 
 ## v2.4.0 — Runtime Provenance Presentation
 
-Status: In progress. The consumer boundary is declared and transport is
-built; presentation is not.
+Status: Complete. The consumer boundary is declared, transport is built, and
+the record is shown. `mq-hal` owns no part of runtime-provenance semantics.
 
 ### Goal
 
@@ -1297,8 +1297,34 @@ is given.
   and `PROVENANCE_SCHEMA` in the transport module. `.mq` is deliberately not
   read at runtime — the constant belongs in the module — so a test binds the
   two instead, and fails in either direction if they drift apart.
-- [ ] **5.4c — presentation and conformance.** Render the record, and prove by
-  test that nothing is derived from it.
+- [x] **5.4c — presentation and conformance.** `mq-hal provenance` and
+  `mq-hal provenance --json` show the record. The invariant: presentation may
+  expose the record and its conclusions; it must not derive a new conclusion,
+  remedy, severity, or process policy of its own.
+
+  Colour keys on the supplied `status` and nothing else. An unfamiliar future
+  status prints verbatim with neutral styling; an unfamiliar future reason
+  code prints verbatim. There is no reason-to-status map, no reason-to-action
+  map, and no severity table keyed on reason codes.
+
+  Exit code is `0` whenever a record was obtained, whatever it says. Turning
+  `FAIL` into a non-zero exit would make `mq-hal` the author of a gate the
+  provenance contract does not contain. This is a view, not a check. Only a
+  transport failure exits non-zero, and it writes to stderr so the `--json`
+  surface never carries an invented record.
+
+  `--json` prints the producer's own bytes. 5.4b already proved
+  `data == json.loads(raw)`, so re-serializing a document `mq-hal` does not
+  own would only add ways for key order, spacing and unknown fields to
+  change.
+
+  Presentation lives in `hal/provenance_view.py`, apart from the transport in
+  `hal/provenance.py`. The two are held to opposite rules: transport may not
+  name provenance vocabulary at all — that is what catches a dormant helper
+  turning a failed subprocess into an invented finding — while presentation
+  must name it in order to display it. Merging them was tried and measured:
+  the transport invariant then fails, so the split is what keeps both rules
+  statable rather than a matter of taste.
 
 ### What `mq-hal` does not own
 

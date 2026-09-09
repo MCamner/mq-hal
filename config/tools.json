@@ -314,6 +314,15 @@
       "uses_ai": false,
       "writes_memory": false,
       "mqlaunch_alias": null
+    },
+    {
+      "name": "provenance",
+      "description": "Runtime provenance record from mq-agent: which code the stack runs",
+      "risk_level": "read-only",
+      "requires_confirm": false,
+      "uses_ai": false,
+      "writes_memory": false,
+      "mqlaunch_alias": null
     }
   ]
 }
