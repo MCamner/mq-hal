@@ -135,6 +135,34 @@ git reset --hard origin/main
 
 ---
 
+## release-check fails: predecessor has no published GitHub release
+
+**Cause:** The version before the current one is declared in `CHANGELOG.md`
+and was tagged, but `gh release create` was never run for it. Tagging and
+publishing are two separate manual steps (`docs/INTEGRATION.md`), and only the
+second one shows up on the releases page.
+
+This happened to `v2.3.0` and `v2.4.0`: both were tagged and pushed, neither
+was published, and the check that existed at the time asked only whether the
+*current* version was already released — which answers "no" both before a
+release and after a forgotten one.
+
+**Fix:** Publish the missing release from its `CHANGELOG.md` section rather
+than from the tag range, which can be misleading when a tag was placed late:
+
+```bash
+gh release create vX.Y.Z \
+  --title "vX.Y.Z — title from the CHANGELOG heading paragraph" \
+  --notes-file notes.md \
+  --latest=false
+```
+
+Use `--latest=false` for anything older than the newest published version, and
+do not move existing tags to tidy the history — where a tag was placed is
+provenance.
+
+---
+
 ## release-check fails: undocumented command
 
 **Cause:** A command was added to `bin/mq-hal` without a matching entry in

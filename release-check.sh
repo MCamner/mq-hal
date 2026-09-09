@@ -114,13 +114,18 @@ fi
 
 step "GitHub release tag"
 if [[ "$DRY_RUN" -eq 1 ]]; then
-  skip "dry-run — not checking whether v$VERSION is already released"
+  skip "dry-run — not reading the GitHub release list"
 elif command -v gh >/dev/null 2>&1; then
-  if gh release view "v${VERSION}" >/dev/null 2>&1; then
-    fail "GitHub release v${VERSION} already exists — bump VERSION before releasing"
+  # Both questions live in tools/check-github-releases.sh: is this version
+  # already published, and was the previous declared version ever published.
+  # The second one is why v2.3.0 and v2.4.0 sat tagged and unreleased for a
+  # month without anything noticing.
+  if _releases_out="$(./tools/check-github-releases.sh 2>&1)"; then
+    pass "GitHub releases agree with VERSION and CHANGELOG"
   else
-    pass "v${VERSION} not yet released on GitHub"
+    fail "GitHub release check failed"
   fi
+  [[ "$JSON" -eq 1 ]] || printf '%s\n' "$_releases_out" | sed 's/^/       /'
 else
   skip "gh CLI not available — skipping GitHub release check"
 fi
@@ -172,6 +177,7 @@ _smoke learn-smoke.sh
 _smoke env-status-smoke.sh
 _smoke provider-boundary-smoke.sh
 _smoke code-plan-smoke.sh
+_smoke release-published-smoke.sh
 _smoke provenance-transport-smoke.sh
 _smoke provenance-presentation-smoke.sh
 _smoke docs-smoke.sh
