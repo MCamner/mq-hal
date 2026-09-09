@@ -59,7 +59,7 @@ _pyfiles=(
   scripts/repo_status.py scripts/ci_status.py scripts/brief.py
   scripts/release_brief.py scripts/audit.py scripts/stack_status.py
   hal/stack.py hal/status.py hal/doctor.py hal/brain.py hal/context.py hal/route.py
-  hal/release.py scripts/memory_status.py scripts/repo_memory.py
+  hal/release.py hal/provider.py scripts/memory_status.py scripts/repo_memory.py
   scripts/agent_brief.py scripts/hello.py scripts/model_profiles.py
   scripts/model_status.py scripts/model_test.py scripts/version.py
   scripts/config_check.py scripts/update.py scripts/visual_hal.py
@@ -169,6 +169,7 @@ _smoke critic-smoke.sh
 _smoke execute-smoke.sh
 _smoke learn-smoke.sh
 _smoke env-status-smoke.sh
+_smoke provider-boundary-smoke.sh
 _smoke provenance-transport-smoke.sh
 _smoke provenance-presentation-smoke.sh
 _smoke docs-smoke.sh
