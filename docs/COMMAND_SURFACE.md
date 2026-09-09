@@ -60,6 +60,7 @@ The detailed reference with flags, examples, and backend notes is in
 | `review-ui` | — | No | No | No | — |
 | `architecture-brief` | — | No | No | No | — |
 | `plan` | — | Yes | No | No | — |
+| `code-plan` | — | Cloud | No | No | — |
 | `critic` | — | No | No | No | — |
 | `execute` | — | No | No | Yes | — |
 | `learn` | — | No | Yes | No | — |
@@ -68,6 +69,10 @@ The detailed reference with flags, examples, and backend notes is in
 **AI** — calls Ollama when available; falls back to deterministic output.
 Visual commands can include local `mq-image-analyze` output when that tool is
 installed, but remain read-only and deterministic without it.
+**AI: Cloud** — sends data to an external provider named on the command line.
+`code-plan` is the only command in this table that does, it never runs without
+`--provider`, and no other command can be made to by configuration. The terms
+are `docs/CLOUD_PROVIDER_BOUNDARY.md`.
 **Memory** — writes to `~/.mq-hal/session.jsonl` (session events) or
 `~/.mq-hal/learn/lessons.jsonl` (`learn add`) unless `--no-memory` is
 passed.

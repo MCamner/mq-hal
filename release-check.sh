@@ -64,6 +64,7 @@ _pyfiles=(
   scripts/model_status.py scripts/model_test.py scripts/version.py
   scripts/config_check.py scripts/update.py scripts/visual_hal.py
   scripts/tools_list.py scripts/models_list.py scripts/planner.py
+  scripts/code_plan.py
   scripts/critic.py scripts/executor.py scripts/learn.py scripts/env_status.py
   tools/write_readme.py tools/markdown_guard.py
 )
@@ -170,6 +171,7 @@ _smoke execute-smoke.sh
 _smoke learn-smoke.sh
 _smoke env-status-smoke.sh
 _smoke provider-boundary-smoke.sh
+_smoke code-plan-smoke.sh
 _smoke provenance-transport-smoke.sh
 _smoke provenance-presentation-smoke.sh
 _smoke docs-smoke.sh
