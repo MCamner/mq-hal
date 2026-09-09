@@ -10,9 +10,11 @@ echo "SMOKE: provenance-transport"
 TMP="$(mktemp -d)"
 trap 'rm -rf "$TMP"' EXIT
 
-# A provenance record carrying a reason code mq-hal has never heard of and a
-# sentinel next_action. Transport must not care about either.
-RECORD='{"schema":"mq.stack-provenance.v1","generated_at":"2026-09-08T00:00:00Z","components":[{"name":"mq-agent","status":"WARN","reasons":["RTP999_FUTURE_REASON"]}],"summary":{"next_action":"SENTINEL"}}'
+# A provenance record carrying a reason code mq-hal has never heard of, a
+# sentinel next_action, and fields from a future schema revision — one at the
+# top level, one nested inside a component. Transport must not care about any
+# of them, and must not drop what it cannot name.
+RECORD='{"schema":"mq.stack-provenance.v1","generated_at":"2026-09-08T00:00:00Z","components":[{"name":"mq-agent","status":"WARN","reasons":["RTP999_FUTURE_REASON"],"future_component_field":["a","b"]}],"summary":{"next_action":"SENTINEL"},"future_extension":{"opaque":true,"value":42}}'
 
 _fake() {
   # _fake <name> <body>
@@ -40,11 +42,11 @@ _fake wrongschema "printf '%s\n' '{\"schema\":\"mq.execution-outcome.v1\",\"comp
 printf '%s\n' '#!/usr/bin/env bash' >"$TMP/noexec"
 chmod 000 "$TMP/noexec"
 
-echo "[1/10] syntax"
+echo "[1/11] syntax"
 python3 -m py_compile hal/provenance.py
 python3 -m py_compile hal/stack.py
 
-echo "[2/10] mq-agent missing — unavailable, rc 127"
+echo "[2/11] mq-agent missing — unavailable, rc 127"
 env -u MQ_AGENT_BIN HOME="$TMP/emptyhome" PATH="/usr/bin:/bin" \
   python3 -c "
 from hal.provenance import read_provenance
@@ -56,7 +58,7 @@ assert 'not found' in r.error, r.error
 print('   rc=127', r.error)
 "
 
-echo "[3/10] timeout — unavailable, rc 124"
+echo "[3/11] timeout — unavailable, rc 124"
 MQ_AGENT_BIN="$TMP/slow" python3 -c "
 from hal.provenance import read_provenance
 r = read_provenance(timeout=1)
@@ -65,7 +67,7 @@ assert r.returncode == 124, r.returncode
 print('   rc=124', r.error)
 "
 
-echo "[4/10] OSError — unavailable"
+echo "[4/11] OSError — unavailable"
 MQ_AGENT_BIN="$TMP/noexec" python3 -c "
 from hal.provenance import read_provenance
 r = read_provenance()
@@ -75,7 +77,7 @@ assert r.error, 'OSError message must be preserved'
 print('   ', r.error)
 "
 
-echo "[5/10] non-zero exit — unavailable, stderr preserved"
+echo "[5/11] non-zero exit — unavailable, stderr preserved"
 MQ_AGENT_BIN="$TMP/nonzero" python3 -c "
 from hal.provenance import read_provenance
 r = read_provenance()
@@ -85,7 +87,7 @@ assert 'exploded' in r.error, r.error
 print('   rc=3', r.error)
 "
 
-echo "[6/10] unparseable output — unavailable, raw preserved"
+echo "[6/11] unparseable output — unavailable, raw preserved"
 MQ_AGENT_BIN="$TMP/badjson" python3 -c "
 from hal.provenance import read_provenance
 r = read_provenance()
@@ -95,7 +97,7 @@ assert 'parse' in r.error, r.error
 print('   ', r.error)
 "
 
-echo "[7/10] wrong top-level shape — array and string both rejected"
+echo "[7/11] wrong top-level shape — array and string both rejected"
 for f in array string; do
   MQ_AGENT_BIN="$TMP/$f" python3 -c "
 from hal.provenance import read_provenance
@@ -106,7 +108,7 @@ assert 'not an object' in r.error, r.error
 done
 echo "   array and string rejected"
 
-echo "[8/10] object with the wrong contract identity — rejected"
+echo "[8/11] object with the wrong contract identity — rejected"
 MQ_AGENT_BIN="$TMP/wrongschema" python3 -c "
 from hal.provenance import read_provenance
 r = read_provenance()
@@ -116,7 +118,7 @@ assert 'execution-outcome' in r.error, r.error
 print('   ', r.error)
 "
 
-echo "[9/10] a provenance record is handed through unchanged"
+echo "[9/11] a provenance record is handed through unchanged"
 MQ_AGENT_BIN="$TMP/ok" RECORD="$RECORD" python3 -c "
 import json, os
 from hal.provenance import read_provenance
@@ -129,10 +131,14 @@ assert r.data == expected, f'record was altered in transit:\n{r.data}\n{expected
 # The consumer must not interpret an unknown reason code, only carry it.
 assert r.data['components'][0]['reasons'] == ['RTP999_FUTURE_REASON']
 assert r.data['summary']['next_action'] == 'SENTINEL'
-print('   RTP999 and SENTINEL survived transport verbatim')
+# Fields from a schema revision mq-hal has never seen must survive too — at the
+# top level and nested. A consumer that rebuilds the record would drop these.
+assert r.data['future_extension'] == {'opaque': True, 'value': 42}
+assert r.data['components'][0]['future_component_field'] == ['a', 'b']
+print('   RTP999, SENTINEL and unknown future fields survived verbatim')
 "
 
-echo "[10/10] transport never speaks provenance vocabulary"
+echo "[10/11] transport never speaks provenance vocabulary"
 python3 -c "
 import ast, sys
 
@@ -167,6 +173,25 @@ if found:
     print('transport names provenance vocabulary: ' + ', '.join(sorted(set(found))), file=sys.stderr)
     raise SystemExit(1)
 print('   no status, reasons, next_action or verdict vocabulary in code')
+"
+
+echo "[11/11] the transport constant matches what the repo declares it consumes"
+python3 -c "
+import json
+from hal.provenance import PROVENANCE_SCHEMA
+
+# Two local declarations name the same contract: the repo contract, which the
+# cross-repo compatibility engine reads, and the constant transport compares
+# against. Nothing else binds them, so they can drift apart while both files
+# stay valid. .mq is deliberately not read at runtime — the constant belongs in
+# the module. This only forbids the drift.
+contract = json.load(open('.mq/repo-contract.json'))
+consumes = contract['compatibility']['consumes']
+assert PROVENANCE_SCHEMA in consumes, (
+    f'hal/provenance.py expects {PROVENANCE_SCHEMA!r}, '
+    f'but .mq/repo-contract.json consumes {consumes!r}'
+)
+print('   ' + PROVENANCE_SCHEMA + ' declared in both')
 "
 
 echo "OK: provenance-transport smoke passed"

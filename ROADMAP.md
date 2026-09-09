@@ -1286,9 +1286,17 @@ is given.
   something `mq-agent` owns.
 
   A record that passes those checks is handed on **unchanged**. The proof is
-  a record carrying `RTP999_FUTURE_REASON` and a sentinel `next_action`,
-  asserted equal to what the producer emitted: transport does not know that
-  `RTP999` is unfamiliar, and must not learn.
+  a record carrying `RTP999_FUTURE_REASON`, a sentinel `next_action`, and
+  fields from a future schema revision — one at the top level, one nested in
+  a component — asserted equal to what the producer emitted. Transport does
+  not know that `RTP999` is unfamiliar, and must not learn; it must also not
+  drop what it cannot name.
+
+  The contract is named twice locally: `compatibility.consumes` in
+  `.mq/repo-contract.json`, which the cross-repo compatibility engine reads,
+  and `PROVENANCE_SCHEMA` in the transport module. `.mq` is deliberately not
+  read at runtime — the constant belongs in the module — so a test binds the
+  two instead, and fails in either direction if they drift apart.
 - [ ] **5.4c — presentation and conformance.** Render the record, and prove by
   test that nothing is derived from it.
 
