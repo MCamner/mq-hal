@@ -173,17 +173,17 @@ SCHEMA_KEYWORDS = frozenset(
 def _check_schema(schema: Any, path: str = "schema") -> None:
     """Refuse a request this module could not honestly verify.
 
-    Two rules, both enforced before anything is announced or sent.
-
     The top level must be an object, because that is what the result type
     promises: `ProviderResult.response` is a `dict`, so a schema asking for an
     array or a string could succeed and still have nowhere to put its answer.
 
-    And every keyword must be one `conforms` implements. A schema carrying
-    `items` or `enum` reads as a constraint the module never checks, so the
-    request would claim an enforcement that does not happen and a violating
-    response would come back marked valid. Refusing here keeps the two in step:
-    what is asked for is what is verified.
+    Every keyword must be one `conforms` implements, and so must every keyword
+    *value*. A schema carrying `items`, or a `type` of `"null"`, reads as a
+    constraint the module never checks: the request would claim an enforcement
+    that does not happen and a violating response would come back marked valid.
+    Permitting a keyword is not the same as understanding what was written in
+    it, and the gap is the same either way. Refusing both keeps the request and
+    the check in step — what is asked for is what is verified.
     """
     if not isinstance(schema, dict):
         raise ValueError(f"{path} must be a JSON Schema object, got {type(schema).__name__}")
@@ -194,6 +194,32 @@ def _check_schema(schema: Any, path: str = "schema") -> None:
             f"{path} uses JSON Schema keywords this module does not verify: "
             f"{', '.join(unsupported)}. Supported: {', '.join(sorted(SCHEMA_KEYWORDS))}"
         )
+
+    # `conforms` looks its type up in _JSON_TYPES and silently checks nothing
+    # when the lookup misses, so a type it does not hold must not get this far.
+    if "type" in schema:
+        declared = schema["type"]
+        if not isinstance(declared, str) or declared not in _JSON_TYPES:
+            raise ValueError(
+                f"{path}.type is {declared!r}, which this module cannot check. "
+                f"Supported types: {', '.join(sorted(_JSON_TYPES))}"
+            )
+
+    # A string here would be iterated character by character, requiring keys
+    # nobody asked for; a non-string entry could never match one.
+    if "required" in schema:
+        required = schema["required"]
+        if not isinstance(required, list) or not all(isinstance(n, str) for n in required):
+            raise ValueError(f"{path}.required must be a list of property names")
+
+    # Only False is read as a restriction. A subschema here would express one
+    # that is never applied.
+    if "additionalProperties" in schema:
+        if not isinstance(schema["additionalProperties"], bool):
+            raise ValueError(
+                f"{path}.additionalProperties must be true or false; "
+                f"a subschema there is not enforced"
+            )
 
     if path == "schema" and schema.get("type") != "object":
         raise ValueError(
