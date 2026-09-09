@@ -9,10 +9,10 @@ export PYTHONPYCACHEPREFIX="$STATE_DIR/pycache"
 
 echo "SMOKE: cloud provider boundary"
 
-echo "[1/12] syntax check"
+echo "[1/14] syntax check"
 python3 -m py_compile "$ROOT/hal/provider.py"
 
-echo "[2/12] a missing credential fails before any network I/O or egress"
+echo "[2/14] a missing credential fails before any network I/O or egress"
 python3 - "$ROOT" <<'PY'
 import io
 import sys
@@ -43,7 +43,7 @@ assert buffer.getvalue() == "", f"credential-missing must emit no egress line: {
 print("  credential-missing → 0 network calls, 0 egress lines: OK")
 PY
 
-echo "[3/12] an HTTP error is a provider error, not a transport failure"
+echo "[3/14] an HTTP error is a provider error, not a transport failure"
 python3 - "$ROOT" <<'PY'
 import io
 import sys
@@ -85,7 +85,7 @@ assert result.ok is False and result.response is None
 print("  HTTP 500 → provider-http-error: OK")
 PY
 
-echo "[4/12] DNS, socket and timeout failures are transport failures"
+echo "[4/14] DNS, socket and timeout failures are transport failures"
 python3 - "$ROOT" <<'PY'
 import io
 import socket
@@ -126,7 +126,7 @@ for exc in (
 print("  transport failures → transport-unavailable, 1 egress line each: OK")
 PY
 
-echo "[5/12] unparseable and schema-breaking answers are different failures"
+echo "[5/14] unparseable and schema-breaking answers are different failures"
 python3 - "$ROOT" <<'PY'
 import io
 import json
@@ -179,7 +179,7 @@ assert answer(envelope('{}')).failure_reason == provider.SCHEMA_INVALID
 print("  response-invalid and schema-invalid stay apart: OK")
 PY
 
-echo "[6/12] a successful request reports which provider produced it"
+echo "[6/14] a successful request reports which provider produced it"
 python3 - "$ROOT" <<'PY'
 import io
 import json
@@ -228,7 +228,7 @@ assert result.provider == "openai" and result.model == "gpt-test", result
 print("  success carries provider, model and response: OK")
 PY
 
-echo "[7/12] the egress line counts the exact bytes handed to the transport"
+echo "[7/14] the egress line counts the exact bytes handed to the transport"
 python3 - "$ROOT" <<'PY'
 import io
 import json
@@ -277,7 +277,7 @@ assert declared == len(body), f"declared {declared} != {len(body)} bytes sent"
 print(f"  bytes={declared} equals the request body handed to transport: OK")
 PY
 
-echo "[8/12] the egress line is written before any network I/O"
+echo "[8/14] the egress line is written before any network I/O"
 python3 - "$ROOT" <<'PY'
 import io
 import sys
@@ -312,7 +312,7 @@ assert "cloud egress:" in seen_before_call["stderr"], (
 print("  egress announced before transfer: OK")
 PY
 
-echo "[9/12] one egress line per request, not per process"
+echo "[9/14] one egress line per request, not per process"
 python3 - "$ROOT" <<'PY'
 import io
 import sys
@@ -341,7 +341,7 @@ assert "model=gpt-two" in lines[1], lines
 print("  3 requests → 3 egress lines, each naming its own model: OK")
 PY
 
-echo "[10/12] the egress line carries no credential and no payload content"
+echo "[10/14] the egress line carries no credential and no payload content"
 python3 - "$ROOT" <<'PY'
 import io
 import sys
@@ -374,7 +374,7 @@ for field in ("provider=", "model=", "kind=", "bytes="):
 print("  egress line is metadata only: OK")
 PY
 
-echo "[11/12] selection is explicit; the transport chooses no provider"
+echo "[11/14] selection is explicit; the transport chooses no provider"
 python3 - "$ROOT" <<'PY'
 import ast
 import sys
@@ -414,7 +414,7 @@ else:
 print("  selection refuses unnamed providers; transport holds no policy: OK")
 PY
 
-echo "[12/12] a local command cannot become a cloud command through config"
+echo "[12/14] a local command cannot become a cloud command through config"
 python3 - "$ROOT" <<'PY'
 import ast
 import json
@@ -443,6 +443,113 @@ profiles = json.loads((root / "config" / "models.json").read_text())["profiles"]
 carrying = {name for name, p in profiles.items() if "provider" in p}
 assert not carrying, f"config/models.json can select a provider: {carrying}"
 print(f"  {len(LOCAL)} local commands hold no provider import; config has no switch: OK")
+PY
+
+echo "[13/14] the destination is fixed in code; the environment cannot move it"
+python3 - "$ROOT" <<'PY'
+import io
+import os
+import sys
+from unittest.mock import patch
+
+# Set before the import: the module reads its destination at import time, so a
+# test that imports first would prove nothing about an env-settable constant.
+os.environ["OPENAI_BASE_URL"] = "https://attacker.example/v1"
+os.environ["OPENAI_API_KEY"] = "sk-test"
+
+sys.path.insert(0, sys.argv[1])
+from hal import provider
+
+seen = []
+
+class Answer:
+    def read(self):
+        return b'{"output": [{"type": "message", "content": [{"type": "output_text", "text": "{\\"ok\\": true}"}]}]}'
+    def __enter__(self):
+        return self
+    def __exit__(self, *a):
+        return False
+
+def capture(request, *a, **k):
+    seen.append(request.full_url)
+    return Answer()
+
+with patch("urllib.request.urlopen", capture):
+    with patch.object(sys, "stderr", io.StringIO()):
+        provider.run_request(
+            provider.select_provider("openai", "gpt-test"),
+            kind="unit-test",
+            instructions="none",
+            input_text="none",
+            schema={"type": "object", "properties": {"ok": {"type": "boolean"}}, "required": ["ok"]},
+            schema_name="t",
+        )
+
+assert seen, "no request was made"
+# Rule 2: changing configuration is not consent to data egress. A credential
+# must not be redirectable to another host while the egress line still says
+# provider=openai.
+assert seen[0].startswith("https://api.openai.com/v1/"), (
+    f"OPENAI_BASE_URL moved the credential to {seen[0]}"
+)
+assert "attacker.example" not in seen[0], seen[0]
+print(f"  destination stayed {seen[0]}: OK")
+PY
+
+echo "[14/14] a schema this module cannot verify is refused before egress"
+python3 - "$ROOT" <<'PY'
+import io
+import sys
+from unittest.mock import patch
+
+sys.path.insert(0, sys.argv[1])
+from hal import provider
+
+calls = []
+buffer = io.StringIO()
+
+# Each of these reads as a constraint the module does not check. Announcing and
+# sending one would claim an enforcement that never happens, and a response
+# violating it would come back marked valid.
+REFUSED = [
+    {"type": "array", "items": {"type": "string"}},
+    {"type": "object", "properties": {"tags": {"type": "array", "items": {"type": "string"}}}},
+    {"type": "object", "properties": {"mode": {"type": "string", "enum": ["a", "b"]}}},
+    {"type": "string"},
+    {"type": "object", "anyOf": [{"required": ["a"]}]},
+]
+
+with patch.dict("os.environ", {"OPENAI_API_KEY": "sk-test"}, clear=True):
+    with patch("urllib.request.urlopen", lambda *a, **k: calls.append(1)):
+        with patch.object(sys, "stderr", buffer):
+            for schema in REFUSED:
+                try:
+                    provider.run_request(
+                        provider.select_provider("openai", "gpt-test"),
+                        kind="unit-test",
+                        instructions="none",
+                        input_text="none",
+                        schema=schema,
+                        schema_name="t",
+                    )
+                except ValueError:
+                    continue
+                raise AssertionError(f"schema was accepted but is not verified: {schema}")
+
+assert calls == [], f"a refused schema must not reach the network: {calls}"
+assert buffer.getvalue() == "", f"a refused schema must emit no egress line: {buffer.getvalue()!r}"
+
+# The supported subset still goes through, and a top-level object result is
+# what `response: dict | None` promises.
+ACCEPTED = {
+    "type": "object",
+    "properties": {"ok": {"type": "boolean"}},
+    "required": ["ok"],
+    "additionalProperties": False,
+    "description": "annotations constrain nothing, so they stay allowed",
+}
+provider._check_schema(ACCEPTED)
+print(f"  {len(REFUSED)} unverifiable schemas refused, no egress, no network: OK")
 PY
 
 echo "OK: cloud provider boundary smoke test passed"

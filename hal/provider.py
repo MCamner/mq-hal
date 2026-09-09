@@ -38,7 +38,13 @@ PROVIDER_HTTP_ERROR = "provider-http-error"
 RESPONSE_INVALID = "response-invalid"
 SCHEMA_INVALID = "schema-invalid"
 
-OPENAI_BASE_URL = os.environ.get("OPENAI_BASE_URL", "https://api.openai.com/v1")
+# Fixed in code, deliberately not read from the environment. Rule 2 of the
+# contract says changing configuration is not consent to data egress, and an
+# env-settable base URL would break that quietly: the credential would follow
+# the new host while the egress line still announced `provider=openai`. A
+# proxy, an Azure deployment or any OpenAI-compatible endpoint is a different
+# destination and belongs to its own named provider, not to this one.
+OPENAI_BASE_URL = "https://api.openai.com/v1"
 
 SUPPORTED_PROVIDERS = {"openai"}
 CREDENTIAL_ENV = {"openai": "OPENAI_API_KEY"}
@@ -157,13 +163,58 @@ _JSON_TYPES: dict[str, Any] = {
 }
 
 
+# The keywords `conforms` implements, plus two that constrain nothing and so
+# cost nothing to allow through.
+SCHEMA_KEYWORDS = frozenset(
+    {"type", "properties", "required", "additionalProperties", "title", "description"}
+)
+
+
+def _check_schema(schema: Any, path: str = "schema") -> None:
+    """Refuse a request this module could not honestly verify.
+
+    Two rules, both enforced before anything is announced or sent.
+
+    The top level must be an object, because that is what the result type
+    promises: `ProviderResult.response` is a `dict`, so a schema asking for an
+    array or a string could succeed and still have nowhere to put its answer.
+
+    And every keyword must be one `conforms` implements. A schema carrying
+    `items` or `enum` reads as a constraint the module never checks, so the
+    request would claim an enforcement that does not happen and a violating
+    response would come back marked valid. Refusing here keeps the two in step:
+    what is asked for is what is verified.
+    """
+    if not isinstance(schema, dict):
+        raise ValueError(f"{path} must be a JSON Schema object, got {type(schema).__name__}")
+
+    unsupported = sorted(set(schema) - SCHEMA_KEYWORDS)
+    if unsupported:
+        raise ValueError(
+            f"{path} uses JSON Schema keywords this module does not verify: "
+            f"{', '.join(unsupported)}. Supported: {', '.join(sorted(SCHEMA_KEYWORDS))}"
+        )
+
+    if path == "schema" and schema.get("type") != "object":
+        raise ValueError(
+            f"schema must describe a top-level object, got type="
+            f"{schema.get('type')!r}; ProviderResult.response carries a dict"
+        )
+
+    properties = schema.get("properties", {})
+    if not isinstance(properties, dict):
+        raise ValueError(f"{path}.properties must be an object")
+    for name, subschema in properties.items():
+        _check_schema(subschema, f"{path}.properties.{name}")
+
+
 def conforms(document: Any, schema: dict[str, Any]) -> bool:
     """Check a document against the subset of JSON Schema this module requests.
 
     Not a general validator: it covers `type`, `properties`, `required` and
-    `additionalProperties`, which is what the strict json_schema requests here
-    are built from. A schema using anything else is checked less strictly than
-    it reads, so keep requests inside this subset.
+    `additionalProperties`. Requests are held to that same subset by
+    `_check_schema`, so a schema reaching here never expresses more than this
+    function checks.
     """
     expected = schema.get("type")
     if expected in _JSON_TYPES:
@@ -213,6 +264,11 @@ def run_request(
     egress line; and the announcement is written before the socket opens, so
     the line means "about to be attempted" rather than "was attempted".
     """
+    # Before the credential check, and so before any egress: a schema outside
+    # the verified subset is a malformed request, not a runtime failure state,
+    # and it never becomes a `ProviderResult`.
+    _check_schema(schema)
+
     env_var = CREDENTIAL_ENV[selection.provider]
     if not os.environ.get(env_var):
         return _fail(selection, CREDENTIAL_MISSING)
@@ -262,10 +318,13 @@ def run_request(
     if not conforms(document, schema):
         return _fail(selection, SCHEMA_INVALID)
 
+    # `_check_schema` required a top-level object and `conforms` just held the
+    # document to it, so this is a dict — `ok=True` can no longer arrive with an
+    # empty response.
     return ProviderResult(
         ok=True,
         provider=selection.provider,
         model=selection.model,
         failure_reason=None,
-        response=document if isinstance(document, dict) else None,
+        response=document,
     )
