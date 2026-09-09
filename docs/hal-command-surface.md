@@ -446,6 +446,16 @@ cloud egress: provider=openai model=gpt-5.4-mini kind=code-plan bytes=1832
 
 The credential is `OPENAI_API_KEY`, read from the process environment only.
 
+The answer is required to be a plan in the same format `mq-hal plan` produces,
+so a cloud plan and a local one can be read side by side and both are accepted
+by `mq-hal critic`. The provider's strict JSON-schema mode has rules the local
+format is not written to — every object must carry
+`additionalProperties: false`, and every property must be listed in `required`
+— so `code_plan.py` derives a narrowed copy of `planner.PLAN_SCHEMA` for the
+request. The local format is not edited to satisfy a remote validator, and the
+narrowing only removes freedom: what comes back is still a plan by the local
+definition.
+
 Exit codes follow the contract, and the precise failure state is in the message
 and in `--json` rather than in the code:
 

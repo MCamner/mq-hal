@@ -9,11 +9,11 @@ export PYTHONPYCACHEPREFIX="$STATE_DIR/pycache"
 
 echo "SMOKE: mq-hal code-plan"
 
-echo "[1/10] syntax check"
+echo "[1/11] syntax check"
 python3 -m py_compile "$ROOT/scripts/code_plan.py"
 bash -n "$ROOT/bin/mq-hal"
 
-echo "[2/10] the two surfaces are different commands, not one command with a flag"
+echo "[2/11] the two surfaces are different commands, not one command with a flag"
 python3 - "$ROOT" <<'PY'
 import ast
 import re
@@ -51,7 +51,7 @@ assert importers == ["code_plan.py"], f"provider transport reached from: {import
 print("  plan → planner.py, code-plan → code_plan.py, one importer of the transport: OK")
 PY
 
-echo "[3/10] a request that does not name a provider is not made"
+echo "[3/11] a request that does not name a provider is not made"
 python3 - "$ROOT" <<'PY'
 import io
 import sys
@@ -95,7 +95,7 @@ assert calls == [], f"an invocation error must not reach the network: {calls}"
 print(f"  {len(REFUSED)} incomplete invocations refused, 0 network calls: OK")
 PY
 
-echo "[4/10] a missing credential is exit 3, before any transfer"
+echo "[4/11] a missing credential is exit 3, before any transfer"
 python3 - "$ROOT" <<'PY'
 import io
 import sys
@@ -125,7 +125,7 @@ assert out.getvalue() == "", out.getvalue()
 print("  credential-missing → exit 3, no egress line, no network: OK")
 PY
 
-echo "[5/10] every provider failure is exit 4 and says which state it was"
+echo "[5/11] every provider failure is exit 4 and says which state it was"
 python3 - "$ROOT" <<'PY'
 import io
 import json
@@ -203,7 +203,7 @@ assert not missing, f"failure states with no exit code: {missing}"
 print(f"  {len(CASES)} provider failures → exit 4, each named; all states mapped: OK")
 PY
 
-echo "[6/10] a plan that matches the schema is exit 0 and says who produced it"
+echo "[6/11] a plan that matches the schema is exit 0 and says who produced it"
 python3 - "$ROOT" <<'PY'
 import io
 import json
@@ -259,7 +259,7 @@ assert "cloud egress:" in err and "cloud egress:" not in out
 print("  exit 0, provider named, --json clean on stdout: OK")
 PY
 
-echo "[7/10] a plan the schema refuses never reaches the operator as a plan"
+echo "[7/11] a plan the schema refuses never reaches the operator as a plan"
 python3 - "$ROOT" <<'PY'
 import io
 import json
@@ -307,7 +307,7 @@ for plan in BROKEN:
 print(f"  {len(BROKEN)} malformed plans → schema-invalid, nothing rendered: OK")
 PY
 
-echo "[8/10] what leaves is the instructions, one repo name and the goal"
+echo "[8/11] what leaves is the instructions, one repo name and the goal"
 python3 - "$ROOT" <<'PY'
 import io
 import json
@@ -367,7 +367,7 @@ assert "sk-test" not in body
 print(f"  request carries 1 repo name and the goal; {len(others)} other repos stayed home: OK")
 PY
 
-echo "[9/10] the egress line is announced before the transfer, once per request"
+echo "[9/11] the egress line is announced before the transfer, once per request"
 python3 - "$ROOT" <<'PY'
 import io
 import sys
@@ -398,7 +398,7 @@ assert "provider=openai" in line[0] and "model=gpt-5.4-mini" in line[0], line[0]
 print(f"  announced before transfer: {line[0]}")
 PY
 
-echo "[10/10] the command surface documents cloud execution"
+echo "[10/11] the command surface documents cloud execution"
 python3 - "$ROOT" <<'PY'
 import sys
 from pathlib import Path
@@ -420,6 +420,89 @@ for required in ("--provider", "sends data off the machine", "cloud egress:", "O
 for code in ("| 0 |", "| 2 |", "| 3 |", "| 4 |"):
     assert code in detail, f"exit code row {code} missing"
 print("  cloud execution is named in both documented surfaces: OK")
+PY
+
+echo "[11/11] the schema sent to the provider narrows the local one, and only here"
+python3 - "$ROOT" <<'PY'
+import copy
+import io
+import json
+import sys
+from contextlib import redirect_stderr, redirect_stdout
+from unittest.mock import patch
+
+root = sys.argv[1]
+sys.path.insert(0, f"{root}/scripts")
+sys.path.insert(0, root)
+import code_plan
+import planner
+from hal import provider
+
+# OpenAI's strict mode refuses an object without additionalProperties: false,
+# and requires every declared property to be listed in required. The local plan
+# format is not written to those rules and must not be edited to satisfy a
+# remote validator, so the adjustment lives in the cloud command.
+before = copy.deepcopy(planner.PLAN_SCHEMA)
+strict = code_plan.strict_schema(planner.PLAN_SCHEMA)
+assert planner.PLAN_SCHEMA == before, "the local plan format was mutated"
+
+
+def objects(schema, path="schema"):
+    if isinstance(schema, dict):
+        if isinstance(schema.get("properties"), dict):
+            yield path, schema
+        for name, sub in (schema.get("properties") or {}).items():
+            yield from objects(sub, f"{path}.properties.{name}")
+        if isinstance(schema.get("items"), dict):
+            yield from objects(schema["items"], f"{path}.items")
+
+
+seen = 0
+for path, obj in objects(strict):
+    assert obj["additionalProperties"] is False, path
+    assert obj["required"] == list(obj["properties"]), path
+    seen += 1
+assert seen >= 2, "the fixture must reach a nested object, not only the root"
+
+# The transport still has to be able to verify what is asked for — B0's rule.
+provider._check_schema(strict)
+
+# Narrowing only: a document the provider is held to is still a plan by the
+# local definition. The reverse is not claimed and is not true.
+assert provider.conforms(planner.SAMPLE_PLAN, strict), "SAMPLE_PLAN fails the strict form"
+loose = {**planner.SAMPLE_PLAN,
+         "steps": [{"id": 1, "description": "x", "requires_confirm": False}]}
+assert provider.conforms(loose, planner.PLAN_SCHEMA), "fixture is not loose-but-valid"
+assert not provider.conforms(loose, strict), "the strict form must be strictly narrower"
+
+# And it is the strict form that actually goes out.
+captured = {}
+
+
+class Fake:
+    def __enter__(self):
+        return self
+    def __exit__(self, *_a):
+        return False
+    def read(self):
+        return b"not json"
+
+
+def capture(request, timeout=None):
+    captured["body"] = request.data
+    return Fake()
+
+
+with patch.dict("os.environ", {"OPENAI_API_KEY": "sk-test"}, clear=True):
+    with patch("urllib.request.urlopen", capture):
+        with redirect_stdout(io.StringIO()), redirect_stderr(io.StringIO()):
+            code_plan.main(["--provider", "openai", "--repo", "mq-hal", "x"])
+
+sent = json.loads(captured["body"].decode("utf-8"))["text"]["format"]
+assert sent["strict"] is True, sent
+for path, obj in objects(sent["schema"]):
+    assert obj["additionalProperties"] is False, f"sent schema is not strict at {path}"
+print(f"  {seen} objects narrowed, local format untouched, strict form sent: OK")
 PY
 
 echo "OK: mq-hal code-plan smoke test passed"

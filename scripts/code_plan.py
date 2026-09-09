@@ -120,6 +120,35 @@ def build_parser() -> argparse.ArgumentParser:
     return parser
 
 
+def strict_schema(schema: Any) -> Any:
+    """`PLAN_SCHEMA` in the shape the provider's strict mode insists on.
+
+    OpenAI refuses a strict `json_schema` whose objects do not carry
+    `additionalProperties: false`, and whose `required` does not list every
+    declared property. The local plan format is not written to those rules, and
+    it should not be: `planner.PLAN_SCHEMA` is what a local model is asked for,
+    and editing it to satisfy a remote validator would move a boundary in the
+    wrong direction. The adjustment belongs to the command that talks to the
+    provider, so it happens here, on a copy.
+
+    Both changes only narrow. Every document satisfying the result satisfies
+    `PLAN_SCHEMA` too, so what comes back is still a plan by the local
+    definition — a nullable field becomes one the answer must mention, not one
+    it must fill.
+    """
+    if isinstance(schema, list):
+        return [strict_schema(item) for item in schema]
+    if not isinstance(schema, dict):
+        return schema
+
+    out = {key: strict_schema(value) for key, value in schema.items()}
+    properties = out.get("properties")
+    if isinstance(properties, dict):
+        out["additionalProperties"] = False
+        out["required"] = list(properties)
+    return out
+
+
 def request_input(repo: str, goal: str) -> str:
     """Everything about the operator's machine that this request carries.
 
@@ -180,7 +209,7 @@ def main(argv: list[str]) -> int:
         kind=REQUEST_KIND,
         instructions=instructions,
         input_text=request_input(repo, goal),
-        schema=PLAN_SCHEMA,
+        schema=strict_schema(PLAN_SCHEMA),
         schema_name="mq_hal_plan",
     )
 
