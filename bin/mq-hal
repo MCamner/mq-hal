@@ -235,6 +235,15 @@ case "${1:-}" in
     exec python3 "$ROOT/scripts/planner.py" "$@"
     ;;
 
+  # The only arm that can reach a network. Deliberately not an option on
+  # `plan`: docs/CLOUD_PROVIDER_BOUNDARY.md rule 2 puts cloud execution in the
+  # command surface, so it is a different command with the provider named in
+  # it. See docs/hal-command-surface.md.
+  code-plan)
+    shift || true
+    exec python3 "$ROOT/scripts/code_plan.py" "$@"
+    ;;
+
   critic)
     shift || true
     exec python3 "$ROOT/scripts/critic.py" "$@"

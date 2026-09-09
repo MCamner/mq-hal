@@ -410,7 +410,64 @@ Create a structured local plan for a goal.
 | Flags | `--json`, `--out <file>`, `--no-ai`, `--sample`, `--model <profile>` |
 
 Uses Ollama when available and falls back to a deterministic stub plan with
-`--no-ai` or when the model is unavailable.
+`--no-ai` or when the model is unavailable. Local only: `plan` holds no import
+of the provider transport, so no flag and no config edit sends a goal off the
+machine.
+
+---
+
+### `code-plan`
+
+Ask a named external provider for a plan.
+**This command sends data off the machine.**
+
+| Property | Value |
+|---|---|
+| `mq-hal` | `mq-hal code-plan --provider openai --repo mq-hal "goal"` |
+| Backend | `scripts/code_plan.py` → `hal/provider.py` |
+| Read-only | Yes (generates a plan only) |
+| Memory write | No |
+| Network | Yes — `https://api.openai.com/v1`, fixed in code |
+| Flags | `--provider <name>` (required), `--repo <name>` (required), `--model <name>`, `--json` |
+
+`--provider` has no default. A request that does not name a provider is not
+made, and there is no configuration that turns any other command into this one:
+`docs/CLOUD_PROVIDER_BOUNDARY.md` rule 2 puts cloud execution in the command
+surface rather than in a model profile.
+
+What is sent: the system instructions in `prompts/code-plan.txt`, the one
+repository name given to `--repo`, and the goal. Not the configured repo list,
+not the active repo, not a path. Every request writes one metadata-only line to
+stderr before the transfer begins:
+
+```text
+cloud egress: provider=openai model=gpt-5.4-mini kind=code-plan bytes=1832
+```
+
+The credential is `OPENAI_API_KEY`, read from the process environment only.
+
+The answer is required to be a plan in the same format `mq-hal plan` produces,
+so a cloud plan and a local one can be read side by side and both are accepted
+by `mq-hal critic`. The provider's strict JSON-schema mode has rules the local
+format is not written to — every object must carry
+`additionalProperties: false`, and every property must be listed in `required`
+— so `code_plan.py` derives a narrowed copy of `planner.PLAN_SCHEMA` for the
+request. The local format is not edited to satisfy a remote validator, and the
+narrowing only removes freedom: what comes back is still a plan by the local
+definition.
+
+Exit codes follow the contract, and the precise failure state is in the message
+and in `--json` rather than in the code:
+
+| Code | Meaning |
+| --- | --- |
+| 0 | a plan was returned and matched the schema |
+| 2 | invocation error — no provider named, no goal, unknown provider |
+| 3 | `credential-missing` — nothing left the machine |
+| 4 | `transport-unavailable`, `provider-http-error`, `response-invalid` or `schema-invalid` |
+
+Exit 3 and exit 4 differ in whether anything was transferred: exit 3 fails
+before network I/O and writes no egress line.
 
 ---
 
