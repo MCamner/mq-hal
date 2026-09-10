@@ -3,7 +3,7 @@
 Local operator layer for the MQ stack.
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
-[![Version](https://img.shields.io/badge/version-2.4.0-blue)](VERSION)
+[![Version](https://img.shields.io/badge/version-2.5.0-blue)](VERSION)
 
 `mq-hal` gives a human-friendly command surface for local repo status, stack
 status, release status, runtime health, model-routing evidence, mqobsidian context readiness, and safe
@@ -112,6 +112,7 @@ Rendered from live command output by
 | Dashboard | `mq-hal`, `mq-hal dashboard` |
 | Session memory | `mq-hal session`, `mq-hal last`, `mq-hal timeline` |
 | Operator action | `mq-hal next`, `mq-hal fix`, `mq-hal open <file>` |
+| Planning | `mq-hal plan` (local), `mq-hal code-plan --provider openai` (cloud) |
 | Router | `mq-hal "prompt"`, `--raw-intent`, `--explain-intent`, `--confirm` |
 
 The canonical command list is [docs/COMMAND_SURFACE.md](docs/COMMAND_SURFACE.md):
@@ -134,6 +135,7 @@ Rules:
 * `fix-doctor` prints repair plans but executes nothing
 * `execute` dry-runs by default and requires `--confirm`
 * session memory is local and can be disabled
+* only `code-plan` reaches an external provider, and only when `--provider` names one — no configuration moves another command across that line
 
 See [docs/INTENT_CONTRACT.md](docs/INTENT_CONTRACT.md).
 
@@ -197,11 +199,9 @@ Do not put HAL business logic in `macos-scripts`; expose it through a thin
 
 ## Roadmap
 
-Current release is v2.4.0 (Runtime Provenance Presentation). It shows which
-code the stack is actually running, read from the `mq.stack-provenance.v1`
-record `mq-agent` produces; `mq-hal` displays that record and derives no
-status, severity or remedy of its own. Full release map:
-[ROADMAP.md](ROADMAP.md).
+Current release is v2.5.0 (Explicit Cloud Code Planning): cloud code planning
+through `mq-hal code-plan`, while existing planning and routing commands stay
+local-first. Full release map: [ROADMAP.md](ROADMAP.md).
 
 ## Docs
 

@@ -45,7 +45,7 @@ It should be:
 Latest stable release:
 
 ```text
-v2.4.0 — Runtime Provenance Presentation
+v2.5.0 — Explicit Cloud Code Planning
 ```
 
 Completed foundation:
@@ -120,6 +120,7 @@ Maintenance — keep routing advisory until a fresh evidence set passes the gate
 | v2.2.0  | Operator feedback polish                             | Done    |
 | v2.3.0  | Local-First Model Routing Control Room               | Done    |
 | v2.4.0  | Runtime Provenance Presentation                      | Done    |
+| v2.5.0  | Explicit Cloud Code Planning                         | Done    |
 
 ---
 
@@ -1339,6 +1340,53 @@ on `status`, never on a reason code, or a new code from `mq-agent` becomes a
 crash or a silent drop in `mq-hal`.
 
 See `docs/INTEGRATION.md` for the durable rule.
+
+---
+
+## v2.5.0 — Explicit Cloud Code Planning
+
+Status: Complete. `mq-hal` can reach an external model provider, from one
+command that says so, and every other command stayed where it was.
+
+### Goal
+
+Give the operator a cloud-backed plan without giving configuration the power
+to send a local command's data off the machine.
+
+### What shipped
+
+```text
+A0  #32   the trust boundary contract, written before the code
+A1  #33   the provider transport
+B0  #34   the schema capability the plan format needs
+B1  #35   mq-hal code-plan, verified against a live provider
+    #36   the reference implementation archived as a tag
+```
+
+Two release-reliability fixes landed in the same window and are part of this
+release: `#31` stopped a release gate from opening an interactive prompt, and
+`#37` made `release-check.sh` notice a previously declared version that was
+tagged and never published.
+
+### Definition of Done
+
+- [x] Existing local commands remain local.
+- [x] Cloud execution requires an explicit `code-plan` command.
+- [x] Provider selection is explicit and has no implicit fallback.
+- [x] Missing credentials cause no network egress.
+- [x] Every outbound request emits metadata-only egress evidence.
+- [x] Cloud responses are validated against the plan contract.
+- [x] OpenAI strict-schema adaptation does not mutate the local plan schema.
+- [x] Human and `--json` output preserve stdout/stderr separation.
+- [x] Provider failure states map to documented exit codes.
+- [x] Public-safe live provider verification has passed.
+- [x] Provider and code-plan smoke tests run from `release-check.sh`.
+- [x] Release-history publication guard is active.
+- [x] README, ROADMAP, command docs and integration docs describe the boundary.
+
+The contract is `docs/CLOUD_PROVIDER_BOUNDARY.md`. The reference implementation
+it was written against is kept at the tag
+`archive/cloud-provider-reference-20260824`, not on a branch.
 
 ---
 

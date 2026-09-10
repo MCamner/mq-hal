@@ -1,7 +1,7 @@
 {
   "repo": "mq-hal",
   "role": "operator-shell",
-  "version": "2.4.0",
+  "version": "2.5.0",
   "status": "active",
   "contracts": [
     "operator_routing.v1",

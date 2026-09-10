@@ -4,6 +4,37 @@
 
 ## [Unreleased]
 
+## [2.5.0] - 2026-09-10
+
+Explicit Cloud Code Planning adds the first deliberately cloud-backed
+mq-hal command without changing the local meaning of existing commands.
+
+### Added
+
+- `mq-hal code-plan --provider openai --repo <repo> "<goal>"`.
+- Explicit provider boundary in `hal/provider.py`.
+- Versioned and validated plan-schema handling for provider responses.
+- Metadata-only cloud-egress notice before network I/O.
+- Provider boundary and code-plan smoke coverage.
+
+### Changed
+
+- OpenAI strict JSON-schema requirements are derived at the request
+  boundary without modifying the local `PLAN_SCHEMA`.
+- Release checks now detect a previously declared version that was
+  tagged but never published.
+- Release smoke tests no longer invoke interactive command surfaces
+  with inherited stdin.
+
+### Security
+
+- Existing `mq-hal plan`, `critic`, routing and model configuration
+  cannot silently switch to cloud execution.
+- Cloud execution requires explicit command-level operator intent.
+- Missing credentials fail before egress.
+- Provider, transport, response and schema failures remain distinct.
+- No implicit provider fallback is permitted.
+
 ## [2.4.0] - 2026-09-09
 
 Runtime Provenance Presentation shows which code the MQ stack is actually
