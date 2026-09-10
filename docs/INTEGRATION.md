@@ -428,10 +428,24 @@ When CI is green:
 ```bash
 git tag -a vX.Y.Z -m "Release X.Y.Z"
 git push origin vX.Y.Z
+```
 
-gh release create vX.Y.Z \
-  --title "mq-hal X.Y.Z — title" \
-  --notes "Short release summary."
+The tag push **is** the publication. `.github/workflows/release.yml` creates the
+release from that version's `CHANGELOG.md` section.
+
+Do not run `gh release create` afterwards. The workflow does not wait, the two
+race, and the workflow usually wins with a plain title. Wait for it, then polish
+the title if you want one:
+
+```bash
+gh release view vX.Y.Z
+gh release edit vX.Y.Z --title "mq-hal X.Y.Z — title"
+```
+
+```text
+tag push    publication
+CHANGELOG   release body
+human       optional title polish
 ```
 
 ## Release checklist for macos-scripts bridge updates
