@@ -138,19 +138,24 @@ git reset --hard origin/main
 ## release-check fails: predecessor has no published GitHub release
 
 **Cause:** The version before the current one is declared in `CHANGELOG.md`
-and was tagged, but `gh release create` was never run for it. Tagging and
-publishing are two separate manual steps (`docs/INTEGRATION.md`), and only the
-second one shows up on the releases page.
+and was tagged, but no release was ever published for it. This is history from
+before `.github/workflows/release.yml` existed, when tagging and publishing
+were two separate manual steps and only the second one showed up on the
+releases page. New tags publish themselves; an old one does not, because the
+workflow fires on the push and that push already happened.
 
 This happened to `v2.3.0` and `v2.4.0`: both were tagged and pushed, neither
 was published, and the check that existed at the time asked only whether the
 *current* version was already released — which answers "no" both before a
 release and after a forgotten one.
 
-**Fix:** Publish the missing release from its `CHANGELOG.md` section rather
-than from the tag range, which can be misleading when a tag was placed late:
+**Fix:** Publish it by hand — this is the one case where `gh release create`
+is still the right command — taking the notes from its `CHANGELOG.md` section
+rather than from the tag range, which can be misleading when a tag was placed
+late:
 
 ```bash
+bash scripts/release-notes.sh vX.Y.Z > notes.md
 gh release create vX.Y.Z \
   --title "vX.Y.Z — title from the CHANGELOG heading paragraph" \
   --notes-file notes.md \
