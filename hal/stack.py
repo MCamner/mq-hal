@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """Operator stack view backed by mq-agent cockpit JSON."""
 from __future__ import annotations
 
@@ -232,4 +231,3 @@ def render(data: dict[str, Any]) -> None:
 
 def print_json(data: dict[str, Any]) -> None:
     print(json.dumps(data, indent=2, ensure_ascii=False))
-
