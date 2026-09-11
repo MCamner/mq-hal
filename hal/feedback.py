@@ -23,6 +23,20 @@ STATUS_ALIASES = {
     "UNKNOWN": "UNAVAILABLE",
     "MISSING": "UNAVAILABLE",
     "MISS": "UNAVAILABLE",
+    # mq_stack_cockpit.v1 vocabulary. Without these every cockpit value fell
+    # through to UNAVAILABLE, so a healthy stack announced itself as broken.
+    # gate: GO | NO-GO | —
+    "GO": "PASS",
+    "NO-GO": "WARN",
+    # contract: READY | REVIEW | DRIFT | BLOCKED | —   (READY aliased above)
+    "REVIEW": "WARN",
+    "DRIFT": "WARN",
+    "NOT READY": "WARN",
+    "BLOCKED": "FAIL",
+    # brain_export.status: fresh | aging | stale | none | unknown
+    "FRESH": "PASS",
+    "AGING": "WARN",
+    "STALE": "WARN",
 }
 
 
