@@ -15,12 +15,11 @@ from pathlib import Path
 from typing import Any
 
 try:
+    from hal.brain import BRAIN_FOLDER_SOURCES
     from hal.feedback import render_feedback, surface_feedback
 except ModuleNotFoundError:  # direct script execution outside the repo root
-    from feedback import (  # type: ignore[no-redef, import-not-found]
-        render_feedback,
-        surface_feedback,
-    )
+    from brain import BRAIN_FOLDER_SOURCES
+    from feedback import render_feedback, surface_feedback
 
 
 OLLAMA_URL = os.environ.get("OLLAMA_URL", "http://localhost:11434").rstrip("/")
@@ -191,8 +190,11 @@ def probe_brain() -> ProbeResult:
         "detail": str(BRAIN_ROOT) if exists else f"{BRAIN_ROOT} not found",
     })
     if exists:
-        expected = ["memory", "learn", "truth", "reviews"]
-        missing = [name for name in expected if not (BRAIN_ROOT / name).exists()]
+        missing = [
+            name
+            for name, sources in BRAIN_FOLDER_SOURCES.items()
+            if not any((BRAIN_ROOT / source).is_dir() for source in sources)
+        ]
         checks.append({
             "name": "folders",
             "status": "RUNNING" if not missing else "WARN",
