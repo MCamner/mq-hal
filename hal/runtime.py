@@ -18,8 +18,11 @@ try:
     from hal.brain import BRAIN_FOLDER_SOURCES
     from hal.feedback import render_feedback, surface_feedback
 except ModuleNotFoundError:  # direct script execution outside the repo root
-    from brain import BRAIN_FOLDER_SOURCES
-    from feedback import render_feedback, surface_feedback
+    from brain import BRAIN_FOLDER_SOURCES  # type: ignore[no-redef, import-not-found]
+    from feedback import (  # type: ignore[no-redef, import-not-found]
+        render_feedback,
+        surface_feedback,
+    )
 
 
 OLLAMA_URL = os.environ.get("OLLAMA_URL", "http://localhost:11434").rstrip("/")
