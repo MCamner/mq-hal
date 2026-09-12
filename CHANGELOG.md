@@ -4,6 +4,32 @@
 
 ## [Unreleased]
 
+### Fixed
+
+- `mq-hal stack` reads the cockpit contract `mq-agent` actually emits. The view
+  still expected `components[]` / `name` / `status` / `overall`, while
+  `mq-agent stack cockpit --json` emits `repos[]` / `repo` / `gate` /
+  `overall_gate` under `mq_stack_cockpit.v1`. Cockpit placeholder dashes are
+  now read as absent rather than as operator statuses, and the shared feedback
+  normalizer knows the cockpit vocabulary — `GO`, `NO-GO`, `REVIEW`, `DRIFT`,
+  `BLOCKED`, `fresh`, `aging`, `stale`. The smoke case is copied from the real
+  cockpit-v1 shape, so the test no longer agrees with an imaginary producer.
+  No routing authority moves into `mq-hal`; this stays a presentation fix.
+
+- `mq-hal brain` and `mq-hal runtime` find truth exports where `mq-agent` writes
+  them. `mq-agent` writes stack truth under `memory/stack-truth/` while `mq-hal`
+  probed only a top-level `truth/`, so `brain` reported zero truth exports and
+  `runtime` warned `missing: truth` with the producer output sitting there.
+  Accepted locations are centralized in `BRAIN_FOLDER_SOURCES` and both commands
+  read the same mapping. Freshness and aging remain a separate concern; no
+  scheduler was added.
+
+- Two module invariants that the rebuilt ports had reintroduced: `hal/stack.py`
+  regained a shebang despite having no `__main__` and never being executed
+  directly, and the script-mode fallback imports in `hal/brain.py` and
+  `hal/runtime.py` lost their explicit `type: ignore[no-redef,
+  import-not-found]` annotations. Behaviour is unchanged.
+
 ## [2.5.0] - 2026-09-10
 
 Explicit Cloud Code Planning adds the first deliberately cloud-backed
