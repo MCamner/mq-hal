@@ -7,6 +7,8 @@
 #   exits 0 (the `status` field carries the verdict). Consumed by mq-agent's
 #   `stack release --all --preflight`. --json implies read-only and network-free
 #   (the GitHub lookup is skipped), matching --dry-run.
+# The parity script documents CI-only Markdownlint and post-tag publication;
+# READY does not claim those separate CI workflows ran locally.
 set -uo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -188,6 +190,20 @@ if ./tools/check-command-docs.sh >/dev/null 2>&1; then
   pass "command surface consistent"
 else
   fail "command surface consistency check failed"
+fi
+
+step "Agent skills consistency"
+if bash scripts/check-skills.sh >/dev/null 2>&1; then
+  pass "agent skills consistent across Codex and Claude"
+else
+  fail "check-skills.sh failed"
+fi
+
+step "Local and CI gate parity"
+if python3 scripts/check-gate-parity.py >/dev/null 2>&1; then
+  pass "CI gate parity mappings are current"
+else
+  fail "check-gate-parity.py failed"
 fi
 
 if [[ "$JSON" -eq 1 ]]; then
