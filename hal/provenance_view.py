@@ -78,14 +78,31 @@ def _identity(identity: Any) -> str:
     Absence and uncertainty are different answers and must not collapse:
     a missing identity was never observed, while an observed identity of
     unknown quality was seen but cannot be trusted to name a commit.
+    A partial identity still carries an observed version even without a commit.
     """
     if identity is None:
         return "not observed"
     if not isinstance(identity, dict):
         return "not observed"
-    if identity.get("identity_quality") == "unknown":
+    quality = identity.get("identity_quality")
+    if quality == "unknown":
         return "identity unknown"
+    if quality == "partial":
+        version = identity.get("version")
+        if isinstance(version, str) and version:
+            return f"version {version}, commit not identified (partial)"
+        return "identity partial, version not reported"
     return _short(identity.get("commit"))
+
+
+def _checkout(checkout: Any) -> str:
+    """No checkout is different from a checkout whose HEAD was not observed."""
+    if checkout is None:
+        return "no checkout"
+    if not isinstance(checkout, dict):
+        return "checkout record not displayable"
+    head = checkout.get("head")
+    return "head unknown" if head is None else _short(head)
 
 
 def _probe(component: dict[str, Any]) -> str:
@@ -130,9 +147,7 @@ def render(record: dict[str, Any]) -> None:
         status = str(component.get("status") or "—")
         print(f"{name:<{_NAME_WIDTH}} {_styled(status)}")
 
-        checkout = component.get("checkout")
-        checkout = checkout if isinstance(checkout, dict) else {}
-        _row("checkout", _short(checkout.get("head")))
+        _row("checkout", _checkout(component.get("checkout")))
         _row("installed", _identity(component.get("installed")))
         _row("running", _identity(component.get("running")))
         _row("probe", _probe(component))
