@@ -26,7 +26,7 @@ SH
 
 # A record whose every displayed value is a sentinel, so the renderer cannot
 # pass by producing something plausible of its own. It also carries a status
-# and a reason code mq-hal has never heard of, and all four kinds of absence.
+# and a reason code mq-hal has never heard of, and distinct absence states.
 cat >"$TMP/rec_ok.json" <<'JSON'
 {
   "schema": "mq.stack-provenance.v1",
@@ -58,6 +58,24 @@ cat >"$TMP/rec_ok.json" <<'JSON'
       "installed": null,
       "running": null,
       "running_probe": {"attempted": true, "endpoint": null, "reachable": true}
+    },
+    {
+      "name": "comp-partial-wheel",
+      "status": "PASS",
+      "reasons": [],
+      "checkout": null,
+      "installed": {"version": "9.9.9-sentinel", "commit": null, "identity_quality": "partial"},
+      "running": null,
+      "running_probe": {"attempted": false, "endpoint": null, "reachable": null}
+    },
+    {
+      "name": "comp-head-unreadable",
+      "status": "WARN",
+      "reasons": [],
+      "checkout": {"head": null},
+      "installed": null,
+      "running": null,
+      "running_probe": {"attempted": false, "endpoint": null, "reachable": null}
     }
   ],
   "summary": {
@@ -96,6 +114,7 @@ python3 -m py_compile hal/provenance.py
 echo "[2/12] every displayed value comes from the record"
 MQ_AGENT_BIN="$TMP/ok" ./bin/mq-hal provenance > "$TMP/out.txt"
 for needle in comp-absent-install comp-unknown-identity comp-future-status \
+              comp-partial-wheel comp-head-unreadable \
               aaaaaaa bbbbbbb eeeeeee ddddddd; do
   grep -q "$needle" "$TMP/out.txt" || { echo "missing sentinel: $needle" >&2; exit 1; }
 done
@@ -152,12 +171,44 @@ for invented in restart reinstall rebuild "verify or update"; do
 done
 echo "   SENTINEL_ACTION_TEXT exact, no invented remedy"
 
-echo "[6/12] the four kinds of absence stay apart"
-grep -q "not observed" "$TMP/out.txt"
-grep -q "identity unknown" "$TMP/out.txt"
-grep -q "not asked" "$TMP/out.txt"
-grep -q "asked — unreachable" "$TMP/out.txt"
-echo "   not observed / identity unknown / not asked / asked — unreachable"
+echo "[6/12] observed, partial and absent identities; no checkout vs unknown HEAD"
+python3 - "$TMP/out.txt" <<'ABSENCECHECK'
+import sys
+
+lines = open(sys.argv[1]).read().splitlines()
+
+def row(component, label):
+    try:
+        start = next(i for i, line in enumerate(lines)
+                     if line.startswith(component + " "))
+    except StopIteration:
+        raise AssertionError(f"missing component: {component}") from None
+    prefix = "  " + label.ljust(12) + " "
+    for line in lines[start + 1:]:
+        if not line.strip():
+            break
+        if line.startswith(prefix):
+            return line[len(prefix):].strip()
+    raise AssertionError(f"missing {label} for {component}")
+
+expected = {
+    ("comp-absent-install", "installed"): "not observed",
+    ("comp-unknown-identity", "installed"): "identity unknown",
+    ("comp-absent-install", "probe"): "not asked",
+    ("comp-unknown-identity", "probe"): "asked — unreachable (http://sentinel/probe)",
+    ("comp-partial-wheel", "installed"): "version 9.9.9-sentinel, commit not identified (partial)",
+    ("comp-partial-wheel", "checkout"): "no checkout",
+    ("comp-head-unreadable", "checkout"): "head unknown",
+    ("comp-absent-install", "checkout"): "aaaaaaa",
+}
+for (component, label), wanted in expected.items():
+    actual = row(component, label)
+    assert actual == wanted, (
+        f"{component}.{label}: expected {wanted!r}, got {actual!r}"
+    )
+assert row("comp-partial-wheel", "checkout") != row("comp-head-unreadable", "checkout")
+ABSENCECHECK
+echo "   partial version preserved; no checkout != unknown HEAD; four absence cases distinct"
 
 echo "[7/12] colour keys on status only, unknown status stays neutral"
 python3 -c "
