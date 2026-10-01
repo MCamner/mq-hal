@@ -25,6 +25,7 @@ The detailed reference with flags, examples, and backend notes is in
 | `runtime` | — | No | No | No | — |
 | `provenance` | — | No | No | No | — |
 | `route` | — | No | No | No | — |
+| `feedback` | — | No | No | No | `feedback` |
 | `dashboard` | no-argument `mq-hal` | No | No | No | — |
 | `repo-status` | `repo` | No | No | No | `hal repo-status` |
 | `ci` | `ci-status` | No | No | No | `hal ci` |
