@@ -4,6 +4,15 @@
 
 ## [Unreleased]
 
+### Added
+
+- `mq-hal feedback` is a read-only operator view over mq-agent Feedback
+  Engine status, reports, comparisons and candidates. Machine JSON is passed
+  through unchanged; human output renders producer verdicts and future unknown
+  states neutrally without recomputing them. Mutating feedback actions remain
+  outside HAL.
+
+
 ### Fixed
 
 - `mq-hal stack` reads the cockpit contract `mq-agent` actually emits. The view
