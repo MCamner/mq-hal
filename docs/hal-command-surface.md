@@ -775,6 +775,29 @@ output as approved.
 
 ---
 
+### \`feedback\`
+
+Read-only consumer of the authoritative mq-agent Feedback Engine.
+
+| Property | Value |
+|---|---|
+| \`mq-hal\` | \`mq-hal feedback [status, report, inspect, compare, candidates]\` |
+| \`mqlaunch\` | \`mqlaunch feedback ...\` |
+| Backend | \`hal/feedback_view.py\` |
+| Read-only | Yes |
+| Memory write | No |
+| Flags | \`--json\`, report also supports \`--task-class\` and \`--since\` |
+
+HAL invokes \`mq-agent feedback ... --json\` and does not read
+\`~/.mq/feedback\` directly. JSON output preserves mq-agent's bytes unchanged.
+Human output displays the producer's health, verdict, evidence counts,
+per-metric deltas, candidate state and the navigation command for candidate
+review.
+
+HAL does **not** map verdicts or reason codes into a local decision vocabulary.
+An unknown future verdict is printed verbatim with neutral treatment. HAL does
+not expose feedback run, candidate-state, purge, handoff or activation actions.
+
 ### `runtime`
 
 Read-only control center for local runtime services.

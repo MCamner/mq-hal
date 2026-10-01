@@ -61,6 +61,7 @@ _pyfiles=(
   scripts/repo_status.py scripts/ci_status.py scripts/brief.py
   scripts/release_brief.py scripts/audit.py scripts/stack_status.py
   hal/stack.py hal/status.py hal/doctor.py hal/brain.py hal/context.py hal/route.py
+  hal/feedback_view.py
   hal/release.py hal/provider.py scripts/memory_status.py scripts/repo_memory.py
   scripts/agent_brief.py scripts/hello.py scripts/model_profiles.py
   scripts/model_status.py scripts/model_test.py scripts/version.py
@@ -162,6 +163,12 @@ _smoke memory-status-smoke.sh
 _smoke brain-smoke.sh
 _smoke context-smoke.sh
 _smoke route-control-smoke.sh
+if out="$(bash ./tests/feedback-control-smoke.sh 2>&1)"; then
+  :
+else
+  fail "feedback-control-smoke.sh"
+  [[ "$JSON" -eq 1 ]] || printf '%s\n' "$out" >&2
+fi
 _smoke repo-memory-smoke.sh
 _smoke agent-brief-smoke.sh
 _smoke hello-smoke.sh

@@ -60,6 +60,11 @@ case "${1:-}" in
     exec python3 "$ROOT/hal/route.py" "$@"
     ;;
 
+  feedback)
+    shift || true
+    exec python3 "$ROOT/hal/feedback_view.py" "$@"
+    ;;
+
   dashboard)
     shift || true
     exec python3 "$ROOT/hal/dashboard.py" "$@"

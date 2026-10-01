@@ -323,6 +323,15 @@
       "uses_ai": false,
       "writes_memory": false,
       "mqlaunch_alias": null
+    },
+    {
+      "name": "feedback",
+      "description": "Read-only mq-agent Feedback Engine evidence and candidate review surface",
+      "risk_level": "read-only",
+      "requires_confirm": false,
+      "uses_ai": false,
+      "writes_memory": false,
+      "mqlaunch_alias": "feedback"
     }
   ]
 }
