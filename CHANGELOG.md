@@ -12,7 +12,6 @@
   states neutrally without recomputing them. Mutating feedback actions remain
   outside HAL.
 
-
 ### Fixed
 
 - `mq-hal stack` reads the cockpit contract `mq-agent` actually emits. The view
