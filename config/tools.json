@@ -332,6 +332,15 @@
       "uses_ai": false,
       "writes_memory": false,
       "mqlaunch_alias": "feedback"
+    },
+    {
+      "name": "changes",
+      "description": "Compare the current check with the previous snapshot: new, resolved, persisting, unverified",
+      "risk_level": "state-write",
+      "requires_confirm": false,
+      "uses_ai": false,
+      "writes_memory": false,
+      "mqlaunch_alias": null
     }
   ]
 }

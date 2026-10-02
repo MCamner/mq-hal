@@ -6,6 +6,15 @@
 
 ### Added
 
+- `mq-hal changes` compares the current check with the previous local
+  snapshot and lists new, resolved, persisting, and unverified problems by
+  stable check ID with source and timestamp. A check that is missing or
+  `SKIPPED` after a previous problem is reported as unverified, never as
+  resolved. Works without Ollama, supports `--json`, and reuses the dashboard
+  collectors instead of adding new probes.
+
+### Added
+
 - `mq-hal feedback` is a read-only operator view over mq-agent Feedback
   Engine status, reports, comparisons and candidates. Machine JSON is passed
   through unchanged; human output renders producer verdicts and future unknown
