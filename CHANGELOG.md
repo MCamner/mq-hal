@@ -21,6 +21,9 @@
 
 ### Fixed
 
+- `mq-hal changes --no-save` no longer reports "baseline recorded" when there
+  is no previous snapshot; it says the baseline was not saved.
+
 - `mq-hal stack` reads the cockpit contract `mq-agent` actually emits. The view
   still expected `components[]` / `name` / `status` / `overall`, while
   `mq-agent stack cockpit --json` emits `repos[]` / `repo` / `gate` /
