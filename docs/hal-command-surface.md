@@ -225,6 +225,42 @@ command reports warnings and blockers but does not route or fix anything.
 
 ---
 
+### `changes`
+
+What changed since the previous check: new, resolved, persisting, and
+unverified problems.
+
+| Property | Value |
+|---|---|
+| `mq-hal` | `mq-hal changes` |
+| Backend | `hal/changes.py` |
+| Read-only | Yes for checked systems; writes a local snapshot |
+| Memory write | No |
+| Flags | `--since last\|PATH`, `--current PATH`, `--no-save`, `--json`, `--sample` |
+
+Runs the dashboard collectors and flattens their JSON into checks with stable
+IDs: `surface:<name>`, `stack:<repo>:<gate\|contract\|status>`,
+`release:<repo>`, `release:<repo>:gate:<name>`, `runtime:<service>` and
+`runtime:<service>:<check>`. Each check carries its status, detail, and source
+command. The result is compared with the previous snapshot and saved to
+`$MQ_HAL_STATE_DIR/changes/` (default `~/.mq-hal`, newest 20 kept).
+
+- `new`: a problem that did not exist before or got worse (`WARN` -> `FAIL`).
+- `resolved`: a previous problem that now reports `PASS`.
+- `persisting`: a problem that remains at the same or a lower severity.
+- `unverified`: a previous problem with no current data (missing or
+  `SKIPPED`). Missing data is never counted as resolved.
+
+When a whole surface is `UNAVAILABLE`, its per-component checks are not
+recorded, so earlier problems in that surface show up as `unverified`. The
+first run records a baseline and reports `SKIPPED`. `--current` reads a
+snapshot file instead of running checks (tests, offline comparison);
+`--sample` never saves. JSON uses `mq_hal.changes.v1` with an attached
+`mq.feedback.v1` whose `next_action` is a read-only command. No model is
+called.
+
+---
+
 ### `next`
 
 Show the next suggested operator action from release blockers or dashboard

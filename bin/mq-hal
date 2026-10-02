@@ -120,6 +120,11 @@ case "${1:-}" in
     exec python3 "$ROOT/hal/history.py" --alerts "$@"
     ;;
 
+  changes)
+    shift || true
+    exec python3 "$ROOT/hal/changes.py" "$@"
+    ;;
+
   next)
     shift || true
     exec python3 "$ROOT/hal/operator.py" "$@"

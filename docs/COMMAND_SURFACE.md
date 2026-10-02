@@ -37,6 +37,7 @@ The detailed reference with flags, examples, and backend notes is in
 | `timeline` | — | No | No | No | `hal timeline` |
 | `history` | — | No | No | No | — |
 | `alerts` | — | No | No | No | — |
+| `changes` | — | No | No | No | — |
 | `next` | — | No | No | No | — |
 | `fix` | — | No | No | Yes | — |
 | `open` | — | No | No | Yes | — |
