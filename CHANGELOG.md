@@ -13,8 +13,6 @@
   resolved. Works without Ollama, supports `--json`, and reuses the dashboard
   collectors instead of adding new probes.
 
-### Added
-
 - `mq-hal feedback` is a read-only operator view over mq-agent Feedback
   Engine status, reports, comparisons and candidates. Machine JSON is passed
   through unchanged; human output renders producer verdicts and future unknown
