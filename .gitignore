@@ -12,3 +12,7 @@ build/
 *.swo
 ~/.mq-hal/
 .codegraph/
+
+# Local editor/agent MCP config: machine-specific paths
+.mcp.json
+.cursor/
