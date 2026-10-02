@@ -241,7 +241,9 @@ def _next_command(check_id: str) -> str:
     return NEXT_COMMANDS.get(prefix, "mq-hal dashboard")
 
 
-def build_report(previous: dict[str, Any] | None, current: dict[str, Any]) -> dict[str, Any]:
+def build_report(
+    previous: dict[str, Any] | None, current: dict[str, Any], *, saved: bool = True,
+) -> dict[str, Any]:
     meta = lambda snap: {"taken_at": snap.get("taken_at"), "source": snap.get("source")}  # noqa: E731
     if previous is None:
         payload: dict[str, Any] = {
@@ -250,7 +252,10 @@ def build_report(previous: dict[str, Any] | None, current: dict[str, Any]) -> di
         }
         return attach_feedback(
             payload, status="SKIPPED",
-            what="No previous snapshot; baseline recorded",
+            what=(
+                "No previous snapshot; baseline recorded" if saved
+                else "No previous snapshot; baseline not saved (--no-save)"
+            ),
             why="Changes can only be reported once two checks exist",
             evidence=[f"{len(current.get('checks', []))} checks in baseline"],
         )
@@ -374,8 +379,9 @@ def main(argv: list[str]) -> int:
         print(f"mq-hal changes: {exc}", file=sys.stderr)
         return 2
 
-    report = build_report(previous, current)
-    if not args.sample and not args.no_save:
+    save = not args.sample and not args.no_save
+    report = build_report(previous, current, saved=save)
+    if save:
         save_snapshot(current)
 
     if args.json:

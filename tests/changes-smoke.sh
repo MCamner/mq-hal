@@ -78,6 +78,14 @@ grep -q "mq-hal release blockers" <<<"$out"
 test ! -e "$MQ_HAL_STATE_DIR/changes"
 
 echo "[4/6] --since last: baseline, then compare against saved snapshot"
+./bin/mq-hal changes --current "$WORK/prev.json" --no-save --json \
+  | python3 -c "
+import json, sys
+d = json.load(sys.stdin)
+what = d['feedback']['what_happened']
+assert 'not saved' in what and 'recorded' not in what, what
+"
+test ! -e "$MQ_HAL_STATE_DIR/changes"
 ./bin/mq-hal changes --current "$WORK/prev.json" --json \
   | python3 -c "
 import json, sys
