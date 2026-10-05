@@ -17,18 +17,15 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # jsonschema for tests/stack-contract-smoke.sh: mq-agent's provenance
-      # schema uses oneOf/if/$ref, beyond a stdlib check. setup-python gives a
-      # pip-installable interpreter; the runner's Homebrew Python is not.
-      # 3.14 matches the runner Python these jobs used before. On 3.12,
-      # hal/operator.py shadowed the stdlib module and broke imports.
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.14"
-
+      # jsonschema for tests/stack-contract-smoke.sh (mq-agent's provenance
+      # schema uses oneOf/if/$ref, beyond a stdlib check), installed into the
+      # runner's own Python so the release gate keeps running under the same
+      # interpreter as before. It is externally managed, hence the flag; the
+      # runner is discarded after the job. setup-python was tried and broke
+      # imports: on a python.org build hal/operator.py shadows the stdlib
+      # `operator` module when hal/*.py runs as a script.
       - name: Install test dependencies
-        run: python -m pip install jsonschema
+        run: python3 -m pip install --break-system-packages jsonschema
 
       - name: Show Python version
         run: python3 --version
