@@ -20,7 +20,19 @@ jobs:
       - name: Show Python version
         run: python3 --version
 
+      # mq.doctor-status.v1 is owned by macos-scripts; mq-hal keeps a copy in
+      # schemas/vendor/. With this checkout the contract smoke test compares
+      # the copy against the owner's file instead of skipping.
+      - name: Check out canonical macos-scripts contracts
+        uses: actions/checkout@v4
+        with:
+          repository: MCamner/macos-scripts
+          ref: main
+          path: .canonical/macos-scripts
+
       - name: Release check (dry-run)
+        env:
+          MQ_CANONICAL_MACOS_SCRIPTS_ROOT: ${{ github.workspace }}/.canonical/macos-scripts
         # Single source of truth for CI: syntax check, version sync, all smoke
         # tests, and command-surface consistency. --dry-run skips only the
         # "is this version already released" gate so post-release pushes stay

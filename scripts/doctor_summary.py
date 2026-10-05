@@ -50,21 +50,26 @@ SUMMARY_SCHEMA: dict[str, Any] = {
     "additionalProperties": False,
 }
 
+# Shaped like real `mqlaunch doctor --json` output: mq.doctor-status.v1, owned by
+# macos-scripts and vendored at schemas/vendor/. The earlier sample used a
+# `message` key the real output never had, so --sample tested an invented shape.
+# tests/doctor-status-contract-smoke.sh keeps this conforming.
 SAMPLE_DOCTOR_JSON = {
+    "schema": "mq.doctor-status.v1",
+    "project": "macos-scripts",
+    "version": "sample",
+    "status": "warn",
+    "checks": [
+        {"name": "git", "status": "ok"},
+        {"name": "gh", "status": "ok"},
+        {"name": "jq", "status": "warn", "detail": "missing", "hint": "brew install jq"},
+    ],
     "summary": {
-        "ok": 7,
+        "ok": 2,
         "warn": 1,
         "fail": 0,
     },
-    "checks": [
-        {"name": "git", "status": "ok", "message": "git found"},
-        {"name": "brew", "status": "ok", "message": "brew found"},
-        {
-            "name": "repo",
-            "status": "warn",
-            "message": "working tree has uncommitted changes",
-        },
-    ],
+    "next": "brew install jq",
 }
 
 
@@ -217,14 +222,41 @@ def walk(value: Any, path: str = "") -> list[tuple[str, Any]]:
     return items
 
 
+def contract_counts(data: Any) -> tuple[int, int, list[str]] | None:
+    """Counts and findings from an mq.doctor-status.v1 document, or None.
+
+    The document carries its own summary, so it is read rather than inferred.
+    Walking every string miscounts it: the top-level `status` is the worst
+    check's status, and a check's `detail` of `missing` is a description, not
+    a second failure.
+    """
+    if not isinstance(data, dict) or data.get("schema") != "mq.doctor-status.v1":
+        return None
+    summary = data.get("summary", {})
+    findings = []
+    for check in data.get("checks", []):
+        if check.get("status") == "ok":
+            continue
+        line = f"{check.get('name')}: {check.get('status')}"
+        if check.get("detail"):
+            line += f" ({check['detail']})"
+        if check.get("hint"):
+            line += f" — {check['hint']}"
+        findings.append(line)
+    return int(summary.get("fail", 0)), int(summary.get("warn", 0)), findings
+
+
 def deterministic_summary(data: Any) -> dict[str, Any]:
+    contract = contract_counts(data)
     counts: dict[str, int] = {
         "ok": 0, "pass": 0, "warn": 0, "warning": 0,
         "fail": 0, "failed": 0, "error": 0, "missing": 0,
     }
     findings: list[str] = []
 
-    for path, value in walk(data):
+    # Other doctors (repo-signal's is a fallback in doctor_commands) carry no
+    # contract, so they keep the heuristic walk below.
+    for path, value in walk(data) if contract is None else ():
         if isinstance(value, str):
             lower = value.lower().strip()
             if lower in counts:
@@ -241,6 +273,8 @@ def deterministic_summary(data: Any) -> dict[str, Any]:
 
     bad = counts["fail"] + counts["failed"] + counts["error"] + counts["missing"]
     warn = counts["warn"] + counts["warning"]
+    if contract is not None:
+        bad, warn, findings = contract
 
     if bad > 0:
         status = "Needs attention"

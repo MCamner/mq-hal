@@ -1,0 +1,14 @@
+{
+  "schema": "mq.doctor-status.v1",
+  "project": "macos-scripts",
+  "version": "2.2.0",
+  "status": "warn",
+  "checks": [
+    {"name": "git", "status": "ok"},
+    {"name": "gh", "status": "ok"},
+    {"name": "jq", "status": "warn", "detail": "missing", "hint": "brew install jq"},
+    {"name": "OPENAI_API_KEY", "status": "ok"}
+  ],
+  "summary": {"ok": 3, "warn": 1, "fail": 0},
+  "next": "brew install jq"
+}
