@@ -6,6 +6,13 @@
 
 ### Added
 
+- Consumer contract for `mqlaunch doctor --json` (`mq.doctor-status.v1`,
+  owned by macos-scripts, vendored in `schemas/vendor/`).
+  `tests/doctor-status-contract-smoke.sh` checks the copy against macos-scripts
+  (CI checks it out), validates a fixture and `doctor-summary --sample`
+  against the schema, and feeds the real shape through `brief` and
+  `doctor_summary`.
+
 - `mq-hal changes` compares the current check with the previous local
   snapshot and lists new, resolved, persisting, and unverified problems by
   stable check ID with source and timestamp. A check that is missing or
@@ -20,6 +27,13 @@
   outside HAL.
 
 ### Fixed
+
+- `doctor-summary` miscounted real doctor output: walking every string read
+  the top-level `status` as a second warning and a check's `detail: missing`
+  as a serious issue — 1 serious and 2 warnings for a run with 0 failures and
+  1 warning. A `mq.doctor-status.v1` document is now read from its own summary
+  and checks; other doctors keep the heuristic. The `--sample` document used a
+  `message` key real output never had and is now shaped like v1.
 
 - `mq-hal changes --no-save` no longer reports "baseline recorded" when there
   is no previous snapshot; it says the baseline was not saved.
