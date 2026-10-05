@@ -127,17 +127,17 @@ case "${1:-}" in
 
   next)
     shift || true
-    exec python3 "$ROOT/hal/operator.py" "$@"
+    exec python3 "$ROOT/hal/operator_actions.py" "$@"
     ;;
 
   fix)
     shift || true
-    exec python3 "$ROOT/hal/operator.py" --command fix "$@"
+    exec python3 "$ROOT/hal/operator_actions.py" --command fix "$@"
     ;;
 
   open)
     shift || true
-    exec python3 "$ROOT/hal/operator.py" --command open "$@"
+    exec python3 "$ROOT/hal/operator_actions.py" --command open "$@"
     ;;
 
   memory-path|session-path)
