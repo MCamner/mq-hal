@@ -269,7 +269,7 @@ alerts.
 | Property | Value |
 |---|---|
 | `mq-hal` | `mq-hal next` |
-| Backend | `hal/operator.py` |
+| Backend | `hal/operator_actions.py` |
 | Read-only | Yes |
 | Memory write | No |
 | Flags | `--json`, `--sample` |
@@ -293,7 +293,7 @@ Route a blocker to the existing `mqlaunch fix` tool.
 | Property | Value |
 |---|---|
 | `mq-hal` | `mq-hal fix "CHANGELOG missing"` |
-| Backend | `hal/operator.py --command fix` |
+| Backend | `hal/operator_actions.py --command fix` |
 | Read-only | Preview by default |
 | Memory write | No |
 | Flags | `--json`, `--sample`, `--confirm` |
@@ -311,7 +311,7 @@ Open a suggested file or explicit target in the selected repo.
 | Property | Value |
 |---|---|
 | `mq-hal` | `mq-hal open CHANGELOG.md --repo mq-hal` |
-| Backend | `hal/operator.py --command open` |
+| Backend | `hal/operator_actions.py --command open` |
 | Read-only | Preview by default |
 | Memory write | No |
 | Flags | `--repo`, `--json`, `--sample`, `--confirm` |

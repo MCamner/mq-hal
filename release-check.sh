@@ -148,6 +148,7 @@ _smoke smoke.sh
 _smoke doctor-summary-smoke.sh
 _smoke doctor-status-contract-smoke.sh
 _smoke stack-contract-smoke.sh
+_smoke stdlib-shadow-smoke.sh
 _smoke fix-planner-smoke.sh
 _smoke session-memory-smoke.sh
 _smoke timeline-smoke.sh

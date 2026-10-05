@@ -27,7 +27,7 @@ export PATH="$TMPBIN:$PATH"
 echo "SMOKE: operator actions"
 
 echo "[1/8] syntax"
-python3 -m py_compile hal/operator.py
+python3 -m py_compile hal/operator_actions.py
 
 echo "[2/8] next sample"
 ./bin/mq-hal next --sample | grep -q "Operator Next"

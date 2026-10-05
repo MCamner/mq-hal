@@ -36,6 +36,13 @@
 
 ### Fixed
 
+- `hal/operator.py` is now `hal/operator_actions.py`. Run as a script it put
+  `hal/` first on `sys.path` and shadowed the stdlib `operator` module, so on
+  any Python that does not import `collections` at startup (a python.org
+  build, or `python3 -S`) mq-hal crashed on import with a circular-import
+  error. `tests/stdlib-shadow-smoke.sh` forbids stdlib names in `hal/` and
+  `scripts/` and runs every `hal/` module without `site`.
+
 - `mq-hal release` showed readiness `unknown` for every repo on real
   `mq-agent stack release-check` output: the parser looked for `ready` /
   `status` on each repo, and real items carry `blockers` and `warnings`

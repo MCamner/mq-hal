@@ -21,9 +21,7 @@ jobs:
       # schema uses oneOf/if/$ref, beyond a stdlib check), installed into the
       # runner's own Python so the release gate keeps running under the same
       # interpreter as before. It is externally managed, hence the flag; the
-      # runner is discarded after the job. setup-python was tried and broke
-      # imports: on a python.org build hal/operator.py shadows the stdlib
-      # `operator` module when hal/*.py runs as a script.
+      # runner is discarded after the job.
       - name: Install test dependencies
         run: python3 -m pip install --break-system-packages jsonschema
 
