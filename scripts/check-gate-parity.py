@@ -14,10 +14,12 @@ CI_ONLY = {
     "release.yml": "CI-only: publishes tags after preflight; not a PR release assertion.",
 }
 STEPS = {
-    "tests.yml": ["Checkout", "Show Python version",
-                  "Check out canonical macos-scripts contracts", "Release check (dry-run)",
+    "tests.yml": ["Checkout", "Install test dependencies", "Show Python version",
+                  "Check out canonical macos-scripts contracts",
+                  "Check out canonical mq-agent contracts", "Release check (dry-run)",
                   "Check skills consistency"],
-    "gate-parity.yml": ["Checkout", "Validate gate parity", "Test parity failures",
+    "gate-parity.yml": ["Checkout", "Install test dependencies",
+                        "Validate gate parity", "Test parity failures",
                         "Run release gate"],
 }
 CI_COMMANDS = {

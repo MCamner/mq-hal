@@ -1,0 +1,69 @@
+{
+  "schema": "mq_stack_release_check.v1",
+  "overall": "NO-GO",
+  "mode": "local",
+  "blocked": [
+    "mqlaunch"
+  ],
+  "warned": [
+    "mq-agent"
+  ],
+  "repos": [
+    {
+      "name": "mqlaunch",
+      "exists": true,
+      "version": "2.2.0",
+      "branch": "fix/smoke-locale",
+      "on_main": false,
+      "dirty": false,
+      "unpushed": 0,
+      "changelog_ok": true,
+      "readme_ok": true,
+      "roadmap_ok": true,
+      "blockers": [
+        "CHANGELOG has no entry for the target version"
+      ],
+      "warnings": [],
+      "go": true
+    },
+    {
+      "name": "mq-agent",
+      "exists": true,
+      "version": "1.29.0",
+      "branch": "mq/update-project-files-20261003-183231",
+      "on_main": false,
+      "dirty": false,
+      "unpushed": 0,
+      "changelog_ok": true,
+      "readme_ok": true,
+      "roadmap_ok": true,
+      "blockers": [],
+      "warnings": [
+        "unreleased commits since last tag"
+      ],
+      "go": true
+    },
+    {
+      "name": "mq-mcp",
+      "exists": true,
+      "version": "2.1.0",
+      "branch": "fix/mcp-profile-safety",
+      "on_main": false,
+      "dirty": true,
+      "unpushed": 0,
+      "changelog_ok": true,
+      "readme_ok": true,
+      "roadmap_ok": true,
+      "blockers": [],
+      "warnings": [],
+      "go": true
+    }
+  ],
+  "compatibility": {
+    "status": "SKIPPED",
+    "reason": "mqlaunch declares no Python dependencies \u2014 nothing for this gate to assess",
+    "blocked_repos": [],
+    "unassigned": []
+  },
+  "checked_at": "2026-10-05T01:25:24.460470+00:00"
+}

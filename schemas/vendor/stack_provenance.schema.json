@@ -1,0 +1,689 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mq.local/schemas/stack_provenance.schema.json",
+  "title": "MQ stack provenance",
+  "description": "Whether the source checkout, the installed runtime, the running runtime and the release identity are the same code — and if not, which two layers differ. Every layer is kept separate: each edge of checkout to installed to running answers a different question, and one boolean over all of them would answer none. This contract reports observations and comparisons only. It never carries a blocking decision; the operation acting on the signal owns that.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "generated_at",
+    "remote_verified",
+    "components",
+    "summary"
+  ],
+  "$defs": {
+    "status": {
+      "description": "PASS: every identity that was available and relevant agrees. WARN: a real difference exists and the command is still safe to run. UNAVAILABLE: an identity could not be observed — unknown is not failure. FAIL: the identity data is malformed or contradicts itself so the result cannot be used. An ordinary mismatch is WARN, not FAIL.",
+      "enum": [
+        "PASS",
+        "WARN",
+        "FAIL",
+        "UNAVAILABLE"
+      ]
+    },
+    "reason_code": {
+      "description": "Stable codes. The code is the API and the rendered text is the interface; a code is never renumbered or reused once published.",
+      "enum": [
+        "RTP001_DIRTY_WORKTREE",
+        "RTP002_HEAD_NOT_INTEGRATED",
+        "RTP003_LOCAL_MAIN_STALE",
+        "RTP004_REMOTE_NOT_VERIFIED",
+        "RTP005_CHECKOUT_BEHIND_REMOTE",
+        "RTP006_INSTALLED_IDENTITY_UNKNOWN",
+        "RTP007_INSTALLED_CHECKOUT_MISMATCH",
+        "RTP008_RUNNING_IDENTITY_UNKNOWN",
+        "RTP009_RUNNING_INSTALLED_MISMATCH",
+        "RTP010_RUNNING_CHECKOUT_MISMATCH",
+        "RTP011_RELEASE_VERSION_MISMATCH",
+        "RTP012_RELEASE_COMMIT_MISMATCH",
+        "RTP013_RUNTIME_IDENTITY_INVALID",
+        "RTP014_REMOTE_UNAVAILABLE",
+        "RTP015_GIT_PROBE_FAILED",
+        "RTP016_CHECKOUT_HEAD_MISSING",
+        "RTP017_CANONICAL_REF_MISSING"
+      ]
+    },
+    "comparison": {
+      "description": "One edge each. true: checked and the two identities match. false: checked and they differ. null: not observed or not applicable — a CLI has no long-lived process, and reporting false there would invent a mismatch.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "installed_matches_checkout",
+        "running_matches_installed",
+        "running_matches_checkout",
+        "release_matches_checkout",
+        "release_matches_installed"
+      ],
+      "properties": {
+        "installed_matches_checkout": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "running_matches_installed": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "running_matches_checkout": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "release_matches_checkout": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "release_matches_installed": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        }
+      }
+    }
+  },
+  "properties": {
+    "schema": {
+      "const": "mq.stack-provenance.v1"
+    },
+    "generated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "remote_verified": {
+      "description": "Whether any remote was contacted. The default command touches no network, so false is the normal state and does not mean a checkout is stale.",
+      "type": "boolean"
+    },
+    "components": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "name",
+          "checkout",
+          "integration",
+          "remote",
+          "installed",
+          "running",
+          "running_probe",
+          "release",
+          "comparison",
+          "status",
+          "reasons"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "checkout": {
+            "description": "What is in the source checkout. Null when the runtime has no checkout — a released wheel is the canonical case, not the suspicious one.",
+            "type": [
+              "object",
+              "null"
+            ],
+            "additionalProperties": false,
+            "required": [
+              "path",
+              "branch",
+              "head",
+              "worktree_clean"
+            ],
+            "properties": {
+              "path": {
+                "type": "string",
+                "minLength": 1
+              },
+              "branch": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "head": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "pattern": "^[0-9a-f]{7,40}$"
+              },
+              "worktree_clean": {
+                "type": [
+                  "boolean",
+                  "null"
+                ]
+              }
+            }
+          },
+          "integration": {
+            "description": "How HEAD relates to the trunk. Reported as separate observations rather than reduced to one word, because 'behind' and 'not integrated' call for different actions.",
+            "type": [
+              "object",
+              "null"
+            ],
+            "additionalProperties": false,
+            "required": [
+              "head_is_main",
+              "head_integrated_in_main",
+              "head_pushed",
+              "ahead",
+              "behind",
+              "diverged"
+            ],
+            "properties": {
+              "head_is_main": {
+                "type": [
+                  "boolean",
+                  "null"
+                ]
+              },
+              "head_integrated_in_main": {
+                "type": [
+                  "boolean",
+                  "null"
+                ]
+              },
+              "head_pushed": {
+                "type": [
+                  "boolean",
+                  "null"
+                ]
+              },
+              "ahead": {
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "minimum": 0
+              },
+              "behind": {
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "minimum": 0
+              },
+              "diverged": {
+                "type": [
+                  "boolean",
+                  "null"
+                ]
+              }
+            }
+          },
+          "remote": {
+            "description": "The locally known origin/main and, only after explicit verification, what the remote actually holds. Three states stay distinct: never asked, asked and unreachable, and confirmed. `verified: false` alone cannot tell the first two apart, so whether anyone asked is recorded separately.",
+            "type": [
+              "object",
+              "null"
+            ],
+            "additionalProperties": false,
+            "required": [
+              "local_origin_main",
+              "remote_origin_main",
+              "verification_attempted",
+              "verified",
+              "verified_at"
+            ],
+            "properties": {
+              "local_origin_main": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "pattern": "^[0-9a-f]{7,40}$"
+              },
+              "remote_origin_main": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "pattern": "^[0-9a-f]{7,40}$"
+              },
+              "verified": {
+                "type": "boolean"
+              },
+              "verified_at": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "verification_attempted": {
+                "description": "Whether this run asked the remote at all. False is the default: the command contacts no network unless asked to. True with `verified: false` means the remote was asked and could not be reached, which is unobserved rather than stale.",
+                "type": "boolean"
+              }
+            },
+            "allOf": [
+              {
+                "if": {
+                  "properties": {
+                    "verified": {
+                      "const": true
+                    }
+                  },
+                  "required": [
+                    "verified"
+                  ]
+                },
+                "then": {
+                  "properties": {
+                    "remote_origin_main": {
+                      "type": "string"
+                    },
+                    "verified_at": {
+                      "type": "string"
+                    },
+                    "verification_attempted": {
+                      "const": true
+                    }
+                  }
+                }
+              }
+            ]
+          },
+          "installed": {
+            "oneOf": [
+              {
+                "$ref": "runtime_identity.schema.json"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The identity of the code that would run, as an mq.runtime-identity.v1 record. Null when it could not be read at all."
+          },
+          "running": {
+            "oneOf": [
+              {
+                "$ref": "runtime_identity.schema.json"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The identity a long-lived process reports about itself, as an mq.runtime-identity.v1 record. Null for a CLI, and null when the process could not be reached — never inferred from the installed package."
+          },
+          "running_probe": {
+            "description": "Whether this run asked a process to identify itself, and whether one answered. `running: null` alone cannot say which: a CLI has no process to ask, and a component whose server is not started was asked and found nothing. Those are different facts — the second says there is nothing to restart, the first says nobody looked. Null when the record was built without a probe concept at all.",
+            "type": [
+              "object",
+              "null"
+            ],
+            "additionalProperties": false,
+            "required": [
+              "attempted",
+              "endpoint",
+              "reachable"
+            ],
+            "properties": {
+              "attempted": {
+                "description": "Whether this run asked.",
+                "type": "boolean"
+              },
+              "endpoint": {
+                "description": "Where it asked, when it asked.",
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "reachable": {
+                "description": "Whether something answered. Null when nobody asked — never false, which would claim an observation.",
+                "type": [
+                  "boolean",
+                  "null"
+                ]
+              }
+            }
+          },
+          "release": {
+            "description": "Release identity as declared and as tagged. A version equal to the latest tag does not mean the tag points at the commit that is running, and a checkout ahead of its tag is ordinary progress rather than a fault — which is why the tag's reachability is recorded separately from whether it matches.",
+            "type": [
+              "object",
+              "null"
+            ],
+            "additionalProperties": false,
+            "required": [
+              "declared_version",
+              "latest_tag",
+              "tag_commit"
+            ],
+            "properties": {
+              "declared_version": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "latest_tag": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "tag_commit": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "pattern": "^[0-9a-f]{7,40}$"
+              },
+              "github_release_tag": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "tag_reachable_from_head": {
+                "description": "Whether the latest tag is an ancestor of the checkout's HEAD. True is the normal state between releases — the checkout has moved on past the tag. False means the tag names a commit that is not in this history at all, which is a real disagreement rather than ordinary progress. Null when it could not be determined.",
+                "type": [
+                  "boolean",
+                  "null"
+                ]
+              }
+            }
+          },
+          "comparison": {
+            "$ref": "#/$defs/comparison"
+          },
+          "status": {
+            "$ref": "#/$defs/status"
+          },
+          "reasons": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/reason_code"
+            }
+          }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "running": {
+                  "type": "null"
+                }
+              },
+              "required": [
+                "running"
+              ]
+            },
+            "then": {
+              "properties": {
+                "comparison": {
+                  "properties": {
+                    "running_matches_installed": {
+                      "type": "null"
+                    },
+                    "running_matches_checkout": {
+                      "type": "null"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "checkout": {
+                  "type": "null"
+                }
+              },
+              "required": [
+                "checkout"
+              ]
+            },
+            "then": {
+              "properties": {
+                "comparison": {
+                  "properties": {
+                    "installed_matches_checkout": {
+                      "type": "null"
+                    },
+                    "running_matches_checkout": {
+                      "type": "null"
+                    },
+                    "release_matches_checkout": {
+                      "type": "null"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "release": {
+                  "type": "null"
+                }
+              },
+              "required": [
+                "release"
+              ]
+            },
+            "then": {
+              "properties": {
+                "comparison": {
+                  "properties": {
+                    "release_matches_checkout": {
+                      "type": "null"
+                    },
+                    "release_matches_installed": {
+                      "type": "null"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "installed": {
+                  "type": "null"
+                }
+              },
+              "required": [
+                "installed"
+              ]
+            },
+            "then": {
+              "properties": {
+                "comparison": {
+                  "properties": {
+                    "installed_matches_checkout": {
+                      "type": "null"
+                    },
+                    "running_matches_installed": {
+                      "type": "null"
+                    },
+                    "release_matches_installed": {
+                      "type": "null"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "$comment": "A reported identity implies somebody asked and something answered. Stated per component: at the array level an `if` over `items` holds only when every component matches, so one component reporting an identity would go unchecked whenever another reported none.",
+            "if": {
+              "properties": {
+                "running": {
+                  "type": "object"
+                }
+              },
+              "required": [
+                "running"
+              ]
+            },
+            "then": {
+              "properties": {
+                "running_probe": {
+                  "type": "object",
+                  "properties": {
+                    "attempted": {
+                      "const": true
+                    },
+                    "reachable": {
+                      "const": true
+                    }
+                  }
+                }
+              },
+              "required": [
+                "running_probe"
+              ]
+            }
+          },
+          {
+            "$comment": "Nobody asked, so nothing was observed: no endpoint and no reachability. The three states are exactly false/null, true/false and true/true.",
+            "if": {
+              "properties": {
+                "running_probe": {
+                  "type": "object",
+                  "properties": {
+                    "attempted": {
+                      "const": false
+                    }
+                  },
+                  "required": [
+                    "attempted"
+                  ]
+                }
+              },
+              "required": [
+                "running_probe"
+              ]
+            },
+            "then": {
+              "properties": {
+                "running_probe": {
+                  "properties": {
+                    "endpoint": {
+                      "type": "null"
+                    },
+                    "reachable": {
+                      "type": "null"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "$comment": "Somebody asked, so both what was asked and whether it answered were observed.",
+            "if": {
+              "properties": {
+                "running_probe": {
+                  "type": "object",
+                  "properties": {
+                    "attempted": {
+                      "const": true
+                    }
+                  },
+                  "required": [
+                    "attempted"
+                  ]
+                }
+              },
+              "required": [
+                "running_probe"
+              ]
+            },
+            "then": {
+              "properties": {
+                "running_probe": {
+                  "properties": {
+                    "endpoint": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "reachable": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    "summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "problem_count",
+        "next_action"
+      ],
+      "properties": {
+        "status": {
+          "$ref": "#/$defs/status"
+        },
+        "problem_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "next_action": {
+          "description": "Exactly one action, or null when there is nothing to do. Ordered by dependency: reinstalling comes before restarting, because restarting a stale install starts the same stale code again.",
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "remote_verified": {
+            "const": false
+          }
+        },
+        "required": [
+          "remote_verified"
+        ]
+      },
+      "then": {
+        "properties": {
+          "components": {
+            "items": {
+              "properties": {
+                "remote": {
+                  "anyOf": [
+                    {
+                      "type": "null"
+                    },
+                    {
+                      "properties": {
+                        "verified": {
+                          "const": false
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,107 @@
+{
+  "schema": "mq.stack-provenance.v1",
+  "generated_at": "2026-10-05T01:25:25.024551Z",
+  "remote_verified": false,
+  "components": [
+    {
+      "running_probe": {
+        "attempted": false,
+        "endpoint": null,
+        "reachable": null
+      },
+      "name": "mq-agent",
+      "checkout": null,
+      "integration": null,
+      "remote": null,
+      "installed": {
+        "schema": "mq.runtime-identity.v1",
+        "component": "mq-agent",
+        "version": "1.28.0",
+        "commit": null,
+        "install_type": "unknown",
+        "identity_quality": "partial",
+        "started_at": null,
+        "executable": "/home/operator/.local/share/uv/tools/mq-agent/bin/python",
+        "module_path": "/home/operator/.local/share/uv/tools/mq-agent/lib/python3.11/site-packages/mq_agent",
+        "source_path": null
+      },
+      "running": null,
+      "release": null,
+      "comparison": {
+        "installed_matches_checkout": null,
+        "running_matches_installed": null,
+        "running_matches_checkout": null,
+        "release_matches_checkout": null,
+        "release_matches_installed": null
+      },
+      "reasons": [],
+      "status": "PASS"
+    },
+    {
+      "running_probe": {
+        "attempted": true,
+        "endpoint": "http://127.0.0.1:8765/runtime-identity",
+        "reachable": true
+      },
+      "name": "mq-mcp",
+      "checkout": {
+        "path": "/home/operator/mq-mcp-main",
+        "branch": "HEAD",
+        "head": "9a99b6dae5527f1611228294063d6100b353ea3f",
+        "worktree_clean": false
+      },
+      "integration": {
+        "head_is_main": false,
+        "head_integrated_in_main": true,
+        "head_pushed": true,
+        "ahead": 0,
+        "behind": 13,
+        "diverged": false
+      },
+      "remote": {
+        "local_origin_main": "0515e35565dbe2591a8b1e7f7c0f7e095be655a5",
+        "remote_origin_main": null,
+        "verification_attempted": false,
+        "verified": false,
+        "verified_at": null
+      },
+      "installed": null,
+      "running": {
+        "schema": "mq.runtime-identity.v1",
+        "component": "mq-mcp",
+        "version": "2.1.0",
+        "commit": "9a99b6dae5527f1611228294063d6100b353ea3f",
+        "install_type": "unknown",
+        "identity_quality": "verified",
+        "started_at": "2026-10-03T16:10:18.630215Z",
+        "executable": "/home/operator/mq-mcp-main/mq-mcp/.venv/bin/python",
+        "module_path": "/home/operator/mq-mcp-main/mq-mcp",
+        "source_path": "/home/operator/mq-mcp-main"
+      },
+      "release": {
+        "declared_version": "2.1.0",
+        "latest_tag": "v2.1.0",
+        "tag_commit": "0b3105cf2adeb96c1d7dcbda53a3cea734d6c9e2",
+        "tag_reachable_from_head": true,
+        "github_release_tag": null
+      },
+      "comparison": {
+        "installed_matches_checkout": null,
+        "running_matches_installed": null,
+        "running_matches_checkout": true,
+        "release_matches_checkout": false,
+        "release_matches_installed": null
+      },
+      "reasons": [
+        "RTP001_DIRTY_WORKTREE",
+        "RTP003_LOCAL_MAIN_STALE"
+      ],
+      "status": "WARN"
+    }
+  ],
+  "summary": {
+    "status": "WARN",
+    "problem_count": 1,
+    "next_action": "commit or stash the changes in mq-mcp's checkout"
+  }
+}

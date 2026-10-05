@@ -1,0 +1,94 @@
+{
+  "schema": "mq_stack_cockpit.v1",
+  "overall_gate": "GO",
+  "overall_contract": "READY",
+  "brain_export": {
+    "path": "/home/operator/mqobsidian/memory/stack-truth/2026-10-03-mq-stack-truth.md",
+    "date": "2026-10-03",
+    "age_days": 2,
+    "status": "aging"
+  },
+  "next_action": "mqlaunch: switch to main (on fix/smoke-locale)",
+  "next_action_contract": {
+    "text": "mqlaunch: switch to main (on fix/smoke-locale)",
+    "source_command": "mq-agent stack cockpit",
+    "severity": "attention",
+    "suggested_route": "git switch main",
+    "requires_approval": true,
+    "repo": "mqlaunch"
+  },
+  "repos": [
+    {
+      "repo": "mqlaunch",
+      "role": "Terminal entrypoint",
+      "exists": true,
+      "version": "2.2.0",
+      "branch": "fix/smoke-locale",
+      "dirty": false,
+      "contract": "REVIEW",
+      "gate": "GO",
+      "unreleased": 57,
+      "last_tag": "v2.1.0",
+      "warnings": [],
+      "blockers": [],
+      "next_action": "switch to main (on fix/smoke-locale)",
+      "next_action_contract": {
+        "text": "switch to main (on fix/smoke-locale)",
+        "source_command": "mq-agent stack cockpit",
+        "severity": "attention",
+        "suggested_route": "git switch main",
+        "requires_approval": true,
+        "repo": "mqlaunch"
+      }
+    },
+    {
+      "repo": "mq-agent",
+      "role": "Orchestrator",
+      "exists": true,
+      "version": "1.29.0",
+      "branch": "mq/update-project-files-20261003-183231",
+      "dirty": false,
+      "contract": "REVIEW",
+      "gate": "GO",
+      "unreleased": 8,
+      "last_tag": "v1.29.0",
+      "warnings": [],
+      "blockers": [],
+      "next_action": "switch to main (on mq/update-project-files-20261003-183231)",
+      "next_action_contract": {
+        "text": "switch to main (on mq/update-project-files-20261003-183231)",
+        "source_command": "mq-agent stack cockpit",
+        "severity": "attention",
+        "suggested_route": "git switch main",
+        "requires_approval": true,
+        "repo": "mq-agent"
+      }
+    },
+    {
+      "repo": "mq-mcp",
+      "role": "Runtime/review truth",
+      "exists": true,
+      "version": "2.1.0",
+      "branch": "fix/mcp-profile-safety",
+      "dirty": true,
+      "contract": "REVIEW",
+      "gate": "GO",
+      "unreleased": 21,
+      "last_tag": "v2.1.0",
+      "warnings": [
+        "uncommitted changes"
+      ],
+      "blockers": [],
+      "next_action": "commit or stash uncommitted changes",
+      "next_action_contract": {
+        "text": "commit or stash uncommitted changes",
+        "source_command": "mq-agent stack cockpit",
+        "severity": "attention",
+        "suggested_route": "git hygiene",
+        "requires_approval": true,
+        "repo": "mq-mcp"
+      }
+    }
+  ],
+  "checked_at": "2026-10-05T01:25:23.272042+00:00"
+}

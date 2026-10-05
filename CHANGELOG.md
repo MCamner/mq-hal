@@ -6,6 +6,14 @@
 
 ### Added
 
+- Consumer contracts for `mq-agent stack cockpit`, `release-check` and
+  `provenance --json`: the schemas (and `runtime_identity`, which provenance
+  references) are vendored in `schemas/vendor/`, and
+  `tests/stack-contract-smoke.sh` checks them against mq-agent (CI checks out
+  the four files), validates sanitized real-shaped fixtures, and feeds them
+  through `hal.stack`, `hal.release` and `hal.provenance`. CI installs
+  `jsonschema` for it.
+
 - Consumer contract for `mqlaunch doctor --json` (`mq.doctor-status.v1`,
   owned by macos-scripts, vendored in `schemas/vendor/`).
   `tests/doctor-status-contract-smoke.sh` checks the copy against macos-scripts
@@ -27,6 +35,12 @@
   outside HAL.
 
 ### Fixed
+
+- `mq-hal release` showed readiness `unknown` for every repo on real
+  `mq-agent stack release-check` output: the parser looked for `ready` /
+  `status` on each repo, and real items carry `blockers` and `warnings`
+  lists instead. A repo with blockers is now `no`, one without is `yes`
+  (warnings do not block).
 
 - `doctor-summary` miscounted real doctor output: walking every string read
   the top-level `status` as a second warning and a check's `detail: missing`

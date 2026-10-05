@@ -144,6 +144,12 @@ def ready(item: dict[str, Any]) -> str:
         return "yes"
     if overall in {"blocked", "fail", "not_ready", "needs_review"}:
         return "no"
+    # mq_stack_release_check.v1 items carry no ready/status, only `blockers`
+    # and `warnings` lists. Without this every real repo rendered `unknown`.
+    # A blocker stops a release; a warning does not.
+    item_blockers = item.get("blockers")
+    if isinstance(item_blockers, list):
+        return "no" if item_blockers else "yes"
     return str(item.get("ready") or item.get("status") or "unknown")
 
 
