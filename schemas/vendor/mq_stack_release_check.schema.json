@@ -1,0 +1,124 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "MQ Stack Release Check",
+  "type": "object",
+  "required": [
+    "schema",
+    "overall",
+    "mode",
+    "blocked",
+    "warned",
+    "repos",
+    "compatibility",
+    "checked_at"
+  ],
+  "properties": {
+    "schema": {
+      "const": "mq_stack_release_check.v1"
+    },
+    "overall": {
+      "enum": [
+        "GO",
+        "NO-GO"
+      ]
+    },
+    "mode": {
+      "enum": [
+        "local",
+        "ci"
+      ]
+    },
+    "blocked": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "warned": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "repos": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "name",
+          "exists",
+          "go",
+          "blockers",
+          "warnings"
+        ],
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "exists": {
+            "type": "boolean"
+          },
+          "go": {
+            "type": "boolean"
+          },
+          "blockers": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "warnings": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "additionalProperties": true
+      }
+    },
+    "compatibility": {
+      "type": "object",
+      "description": "Static mq.stack-compatibility.v1 verdict. Only blocks_release findings refuse a release.",
+      "required": [
+        "status",
+        "reason",
+        "blocked_repos",
+        "unassigned"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "PASS",
+            "WARN",
+            "FAIL",
+            "SKIPPED",
+            "UNAVAILABLE"
+          ]
+        },
+        "reason": {
+          "type": "string"
+        },
+        "blocked_repos": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "unassigned": {
+          "type": "array",
+          "description": "Blocked repositories outside this gate's own inventory.",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "checked_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "additionalProperties": true
+}

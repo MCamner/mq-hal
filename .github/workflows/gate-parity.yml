@@ -15,6 +15,17 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      # The release gate below runs tests/stack-contract-smoke.sh, which needs
+      # jsonschema. setup-python gives a pip-installable interpreter; the
+      # runner's Homebrew Python is not.
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install test dependencies
+        run: python -m pip install jsonschema
+
       - name: Validate gate parity
         run: python3 scripts/check-gate-parity.py
 

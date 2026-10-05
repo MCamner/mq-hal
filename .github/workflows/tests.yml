@@ -17,6 +17,17 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      # jsonschema for tests/stack-contract-smoke.sh: mq-agent's provenance
+      # schema uses oneOf/if/$ref, beyond a stdlib check. setup-python gives a
+      # pip-installable interpreter; the runner's Homebrew Python is not.
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install test dependencies
+        run: python -m pip install jsonschema
+
       - name: Show Python version
         run: python3 --version
 
@@ -36,9 +47,26 @@ jobs:
           sparse-checkout: schemas/mq.doctor-status.v1.json
           sparse-checkout-cone-mode: false
 
+      # mq-agent owns the stack cockpit/release-check/provenance schemas (and
+      # runtime_identity, which provenance $refs); mq-hal vendors them. Only
+      # those four files, for the same repo_memory reason as above.
+      - name: Check out canonical mq-agent contracts
+        uses: actions/checkout@v4
+        with:
+          repository: MCamner/mq-agent
+          ref: main
+          path: .canonical/mq-agent
+          sparse-checkout: |
+            schemas/mq_stack_cockpit.schema.json
+            schemas/mq_stack_release_check.schema.json
+            schemas/stack_provenance.schema.json
+            schemas/runtime_identity.schema.json
+          sparse-checkout-cone-mode: false
+
       - name: Release check (dry-run)
         env:
           MQ_CANONICAL_MACOS_SCRIPTS_ROOT: ${{ github.workspace }}/.canonical/macos-scripts
+          MQ_CANONICAL_AGENT_ROOT: ${{ github.workspace }}/.canonical/mq-agent
         # Single source of truth for CI: syntax check, version sync, all smoke
         # tests, and command-surface consistency. --dry-run skips only the
         # "is this version already released" gate so post-release pushes stay
