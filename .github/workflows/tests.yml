@@ -23,12 +23,18 @@ jobs:
       # mq.doctor-status.v1 is owned by macos-scripts; mq-hal keeps a copy in
       # schemas/vendor/. With this checkout the contract smoke test compares
       # the copy against the owner's file instead of skipping.
+      #
+      # Only that one file: the checkout lands inside this workspace, and a
+      # full tree there fills repo_memory's MAX_INDEX_FILES cap before mq-hal's
+      # own files are reached, which failed repo-memory-smoke.sh.
       - name: Check out canonical macos-scripts contracts
         uses: actions/checkout@v4
         with:
           repository: MCamner/macos-scripts
           ref: main
           path: .canonical/macos-scripts
+          sparse-checkout: schemas/mq.doctor-status.v1.json
+          sparse-checkout-cone-mode: false
 
       - name: Release check (dry-run)
         env:
