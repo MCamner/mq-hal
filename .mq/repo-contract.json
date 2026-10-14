@@ -12,7 +12,8 @@
     "consumes": [
       "mq.stack-provenance.v1",
       "mq.route-readiness.v1",
-      "mq.route-divergence.v1"
+      "mq.route-divergence.v1",
+      "mq.stack-compatibility.v1"
     ]
   },
   "next_focus": "maintenance — present current-era learned-routing evidence without moving routing authority",
