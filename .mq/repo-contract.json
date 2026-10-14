@@ -10,9 +10,11 @@
   ],
   "compatibility": {
     "consumes": [
-      "mq.stack-provenance.v1"
+      "mq.stack-provenance.v1",
+      "mq.route-readiness.v1",
+      "mq.route-divergence.v1"
     ]
   },
-  "next_focus": "maintenance — evidence-gated model routing observability",
+  "next_focus": "maintenance — present current-era learned-routing evidence without moving routing authority",
   "release_mode": "direct"
 }
