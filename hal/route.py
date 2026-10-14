@@ -23,6 +23,8 @@ SCHEMA = "mq_hal.model_route.v1"
 DECISION_SCHEMA = "mq.model-route-decision.v1"
 REPORT_SCHEMA = "mq.model-route-report.v1"
 HISTORY_SCHEMA = "mq.model-route-history.v1"
+READINESS_SCHEMA = "mq.route-readiness.v1"
+DIVERGENCE_SCHEMA = "mq.route-divergence.v1"
 HISTORY_LIMIT = 20
 STATUSES = {"PASS", "WARN", "FAIL", "SKIPPED", "UNAVAILABLE"}
 MODE_MAP = {
@@ -96,6 +98,43 @@ def report_data() -> tuple[dict[str, Any] | None, str | None]:
     if report is None or report.get("schema") != REPORT_SCHEMA:
         return None, "report-contract-invalid"
     return report, None
+
+
+def readiness_data() -> tuple[dict[str, Any] | None, str | None]:
+    readiness, error = run_agent(["route", "readiness", "--json"])
+    if error:
+        return None, error
+    if readiness is None or readiness.get("schema") != READINESS_SCHEMA:
+        return None, "readiness-contract-invalid"
+    if not isinstance(readiness.get("thresholds"), dict):
+        return None, "readiness-contract-invalid"
+    if not isinstance(readiness.get("task_classes"), dict):
+        return None, "readiness-contract-invalid"
+    return readiness, None
+
+
+def divergence_data(
+    *,
+    task_class: str | None = None,
+    era: str | None = None,
+) -> tuple[dict[str, Any] | None, str | None]:
+    args = ["route", "divergence"]
+    if task_class:
+        args.extend(["--task-class", task_class])
+    if era:
+        args.extend(["--era", era])
+    divergence, error = run_agent([*args, "--json"])
+    if error:
+        return None, error
+    if divergence is None or divergence.get("schema") != DIVERGENCE_SCHEMA:
+        return None, "divergence-contract-invalid"
+    if not isinstance(divergence.get("era"), dict):
+        return None, "divergence-contract-invalid"
+    if not isinstance(divergence.get("cohort"), dict):
+        return None, "divergence-contract-invalid"
+    if not isinstance(divergence.get("routes"), dict):
+        return None, "divergence-contract-invalid"
+    return divergence, None
 
 
 def ollama_status(local_model: str | None) -> tuple[str, str | None]:
@@ -259,6 +298,94 @@ def collect_accuracy() -> dict[str, Any]:
     )
 
 
+def collect_readiness() -> dict[str, Any]:
+    readiness, error = readiness_data()
+    if readiness is None:
+        return attach_feedback(
+            {
+                "schema": "mq_hal.model_route_readiness.v1",
+                "status": "WARN",
+                "readiness": None,
+                "error": error,
+            },
+            status="WARN",
+            what="Routing readiness is unavailable",
+            why="HAL only presents readiness produced by mq-agent",
+            evidence=[str(error)],
+            next_action=make_next_action(
+                text="Inspect routing readiness",
+                command="mq-agent route readiness --json",
+                safety="read-only",
+                requires_confirmation=False,
+            ),
+        )
+    return attach_feedback(
+        {
+            "schema": "mq_hal.model_route_readiness.v1",
+            "status": "PASS",
+            "readiness": readiness,
+            "error": None,
+        },
+        status="PASS",
+        what="Routing readiness loaded",
+        why="HAL presents mq-agent readiness gates without recomputing eligibility",
+        evidence=[
+            READINESS_SCHEMA,
+            f"source: {readiness.get('source', '-')}",
+            f"automatic_routing_enabled: {readiness.get('automatic_routing_enabled')}",
+        ],
+    )
+
+
+def collect_divergence(
+    *,
+    task_class: str | None = "docs-review",
+    era: str | None = None,
+) -> dict[str, Any]:
+    divergence, error = divergence_data(task_class=task_class, era=era)
+    if divergence is None:
+        args = ["mq-agent route divergence"]
+        if task_class:
+            args.append(f"--task-class {task_class}")
+        if era:
+            args.append(f"--era {era}")
+        args.append("--json")
+        return attach_feedback(
+            {
+                "schema": "mq_hal.model_route_divergence.v1",
+                "status": "WARN",
+                "divergence": None,
+                "error": error,
+            },
+            status="WARN",
+            what="Routing divergence is unavailable",
+            why="HAL only presents divergence produced by mq-agent",
+            evidence=[str(error)],
+            next_action=make_next_action(
+                text="Inspect route divergence",
+                command=" ".join(args),
+                safety="read-only",
+                requires_confirmation=False,
+            ),
+        )
+    return attach_feedback(
+        {
+            "schema": "mq_hal.model_route_divergence.v1",
+            "status": "PASS",
+            "divergence": divergence,
+            "error": None,
+        },
+        status="PASS",
+        what="Routing divergence loaded",
+        why="HAL presents mq-agent current-era evidence without ranking or promoting routes",
+        evidence=[
+            DIVERGENCE_SCHEMA,
+            f"era: {divergence.get('era', {}).get('name', '-')}",
+            f"producer_status: {divergence.get('status', '-')}",
+        ],
+    )
+
+
 def history_schema(decision_id: str | None) -> str:
     return "mq_hal.model_route_explain.v1" if decision_id else "mq_hal.model_route_history.v1"
 
@@ -361,6 +488,89 @@ def render_inspect(data: dict[str, Any]) -> None:
     render_feedback(data["feedback"])
 
 
+def render_readiness(data: dict[str, Any]) -> None:
+    readiness = data.get("readiness")
+    if not isinstance(readiness, dict):
+        render_feedback(data["feedback"])
+        return
+
+    print("Learned Routing Readiness")
+    print("=========================")
+    thresholds = readiness.get("thresholds", {})
+    task_classes = readiness.get("task_classes", {})
+    if not task_classes:
+        print("No applied routing evidence.")
+    for name, item in task_classes.items():
+        actual = item.get("actual", {})
+        routes = item.get("routes", {})
+        print(name)
+        print(
+            f"  observations: {actual.get('observations', 0)} / "
+            f"{thresholds.get('minimum_observations', '-')}"
+        )
+        print(
+            f"  routes:       {actual.get('candidate_routes', 0)} / "
+            f"{thresholds.get('minimum_candidate_routes', '-')}"
+        )
+        print(
+            f"  window:       {actual.get('window_days', 0)}d / "
+            f"{thresholds.get('minimum_window_days', '-')}d"
+        )
+        print(
+            f"  min/route:    {actual.get('minimum_samples_per_route', 0)} / "
+            f"{thresholds.get('minimum_samples_per_route', '-')}"
+        )
+        print(f"  counts:       {json.dumps(routes, sort_keys=True)}")
+        print(f"  decision:     {item.get('recommendation', '-')}")
+        print()
+    print(f"Automatic routing: {readiness.get('automatic_routing_enabled')}")
+    print(f"Operator approval required: {readiness.get('operator_approval_required')}")
+    print()
+    render_feedback(data["feedback"])
+
+
+def render_divergence(data: dict[str, Any]) -> None:
+    divergence = data.get("divergence")
+    if not isinstance(divergence, dict):
+        render_feedback(data["feedback"])
+        return
+
+    era = divergence.get("era", {})
+    cohort = divergence.get("cohort", {})
+    print("Route Divergence")
+    print("================")
+    print(f"Era:         {era.get('name', '-')}")
+    print(f"Era commit:  {era.get('commit', '-')}")
+    print(f"Task class:  {divergence.get('task_class') or 'all'}")
+    print(
+        f"Cohort:      {cohort.get('included', 0)} included, "
+        f"{cohort.get('excluded', 0)} excluded"
+    )
+    print(f"Status:      {divergence.get('status', '-')}")
+    print(f"Min/route:   {divergence.get('minimum_samples_per_route', '-')}")
+    print()
+    for name, item in divergence.get("routes", {}).items():
+        execution = item.get("execution", {})
+        evidence = item.get("evidence", {})
+        print(f"{name}")
+        print(f"  observations: {item.get('observations', 0)}")
+        print(f"  sufficient:   {item.get('sufficient')}")
+        print(f"  verification: {execution.get('verification', {})}")
+        print(f"  escalated:    {execution.get('escalated', 0)}")
+        print(f"  grounding:    {evidence.get('grounding_ratio')}")
+        print(f"  measured:     {evidence.get('measured', 0)}")
+        print()
+    if divergence.get("insufficient_reasons"):
+        print("Insufficient evidence:")
+        for reason in divergence["insufficient_reasons"]:
+            print(f"  - {reason}")
+        print()
+    print(f"Grants promotion: {divergence.get('grants_promotion')}")
+    print(f"Recommends route: {divergence.get('recommends_route')}")
+    print()
+    render_feedback(data["feedback"])
+
+
 def render_history(data: dict[str, Any]) -> None:
     for entry in data["history"]:
         verification = entry.get("verification", {})
@@ -389,9 +599,11 @@ def _flag(value: Any) -> str:
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="mq-hal route", description="Read-only model routing control room")
     parser.add_argument("command", nargs="?", default="status",
-                        choices=["status", "inspect", "history", "accuracy", "explain"])
+                        choices=["status", "inspect", "history", "accuracy", "explain", "readiness", "divergence"])
     parser.add_argument("value", nargs="?")
     parser.add_argument("--agent", choices=["codex", "claude"], default="codex")
+    parser.add_argument("--task-class", default="docs-review")
+    parser.add_argument("--era")
     parser.add_argument("--json", action="store_true")
     args = parser.parse_args(argv)
     if args.command == "inspect":
@@ -402,6 +614,10 @@ def main(argv: list[str] | None = None) -> int:
         data = collect_accuracy()
     elif args.command == "history":
         data = collect_history()
+    elif args.command == "readiness":
+        data = collect_readiness()
+    elif args.command == "divergence":
+        data = collect_divergence(task_class=args.task_class, era=args.era)
     elif args.command == "explain":
         if not args.value:
             parser.error("explain requires a decision id")
@@ -412,6 +628,10 @@ def main(argv: list[str] | None = None) -> int:
         print(json.dumps(data, indent=2, ensure_ascii=False))
     elif args.command == "inspect":
         render_inspect(data)
+    elif args.command == "readiness":
+        render_readiness(data)
+    elif args.command == "divergence":
+        render_divergence(data)
     elif args.command in {"history", "explain", "accuracy"}:
         print(data["schema"])
         if args.command == "accuracy":
