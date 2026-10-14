@@ -6,6 +6,13 @@
 
 ### Added
 
+- `mq-hal route readiness` and `mq-hal route divergence` expose mq-agent's
+  evidence-gated learned-routing state as read-only operator views. HAL validates
+  the producer schema IDs, preserves mq-agent's recommendation/status, current
+  analysis era, route counts and safety flags, and never recomputes eligibility,
+  ranks a route or grants promotion. Divergence defaults to mq-agent's current
+  era and `docs-review`, with optional `--era` / `--task-class` filters.
+
 - Consumer contracts for `mq-agent stack cockpit`, `release-check` and
   `provenance --json`: the schemas (and `runtime_identity`, which provenance
   references) are vendored in `schemas/vendor/`, and

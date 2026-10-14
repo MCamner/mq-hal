@@ -107,7 +107,7 @@ Rendered from live command output by
 | Release | `mq-hal release`, `mq-hal release-brief` |
 | Brain/context | `mq-hal brain`, `mq-hal context` |
 | Runtime | `mq-hal runtime`, `mq-hal models`, `mq-hal model-status` |
-| Model routing | `mq-hal route`, `mq-hal route inspect`, `mq-hal route history`, `mq-hal route accuracy`, `mq-hal route explain` |
+| Model routing | `mq-hal route`, `mq-hal route inspect`, `mq-hal route history`, `mq-hal route accuracy`, `mq-hal route readiness`, `mq-hal route divergence`, `mq-hal route explain` |
 | Provenance | `mq-hal provenance`, `mq-hal provenance --json` |
 | Dashboard | `mq-hal`, `mq-hal dashboard` |
 | Session memory | `mq-hal session`, `mq-hal last`, `mq-hal timeline` |
