@@ -75,8 +75,6 @@ mqlaunch hal timeline
 
 ## Examples
 
-`mq-hal route readiness` and `mq-hal route divergence` are read-only views of mq-agent's evidence gates and current-era route comparison. HAL never recomputes eligibility, ranks a route, or grants promotion.
-
 `mq-hal route inspect` — read-only routing decision, owned by `mq-agent`:
 
 ```text
