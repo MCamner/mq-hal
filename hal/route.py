@@ -319,11 +319,11 @@ def collect_readiness() -> dict[str, Any]:
                 requires_confirmation=False,
             ),
         )
-    return attach_feedback(
+    payload = attach_feedback(
         {
             "schema": "mq_hal.model_route_readiness.v1",
             "status": "PASS",
-            "readiness": readiness,
+            "readiness": None,
             "error": None,
         },
         status="PASS",
@@ -335,6 +335,11 @@ def collect_readiness() -> dict[str, Any]:
             f"automatic_routing_enabled: {readiness.get('automatic_routing_enabled')}",
         ],
     )
+    # Preserve authoritative producer vocabulary. attach_feedback() normalizes
+    # every nested key named "status" into HAL's health vocabulary, which must
+    # not rewrite mq-agent evidence states.
+    payload["readiness"] = readiness
+    return payload
 
 
 def collect_divergence(
@@ -368,11 +373,11 @@ def collect_divergence(
                 requires_confirmation=False,
             ),
         )
-    return attach_feedback(
+    payload = attach_feedback(
         {
             "schema": "mq_hal.model_route_divergence.v1",
             "status": "PASS",
-            "divergence": divergence,
+            "divergence": None,
             "error": None,
         },
         status="PASS",
@@ -384,6 +389,9 @@ def collect_divergence(
             f"producer_status: {divergence.get('status', '-')}",
         ],
     )
+    # Keep mq-agent's status (for example INSUFFICIENT_EVIDENCE) verbatim.
+    payload["divergence"] = divergence
+    return payload
 
 
 def history_schema(decision_id: str | None) -> str:
