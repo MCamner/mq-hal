@@ -193,6 +193,7 @@ _smoke code-plan-smoke.sh
 _smoke release-published-smoke.sh
 _smoke provenance-transport-smoke.sh
 _smoke provenance-presentation-smoke.sh
+_smoke compatibility-smoke.sh
 _smoke docs-smoke.sh
 [[ "$FAILED" -eq "$_smoke_start" ]] && pass "all smoke tests passed"
 

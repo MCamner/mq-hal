@@ -24,6 +24,7 @@ The detailed reference with flags, examples, and backend notes is in
 | `release` | — | No | No | No | — |
 | `runtime` | — | No | No | No | — |
 | `provenance` | — | No | No | No | — |
+| `compatibility` | — | No | No | No | — |
 | `route` | — | No | No | No | — |
 | `feedback` | — | No | No | No | `feedback` |
 | `dashboard` | no-argument `mq-hal` | No | No | No | — |

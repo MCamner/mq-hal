@@ -6,6 +6,15 @@
 
 ### Added
 
+- `mq-hal compatibility` shows the stack compatibility report produced by
+  `mq-agent stack compatibility --json` (`mq.stack-compatibility.v1`):
+  repositories, producer/consumer relationships, findings with every
+  implicated repo, and mq-agent's next action. `--json` prints the producer's
+  bytes. Transport differs from provenance in one way: mq-agent exits 2 for
+  FAIL and 3 for UNAVAILABLE while still printing a report, so a non-zero exit
+  with a valid report is a report, and the view passes mq-agent's exit code
+  through. HAL derives no severity, blocking rule or remedy of its own.
+
 - `mq-hal route readiness` and `mq-hal route divergence` expose mq-agent's
   evidence-gated learned-routing state as read-only operator views. HAL validates
   the producer schema IDs, preserves mq-agent's recommendation/status, current
