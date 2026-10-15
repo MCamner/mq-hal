@@ -4,7 +4,7 @@ Reference for every command exposed through `mq-hal` and `mqlaunch hal`.
 
 Each entry lists: what it does, which backend it calls, whether it is read-only, and whether it writes to session memory.
 
-Main operator commands share `mq.feedback.v1`. Human and JSON output use
+Most operator commands share `mq.feedback.v1`. Human and JSON output use
 `PASS`, `WARN`, `FAIL`, `SKIPPED`, or `UNAVAILABLE`. Actionable results include
 a non-executing `next_action` with its command, safety class, and confirmation
 requirement. The schema is `schemas/feedback.schema.json`.
@@ -12,6 +12,32 @@ requirement. The schema is `schemas/feedback.schema.json`.
 ---
 
 ## OBSERVE
+
+### `workflow-receipt`
+
+Read mq-agent-owned `mq.workflow-receipt.v1` JSON from a file or stdin.
+
+```bash
+mq-hal workflow-receipt receipt.json
+mq-agent workflow receipt RUN_ID --json | mq-hal workflow-receipt -
+```
+
+| Property | Value |
+|---|---|
+| Backend | `scripts/workflow_receipt.py` |
+| Read-only | Yes; no tool execution or network calls |
+| Memory/session write | No; no state or logs are saved |
+| Flags | `--json` preserves the input receipt fields |
+
+HAL presents the producer's status, verification, coverage, steps, recording
+confirmations, and next action without recalculating a verdict. Missing or null
+values stay unknown. Producer storage failures remain visible; reading a receipt
+does not retry storage. Invalid JSON, schema markers, field container types, or
+an `ok=true` receipt without `status=completed`, `completeness.status=complete`,
+and `verification.status=passed` are rejected on stderr with exit 2. Exit 0 means the receipt was rendered, regardless of its verdict.
+This command preserves the receipt contract rather than adding `mq.feedback.v1`.
+
+---
 
 ### `brief`
 

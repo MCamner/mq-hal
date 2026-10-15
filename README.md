@@ -103,7 +103,7 @@ Rendered from live command output by
 | Area | Commands |
 | --- | --- |
 | Repo brief | `mq-hal brief`, `mq-hal audit`, `mq-hal repo-status`, `mq-hal ci` |
-| Stack | `mq-hal stack`, `mq-hal stack-status`, `mq-hal status` |
+| Stack/workflow | `mq-hal stack`, `mq-hal stack-status`, `mq-hal status`, `mq-hal workflow-receipt [PATH|-] [--json]` |
 | Release | `mq-hal release`, `mq-hal release-brief` |
 | Brain/context | `mq-hal brain`, `mq-hal context` |
 | Runtime | `mq-hal runtime`, `mq-hal models`, `mq-hal model-status` |

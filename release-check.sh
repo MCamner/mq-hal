@@ -155,6 +155,7 @@ _smoke timeline-smoke.sh
 _smoke brief-smoke.sh
 _smoke repo-status-smoke.sh
 _smoke ci-status-smoke.sh
+_smoke workflow-receipt-smoke.sh
 _smoke release-brief-smoke.sh
 _smoke release-control-smoke.sh
 _smoke audit-smoke.sh

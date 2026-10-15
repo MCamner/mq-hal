@@ -35,6 +35,11 @@ case "${1:-}" in
     exec python3 "$ROOT/scripts/brief.py" "$@"
     ;;
 
+  workflow-receipt)
+    shift || true
+    exec python3 "$ROOT/scripts/workflow_receipt.py" "$@"
+    ;;
+
   release-brief)
     shift || true
     exec python3 "$ROOT/scripts/release_brief.py" "$@"
