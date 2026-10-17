@@ -139,7 +139,11 @@ def call_ollama(goal: str, config: dict[str, Any], model: str = OLLAMA_MODEL) ->
         "prompt": prompt,
         "format": PLAN_SCHEMA,
         "stream": False,
-        "options": {"temperature": 0},
+        "think": False,
+        "options": {
+            "temperature": 0,
+            "num_predict": 1024,
+        },
     }
     data = json.dumps(payload).encode("utf-8")
     url = f"{OLLAMA_URL.rstrip('/')}/api/generate"
@@ -152,7 +156,7 @@ def call_ollama(goal: str, config: dict[str, Any], model: str = OLLAMA_MODEL) ->
     try:
         with urllib.request.urlopen(request, timeout=180) as resp:
             body = json.loads(resp.read().decode("utf-8"))
-    except urllib.error.URLError as exc:
+    except (urllib.error.URLError, TimeoutError) as exc:
         print(
             f"WARN: could not reach Ollama ({exc}). "
             f"Start Ollama: ollama pull {model}",
