@@ -22,7 +22,7 @@ STATE_DIR = Path(os.environ.get("MQ_HAL_STATE_DIR", str(Path.home() / ".mq-hal")
 STATE_PATH = STATE_DIR / "state.json"
 
 OLLAMA_URL = os.environ.get("OLLAMA_URL", "http://localhost:11434")
-DEFAULT_OLLAMA_MODEL = "qwen3:4b-instruct"
+DEFAULT_OLLAMA_MODEL = "qwen3.5:9b"
 OLLAMA_MODEL = os.environ.get("OLLAMA_MODEL", DEFAULT_OLLAMA_MODEL)
 INTENT_SCHEMA_VERSION = "mq-hal.intent.v1"
 

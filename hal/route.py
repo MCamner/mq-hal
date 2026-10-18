@@ -38,7 +38,7 @@ STATUS_SCHEMA_PATH = Path(__file__).resolve().parents[1] / "schemas" / "model_ro
 SAMPLE_STATUS: dict[str, Any] = {
     "schema": SCHEMA, "title": "MQ Model Routing", "status": "PASS",
     "router": "PASS", "mode": "SHADOW", "ollama": "PASS",
-    "local_model": "qwen3:4b-instruct", "authoritative_agent": "codex",
+    "local_model": "qwen3.5:9b", "authoritative_agent": "codex",
     "decision": {"recommended_route": "local-shadow"},
     "metrics": {
         "total_records": 38, "valid_outcomes": 38, "attempted": 38,

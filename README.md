@@ -48,7 +48,7 @@ Optional local model setup:
 ```bash
 brew install ollama
 brew services start ollama
-ollama pull qwen3:4b-instruct
+ollama pull qwen3.5:9b
 ```
 
 ## 30 Second Demo

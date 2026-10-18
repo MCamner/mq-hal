@@ -20,7 +20,7 @@ CONFIG_PATH = BASE_DIR / "config" / "repos.json"
 PROMPT_PATH = BASE_DIR / "prompts" / "doctor-summary.txt"
 
 OLLAMA_URL = os.environ.get("OLLAMA_URL", "http://localhost:11434")
-OLLAMA_MODEL = os.environ.get("OLLAMA_MODEL", "qwen3:4b-instruct")
+OLLAMA_MODEL = os.environ.get("OLLAMA_MODEL", "qwen3.5:9b")
 
 SUMMARY_SCHEMA: dict[str, Any] = {
     "type": "object",

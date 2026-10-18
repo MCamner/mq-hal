@@ -27,7 +27,7 @@ TEST_SCHEMA: dict[str, Any] = {
 
 SAMPLE_RESULT: dict[str, Any] = {
     "profile": "router",
-    "model": "qwen3:4b-instruct",
+    "model": "qwen3.5:9b",
     "ok": True,
     "latency_ms": 35,
     "response": {"status": "ok", "message": "ready"},
@@ -38,7 +38,7 @@ def call_model(profile: str) -> dict[str, Any]:
     model, selected = model_for_profile(
         profile,
         default_profile="router",
-        env_default="qwen3:4b-instruct",
+        env_default="qwen3.5:9b",
     )
     payload = {
         "model": model,

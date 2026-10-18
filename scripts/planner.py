@@ -23,7 +23,7 @@ STATE_DIR = Path(
 STATE_PATH = STATE_DIR / "state.json"
 
 OLLAMA_URL = os.environ.get("OLLAMA_URL", "http://localhost:11434")
-DEFAULT_OLLAMA_MODEL = "qwen3:8b"
+DEFAULT_OLLAMA_MODEL = "qwen3.5:9b"
 OLLAMA_MODEL = os.environ.get("OLLAMA_MODEL", DEFAULT_OLLAMA_MODEL)
 
 PLAN_SCHEMA: dict[str, Any] = {

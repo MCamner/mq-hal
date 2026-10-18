@@ -22,22 +22,22 @@ SAMPLE_STATUS: dict[str, Any] = {
     "latency_ms": 12,
     "profiles": {
         "router": {
-            "model": "qwen3:4b-instruct",
+            "model": "qwen3.5:9b",
             "available": True,
             "reasoning_effort": "low",
         },
         "planner": {
-            "model": "qwen3:8b",
+            "model": "qwen3.5:9b",
             "available": True,
             "reasoning_effort": "medium",
         },
         "critic": {
-            "model": "qwen3:8b",
+            "model": "qwen3.5:9b",
             "available": True,
             "reasoning_effort": "high",
         },
         "code": {
-            "model": "qwen2.5-coder:7b",
+            "model": "qwen3.5:9b",
             "available": False,
             "reasoning_effort": "medium",
         },

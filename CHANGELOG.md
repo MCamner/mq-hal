@@ -50,6 +50,13 @@
   states neutrally without recomputing them. Mutating feedback actions remain
   outside HAL.
 
+### Changed
+
+- Default local Ollama model is `qwen3.5:9b` for every profile (router,
+  planner, critic, code), the planner, routing, doctor and model checks,
+  replacing `qwen3:4b-instruct`, `qwen3:8b` and `qwen2.5-coder:7b`. Install
+  hints in README and guides pull `qwen3.5:9b`.
+
 ### Fixed
 
 - `hal/operator.py` is now `hal/operator_actions.py`. Run as a script it put
