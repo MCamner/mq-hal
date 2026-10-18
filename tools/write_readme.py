@@ -36,7 +36,7 @@ brew install ollama
 brew services start ollama
 
 # 2. Pull model
-ollama pull qwen3:4b-instruct
+ollama pull qwen3.5:9b
 
 # 3. Clone and link binary
 git clone https://github.com/MCamner/mq-hal.git ~/mq-hal
@@ -494,7 +494,7 @@ mq-hal open CHANGELOG.md --repo mq-hal
 ## Optional model override
 
 {F}bash
-OLLAMA_MODEL=qwen3:4b ~/mq-hal/bin/mq-hal "visa git status"
+OLLAMA_MODEL=qwen3.5:9b ~/mq-hal/bin/mq-hal "visa git status"
 {F}
 
 ## Natural-language routing

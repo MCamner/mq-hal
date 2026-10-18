@@ -17,7 +17,7 @@ BASE_DIR = Path(__file__).resolve().parents[1]
 # (name, default, sensitive)
 _HAL_VARS: list[tuple[str, str, bool]] = [
     ("OLLAMA_URL",          "http://localhost:11434", False),
-    ("OLLAMA_MODEL",        "qwen3:4b-instruct",      False),
+    ("OLLAMA_MODEL",        "qwen3.5:9b",      False),
     ("MQ_HAL_STATE_DIR",    "~/.mq-hal",              False),
     ("MQ_HAL_CONFIG_PATH",  "(not set)",              False),
     ("EDITOR",              "(not set)",              False),
@@ -101,7 +101,7 @@ def build_recommendations(
                 "Ollama not found. AI routing is unavailable. "
                 "Deterministic fallback is active. "
                 "Fix: install Ollama from https://ollama.com and run "
-                "`ollama pull qwen3:4b-instruct`."
+                "`ollama pull qwen3.5:9b`."
             ),
         })
 

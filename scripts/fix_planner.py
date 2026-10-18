@@ -19,7 +19,7 @@ DOCTOR_SUMMARY_SCRIPT = BASE_DIR / "scripts" / "doctor_summary.py"
 PROMPT_PATH = BASE_DIR / "prompts" / "fix-planner.txt"
 
 OLLAMA_URL = os.environ.get("OLLAMA_URL", "http://localhost:11434")
-OLLAMA_MODEL = os.environ.get("OLLAMA_MODEL", "qwen3:4b-instruct")
+OLLAMA_MODEL = os.environ.get("OLLAMA_MODEL", "qwen3.5:9b")
 
 PLAN_SCHEMA: dict[str, Any] = {
     "type": "object",

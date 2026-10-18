@@ -96,7 +96,7 @@ name is wrong.
 
 ```bash
 mq-hal models          # list configured profiles
-ollama pull qwen3:4b   # pull the missing model
+ollama pull qwen3.5:9b   # pull the missing model
 mq-hal model-test      # verify all configured models respond
 ```
 
