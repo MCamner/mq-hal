@@ -233,6 +233,7 @@ def call_ollama_plan(summary_envelope: dict[str, Any]) -> dict[str, Any] | None:
         "prompt": json.dumps(summary_envelope, indent=2, ensure_ascii=False),
         "format": PLAN_SCHEMA,
         "stream": False,
+        "think": False,
         "options": {"temperature": 0},
     }
 

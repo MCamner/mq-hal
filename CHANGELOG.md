@@ -59,6 +59,10 @@
 
 ### Fixed
 
+- `hal.py`, `doctor_summary.py`, `fix_planner.py` and `model_test.py` send
+  `think: false` to Ollama, as `planner.py` already did. qwen3.5 thinks by
+  default: `model_test.py` took 25 s against its 30 s timeout, now 0.8 s, and
+  an intent request took 46-80 s instead of 1.1 s.
 - `hal/operator.py` is now `hal/operator_actions.py`. Run as a script it put
   `hal/` first on `sys.path` and shadowed the stdlib `operator` module, so on
   any Python that does not import `collections` at startup (a python.org
