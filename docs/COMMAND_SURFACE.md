@@ -134,3 +134,36 @@ See `schemas/intent.schema.json` for the formal schema and
 | `run_mqlaunch` | mqlaunch-allowlisted | No |
 | `create_branch` | repo-write | Yes |
 | `refuse` | no-op | — |
+
+## Changed-file verification
+
+```bash
+mq-hal audit --repo mq-agent --verification --json
+mq-hal stack-status --verification --json
+mq-hal stack-status --legacy --verification
+```
+
+Both views separate structural/runtime status from changed-file evidence. With
+`--verification`, HAL reads `repo-signal doctor <configured-path> --verification
+--json`; repo-signal delegates existing-receipt validation to mq-agent. HAL runs
+no test, writes no receipt and calls no cloud provider. Use trusted installed
+repo-signal and mq-agent executables.
+
+Without the flag, verification is `NOT_VERIFIED` and no doctor process starts.
+Samples stay offline even with the flag. Missing/older providers, invalid JSON,
+timeouts and invalid verification fields remain `NOT_VERIFIED`. Repo-signal with
+its doctor verification extension and mq-agent with verify-changes are required.
+
+Audit adds `verification`. Stack adds a HAL presentation map `verification`
+keyed by repository name and `verification_summary`. Existing cockpit fields
+and HAL feedback are preserved; verification_summary is a separate verdict:
+FAIL precedes STALE, which precedes NOT_VERIFIED, and only a nonempty set of PASS
+results gives PASS. Unconfigured cockpit items remain NOT_VERIFIED; producer
+paths are never used to launch doctor. Each local read has a 35-second timeout,
+so an explicitly requested multi-repo check can take longer than ordinary stack.
+
+Status is PASS, FAIL, STALE or NOT_VERIFIED, with fixed advisory `next_action`
+text. Actions are never executed. A PASS covers changed files against HEAD,
+not the full test suite, GitHub CI or release approval. A passing structural
+`overall` or runtime feedback does not override verification status. Raw doctor
+reports, paths, stderr and receipt bodies are not copied into verification.

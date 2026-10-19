@@ -158,6 +158,7 @@ _smoke ci-status-smoke.sh
 _smoke release-brief-smoke.sh
 _smoke release-control-smoke.sh
 _smoke audit-smoke.sh
+_smoke verification-status-smoke.sh
 _smoke stack-status-smoke.sh
 _smoke hal-router-smoke.sh
 _smoke intent-schema-smoke.sh

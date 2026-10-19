@@ -55,7 +55,7 @@ ollama pull qwen3.5:9b
 
 ```bash
 mq-hal brief                       # repo operator brief
-mq-hal stack --json                # stack cockpit summary from mq-agent
+mq-hal stack --verification --json # cockpit + existing changed-file evidence
 mq-hal context                     # mqobsidian context-pack readiness
 mq-hal runtime                     # local service health
 mq-hal --explain-intent "kör tester i mq-hal"
@@ -102,7 +102,7 @@ Rendered from live command output by
 
 | Area | Commands |
 | --- | --- |
-| Repo brief | `mq-hal brief`, `mq-hal audit`, `mq-hal repo-status`, `mq-hal ci` |
+| Repo brief | `mq-hal brief`, `mq-hal audit --verification`, `mq-hal repo-status`, `mq-hal ci` |
 | Stack | `mq-hal stack`, `mq-hal stack-status`, `mq-hal status` |
 | Release | `mq-hal release`, `mq-hal release-brief` |
 | Brain/context | `mq-hal brain`, `mq-hal context` |
