@@ -46,6 +46,7 @@ def call_model(profile: str) -> dict[str, Any]:
         "prompt": "Return status ok and message ready.",
         "format": TEST_SCHEMA,
         "stream": False,
+        "think": False,
         "options": {"temperature": 0},
     }
     data = json.dumps(payload).encode("utf-8")

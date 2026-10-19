@@ -185,6 +185,7 @@ def call_ollama(prompt: str, model: str = OLLAMA_MODEL) -> str | None:
         "prompt": model_prompt(prompt),
         "format": INTENT_SCHEMA,
         "stream": False,
+        "think": False,
         "options": {
             "temperature": 0
         },

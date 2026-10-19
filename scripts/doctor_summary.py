@@ -323,6 +323,7 @@ def call_ollama_summary(data: Any, repo_name: str, command: str) -> dict[str, An
         "prompt": user_prompt,
         "format": SUMMARY_SCHEMA,
         "stream": False,
+        "think": False,
         "options": {"temperature": 0},
     }
 
