@@ -265,8 +265,11 @@ def run_open(target: str, repo: str | None, confirm: bool, json_out: bool) -> in
         print()
         print("Preview only. Re-run with --confirm to open; omit it to cancel.")
         return 0
-    result = subprocess.run(command, cwd=str(repo_path), check=False)
-    code = int(result.returncode)
+    try:
+        code = int(subprocess.run(command, cwd=str(repo_path), check=False).returncode)
+    except FileNotFoundError:
+        print(f"ERROR: editor not found: {command[0]}", file=sys.stderr)
+        code = 127
     record_action(
         source="open", outcome="executed", exit_code=code, command=command,
         cwd=str(repo_path), confirmation="accepted", repo=repo_name,

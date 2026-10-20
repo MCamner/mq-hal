@@ -688,7 +688,7 @@ mq-hal commands:
         if not query:
             print("ERROR: missing search query", file=sys.stderr)
             return 2
-        return run_planned_command(["rg", "-n", "--", query], cwd=repo_path, confirm=confirm)
+        return run_planned_command(["rg", "-n", "--", query, "."], cwd=repo_path, confirm=confirm)
 
     if action == "run_test":
         command = test_command_for_repo(repo_path)

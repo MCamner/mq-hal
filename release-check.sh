@@ -134,7 +134,7 @@ else
 fi
 
 step "Smoke tests"
-_smoke_start=$FAILED
+_smoke_start=${#BLOCKERS[@]}
 _smoke() {
   local s="$1" out
   if out="$("./tests/$s" 2>&1)"; then
@@ -197,7 +197,7 @@ _smoke provenance-transport-smoke.sh
 _smoke provenance-presentation-smoke.sh
 _smoke compatibility-smoke.sh
 _smoke docs-smoke.sh
-[[ "$FAILED" -eq "$_smoke_start" ]] && pass "all smoke tests passed"
+[[ "${#BLOCKERS[@]}" -eq "$_smoke_start" ]] && pass "all smoke tests passed"
 
 step "Command surface consistency"
 if ./tools/check-command-docs.sh >/dev/null 2>&1; then

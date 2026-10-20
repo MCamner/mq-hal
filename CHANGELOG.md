@@ -74,6 +74,13 @@
 
 ### Fixed
 
+- Router `grep_repo` passes `.` to `rg`, so it no longer waits on stdin when
+  stdin is not a terminal (pipes, scripts, CI).
+- `mq-hal open --confirm` with a missing editor reports exit 127 instead of
+  raising `FileNotFoundError`, and the attempt is recorded in the action ledger.
+- `release-check.sh` no longer prints "all smoke tests passed" when a smoke
+  test fails after an earlier gate has already failed.
+
 - Stack verification resolves the cockpit label `mqlaunch` to the configured
   `macos-scripts` repo, preserving an explicit mqlaunch override. Register
   `mqobsidian` in the default repository map so both components are checked
