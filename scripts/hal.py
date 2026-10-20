@@ -403,6 +403,9 @@ def ensure_repo_exists(repo_name: str, repo_path: Path) -> None:
 
 
 def run_command(command: list[str], cwd: Path | None = None) -> int:
+    # Flush HAL's own lines first: on a pipe they would otherwise land after
+    # the child's output, and flushing at exit fails once the reader is gone.
+    sys.stdout.flush()
     try:
         completed = subprocess.run(command, cwd=str(cwd) if cwd else None)
     except FileNotFoundError:

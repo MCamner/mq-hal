@@ -78,6 +78,8 @@
   stdin is not a terminal (pipes, scripts, CI).
 - `mq-hal open --confirm` with a missing editor reports exit 127 instead of
   raising `FileNotFoundError`, and the attempt is recorded in the action ledger.
+- Router output on a pipe: HAL's own line now comes before the command's
+  output, and `mq-hal "..." | head` no longer ends with `BrokenPipeError`.
 - `release-check.sh` no longer prints "all smoke tests passed" when a smoke
   test fails after an earlier gate has already failed.
 
