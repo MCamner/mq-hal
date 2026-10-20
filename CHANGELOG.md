@@ -66,6 +66,11 @@
 
 ### Fixed
 
+- Stack verification resolves the cockpit label `mqlaunch` to the configured
+  `macos-scripts` repo, preserving an explicit mqlaunch override. Register
+  `mqobsidian` in the default repository map so both components are checked
+  instead of reported as unconfigured.
+
 - `hal.py`, `doctor_summary.py`, `fix_planner.py` and `model_test.py` send
   `think: false` to Ollama, as `planner.py` already did. qwen3.5 thinks by
   default: `model_test.py` took 25 s against its 30 s timeout, now 0.8 s, and

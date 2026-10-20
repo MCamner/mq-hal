@@ -135,6 +135,25 @@ class VerificationTests(unittest.TestCase):
                 self.assertEqual(stack_status.main(['--json', '--verification']), 1)
             self.assertEqual(json.loads(out.getvalue())['verification_summary'], 'NOT_VERIFIED')
 
+    def test_mqlaunch_uses_macos_scripts_repo_without_duplicate_registration(self):
+        cockpit = {'repos': [{'name': 'mqlaunch'}]}
+        with patch.object(evidence, 'collect', return_value=evidence.unverified()) as collect:
+            stack_status.with_verification(cockpit, enabled=True,
+                                           repos={'macos-scripts': '/configured/launcher'})
+            collect.assert_called_once_with(Path('/configured/launcher'), enabled=True)
+
+    def test_explicit_mqlaunch_override_wins(self):
+        cockpit = {'repos': [{'name': 'mqlaunch'}]}
+        with patch.object(evidence, 'collect', return_value=evidence.unverified()) as collect:
+            stack_status.with_verification(cockpit, enabled=True,
+                                           repos={'mqlaunch': '/explicit', 'macos-scripts': '/default'})
+            collect.assert_called_once_with(Path('/explicit'), enabled=True)
+
+    def test_mqobsidian_is_in_default_repo_config(self):
+        path = Path(__file__).resolve().parents[1] / 'config/repos.json'
+        config = json.loads(path.read_text())
+        self.assertEqual(config['repos']['mqobsidian'], '~/mqobsidian')
+
 
 if __name__ == '__main__':
     unittest.main()

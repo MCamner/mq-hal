@@ -159,7 +159,8 @@ keyed by repository name and `verification_summary`. Existing cockpit fields
 and HAL feedback are preserved; verification_summary is a separate verdict:
 FAIL precedes STALE, which precedes NOT_VERIFIED, and only a nonempty set of PASS
 results gives PASS. Unconfigured cockpit items remain NOT_VERIFIED; producer
-paths are never used to launch doctor. Each local read has a 35-second timeout,
+paths are never used to launch doctor. The cockpit label `mqlaunch` resolves to
+`macos-scripts` unless explicitly configured; `mqobsidian` is registered by default. Each local read has a 35-second timeout,
 so an explicitly requested multi-repo check can take longer than ordinary stack.
 
 Status is PASS, FAIL, STALE or NOT_VERIFIED, with fixed advisory `next_action`
