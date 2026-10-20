@@ -6,6 +6,10 @@ WORK="$(mktemp -d)"
 trap 'rm -rf "$WORK"' EXIT
 
 export MQ_HAL_STATE_DIR="$WORK/state"
+# config/repos.json maps mq-hal to ~/mq-hal; CI checks out elsewhere.
+mkdir -p "$WORK/home"
+ln -s "$ROOT" "$WORK/home/mq-hal"
+export HOME="$WORK/home"
 export PYTHONPYCACHEPREFIX="$WORK/pycache"
 LEDGER="$MQ_HAL_STATE_DIR/actions.jsonl"
 
