@@ -6,6 +6,14 @@
 
 ### Added
 
+- `mq-hal actions` shows a local, append-only ledger of what HAL ran,
+  cancelled or refused. The router, `execute` steps and confirmed
+  `open`/`fix` each write one `mq_hal.action.v1` entry to
+  `$MQ_HAL_STATE_DIR/actions.jsonl` with intent, repo, routing, command,
+  confirmation, outcome, exit code and duration (newest 1000 kept). Prompts
+  and arguments are secret-redacted before write. A failed ledger write only
+  warns; it never blocks the command.
+
 - `audit --verification` and `stack-status --verification` present repo-signal's
   existing changed-file evidence as PASS, FAIL, STALE or NOT_VERIFIED, separately
   from structural/runtime status. Shared bounded read-only collection supports

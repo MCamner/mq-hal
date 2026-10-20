@@ -261,6 +261,42 @@ called.
 
 ---
 
+### `actions`
+
+What mq-hal itself ran, cancelled or refused.
+
+| Property | Value |
+|---|---|
+| `mq-hal` | `mq-hal actions` |
+| Backend | `scripts/action_log.py` |
+| Read-only | Yes |
+| Memory write | No |
+| Flags | `--last N`, `--repo NAME`, `--source router\|execute\|open\|fix`, `--outcome executed\|cancelled\|refused\|internal\|error`, `--json` |
+
+Every routed prompt (`mq-hal "..."`), every `execute` step, and every
+confirmed `open` or `fix` appends one `mq_hal.action.v1` line to
+`$MQ_HAL_STATE_DIR/actions.jsonl` (default `~/.mq-hal`, newest 1000 kept).
+An entry records source, intent, repo, routing (`ai` or `deterministic`),
+prompt, command, cwd, confirmation (`not_required`, `accepted`, `cancelled`),
+outcome, exit code and duration. Prompts and command arguments pass through
+the learn-layer secret redaction before write.
+
+- `executed`: a command was started; the exit code is its result (127 when
+  the binary was not found).
+- `cancelled`: the operator declined the confirmation prompt.
+- `refused`: the router rejected the intent or failed before running a
+  command.
+- `internal`: a read-only intent answered without a subprocess (`pwd`,
+  `list_repos`, `repo_tree`).
+- `error`: a required tool was missing (`fix` without `mqlaunch`).
+
+`--raw-intent`, `--explain-intent` and preview runs without `--confirm` are
+not recorded because nothing runs. If the ledger cannot be written, the
+command still runs and a `WARN: action ledger not written` line goes to
+stderr. JSON uses `mq_hal.actions.v1`. No model is called.
+
+---
+
 ### `next`
 
 Show the next suggested operator action from release blockers or dashboard

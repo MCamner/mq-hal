@@ -168,6 +168,7 @@ _smoke brain-smoke.sh
 _smoke context-smoke.sh
 _smoke route-control-smoke.sh
 _smoke changes-smoke.sh
+_smoke actions-smoke.sh
 if out="$(bash ./tests/feedback-control-smoke.sh 2>&1)"; then
   :
 else

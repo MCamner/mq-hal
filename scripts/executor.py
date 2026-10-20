@@ -8,8 +8,11 @@ import re
 import shlex
 import subprocess
 import sys
+import time
 from pathlib import Path
 from typing import Any
+
+from action_log import record_action
 
 BASE_DIR = Path(__file__).resolve().parents[1]
 CONFIG_PATH = BASE_DIR / "config" / "repos.json"
@@ -98,29 +101,46 @@ def run_step(
         print(f"  ↳ manual step — no command defined, skipped")
         return True, 0
 
+    def log(outcome: str, code: int | None, confirmation: str,
+            duration_ms: int | None = None) -> None:
+        record_action(
+            source="execute", outcome=outcome, exit_code=code,
+            command=[cmd], cwd=str(repo_path), confirmation=confirmation,
+            duration_ms=duration_ms, intent=f"step {step.get('id', '?')}",
+            prompt=desc,
+        )
+
     err = validate_command(cmd)
     if err:
         step_id = step.get("id", "?")
         print(f"  ERROR: refusing to run step {step_id}: {err}",
               file=sys.stderr)
+        log("refused", 2, "not_required")
         return False, 2
 
+    confirmation = "not_required"
     if requires or auto_confirm:
         if not confirm_step(step, repo_path):
             print("  Cancelled.")
+            log("cancelled", None, "cancelled")
             return True, 0
+        confirmation = "accepted"
 
+    started = time.monotonic()
     try:
         parts = shlex.split(cmd)
         result = subprocess.run(parts, cwd=str(repo_path))
-        return False, result.returncode
+        code = result.returncode
     except FileNotFoundError:
         print(f"  ERROR: command not found: {shlex.split(cmd)[0]}",
               file=sys.stderr)
-        return False, 127
+        code = 127
     except OSError as exc:
         print(f"  ERROR: {exc}", file=sys.stderr)
-        return False, 1
+        code = 1
+    log("executed", code, confirmation,
+        int((time.monotonic() - started) * 1000))
+    return False, code
 
 
 def render_preflight(verdict: str, findings: list[dict[str, Any]]) -> None:

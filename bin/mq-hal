@@ -130,6 +130,11 @@ case "${1:-}" in
     exec python3 "$ROOT/hal/changes.py" "$@"
     ;;
 
+  actions)
+    shift || true
+    exec python3 "$ROOT/scripts/action_log.py" "$@"
+    ;;
+
   next)
     shift || true
     exec python3 "$ROOT/hal/operator_actions.py" "$@"

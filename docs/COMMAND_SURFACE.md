@@ -39,6 +39,7 @@ The detailed reference with flags, examples, and backend notes is in
 | `history` | — | No | No | No | — |
 | `alerts` | — | No | No | No | — |
 | `changes` | — | No | No | No | — |
+| `actions` | — | No | No | No | — |
 | `next` | — | No | No | No | — |
 | `fix` | — | No | No | Yes | — |
 | `open` | — | No | No | Yes | — |
