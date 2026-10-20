@@ -6,6 +6,13 @@
 
 ### Added
 
+- `audit --verification` and `stack-status --verification` present repo-signal's
+  existing changed-file evidence as PASS, FAIL, STALE or NOT_VERIFIED, separately
+  from structural/runtime status. Shared bounded read-only collection supports
+  canonical and legacy stack views; missing or malformed evidence never passes.
+  Default and sample paths do not start verification providers. No tests or
+  receipt writes are performed by HAL.
+
 - `mq-hal compatibility` shows the stack compatibility report produced by
   `mq-agent stack compatibility --json` (`mq.stack-compatibility.v1`):
   repositories, producer/consumer relationships, findings with every

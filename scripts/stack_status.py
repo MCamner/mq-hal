@@ -17,6 +17,8 @@ sys.path.insert(0, str(BASE_DIR))
 from hal import stack as operator_stack
 from hal.feedback import render_feedback, surface_feedback
 
+import verification_status as evidence
+
 CONFIG_PATH = BASE_DIR / "config" / "repos.json"
 
 SAMPLE: dict[str, Any] = {
@@ -497,12 +499,26 @@ def render(data: dict[str, Any]) -> None:
     print()
 
 
+def with_verification(data: dict[str, Any], *, enabled: bool = False,
+                      repos: dict[str, str] | None = None, sample: bool = False) -> dict[str, Any]:
+    configured = load_config().get("repos", {}) if repos is None else repos
+    items: dict[str, dict[str, Any]] = {}
+    for item in operator_stack._items(data):
+        name = operator_stack._name(item)
+        path = configured.get(name) if isinstance(configured, dict) else None
+        items[name] = (evidence.collect(Path(path).expanduser(), enabled=enabled)
+                       if isinstance(path, str) and not sample
+                       else evidence.unverified("sample" if sample else "repo_not_configured"))
+    return {**data, "verification": items, "verification_summary": evidence.summary(items)}
+
+
 def main(argv: list[str]) -> int:
     parser = argparse.ArgumentParser(
         prog="mq-hal stack-status",
         description="Show MQ stack status from mq-agent cockpit JSON, with a local legacy fallback.",
     )
     parser.add_argument("--json", action="store_true", help="Print machine-readable JSON.")
+    parser.add_argument("--verification", action="store_true", help="Read existing changed-file evidence via repo-signal; run no tests.")
     parser.add_argument("--sample", action="store_true", help="Print sample output without touching local repos.")
     parser.add_argument(
         "--legacy",
@@ -515,10 +531,12 @@ def main(argv: list[str]) -> int:
         data = surface_feedback(
             operator_stack.SAMPLE_COCKPIT, surface="Stack", command="mq-hal stack"
         )
+        data = with_verification(data, sample=True)
         if args.json:
             operator_stack.print_json(data)
         else:
             operator_stack.render(data)
+            evidence.render(data["verification"])
         return 0
 
     if not args.legacy:
@@ -527,10 +545,12 @@ def main(argv: list[str]) -> int:
             data = surface_feedback(
                 cockpit.data, surface="Stack", command="mq-hal stack"
             )
+            data = with_verification(data, enabled=args.verification)
             if args.json:
                 operator_stack.print_json(data)
             else:
                 operator_stack.render(data)
+                evidence.render(data["verification"])
                 print()
                 render_feedback(data["feedback"])
             return 0
@@ -541,6 +561,8 @@ def main(argv: list[str]) -> int:
                     surface_feedback({
                         "status": "warn",
                         "source": "mq-agent stack cockpit --json",
+                        "verification": {},
+                        "verification_summary": "NOT_VERIFIED",
                         "error": cockpit.error,
                         "returncode": cockpit.returncode,
                     }, surface="Stack", command="mq-hal stack", status="UNAVAILABLE",
@@ -561,12 +583,14 @@ def main(argv: list[str]) -> int:
         print(f"Fallback: {cockpit.error}. Showing legacy local stack-status.")
         print()
 
-    data = surface_feedback(collect(), surface="Stack", command="mq-hal stack")
+    data = with_verification(surface_feedback(collect(), surface="Stack", command="mq-hal stack"),
+                             enabled=args.verification)
     if args.json:
         print(json.dumps(data, indent=2, ensure_ascii=False))
         return 0
 
     render(data)
+    evidence.render(data["verification"])
     print()
     render_feedback(data["feedback"])
     return 0

@@ -13,6 +13,7 @@ from typing import Any
 
 sys.path.insert(0, str(Path(__file__).parent))
 from session_memory import append_event  # noqa: E402
+import verification_status as evidence  # noqa: E402
 
 BASE_DIR = Path(__file__).resolve().parents[1]
 CONFIG_PATH = BASE_DIR / "config" / "repos.json"
@@ -190,7 +191,7 @@ def derive_recommendation(
         parts.append(f"Add README sections: {', '.join(readme['missing'][:4])}.")
 
     if overall == "ready":
-        return "Repo looks publish-ready. Run mqlaunch release-check when ready to tag."
+        return "Structural checks look ready. Check verification evidence separately before release checks."
     if parts:
         return " ".join(parts) + " Then rerun mqlaunch hal audit."
     return "Review findings above and rerun mqlaunch hal audit."
@@ -205,7 +206,7 @@ def render(data: dict[str, Any]) -> None:
     print()
     print(f"Repo:    {data['repo']}")
     print(f"Version: {data['version']}")
-    print(f"Overall: {data['overall']}")
+    print(f"Overall (structural): {data['overall']}")
     print()
 
     # Publish checklist
@@ -231,6 +232,12 @@ def render(data: dict[str, Any]) -> None:
         print("README score:      unavailable (repo-signal not found)")
     print()
 
+    verification = data.get("verification", evidence.unverified())
+    print(f"Code verification: {verification['status']}")
+    print(f"Next action: {verification['next_action']}")
+    print("Scope: changed files against HEAD; not a full-suite or CI verdict.")
+    print()
+
     # Recommendation
     print("Recommendation")
     print("--------------")
@@ -246,11 +253,12 @@ def main(argv: list[str]) -> int:
     parser.add_argument("--repo", help="Configured repo name. Defaults to config default_repo.")
     parser.add_argument("--json", action="store_true", help="Print machine-readable JSON.")
     parser.add_argument("--sample", action="store_true", help="Print sample output without touching the repo.")
+    parser.add_argument("--verification", action="store_true", help="Read existing changed-file evidence via repo-signal; run no tests.")
     parser.add_argument("--no-memory", action="store_true", help="Do not save to session memory.")
     args = parser.parse_args(argv)
 
     if args.sample:
-        data: dict[str, Any] = SAMPLE
+        data: dict[str, Any] = {**SAMPLE, "verification": evidence.unverified("sample")}
     else:
         repo_name, repo_path = resolve_repo(args.repo)
         version = collect_version(repo_path)
@@ -264,6 +272,7 @@ def main(argv: list[str]) -> int:
             "overall": overall,
             "publish": publish,
             "readme": readme,
+            "verification": evidence.collect(repo_path, enabled=args.verification),
             "recommendation": recommendation,
         }
 
