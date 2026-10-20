@@ -4,6 +4,13 @@
 
 ## [Unreleased]
 
+### Fixed
+
+- Stack verification resolves the cockpit label `mqlaunch` to the configured
+  `macos-scripts` repo, preserving an explicit mqlaunch override. Register
+  `mqobsidian` in the default repository map so both components are checked
+  instead of reported as unconfigured.
+
 ### Added
 
 - `audit --verification` and `stack-status --verification` present repo-signal's

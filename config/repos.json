@@ -9,6 +9,7 @@
     "mq-hal": "~/mq-hal",
     "mq-ums": "~/mq-ums",
     "atlas-one": "~/atlas-one",
-    "mcamner-journal": "~/mcamner-journal"
+    "mcamner-journal": "~/mcamner-journal",
+    "mqobsidian": "~/mqobsidian"
   }
 }

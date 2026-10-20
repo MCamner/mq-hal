@@ -111,6 +111,7 @@ def load_config() -> dict[str, Any]:
                 "macos-scripts": "~/macos-scripts",
                 "repo-signal": "~/repo-signal",
                 "mq-mcp": "~/mq-mcp",
+                "mqobsidian": "~/mqobsidian",
             },
         }
 
@@ -505,7 +506,9 @@ def with_verification(data: dict[str, Any], *, enabled: bool = False,
     items: dict[str, dict[str, Any]] = {}
     for item in operator_stack._items(data):
         name = operator_stack._name(item)
-        path = configured.get(name) if isinstance(configured, dict) else None
+        # mq-agent labels the launcher component mqlaunch; its repo is macos-scripts.
+        repo_name = "macos-scripts" if name == "mqlaunch" else name
+        path = (configured.get(name) or configured.get(repo_name)) if isinstance(configured, dict) else None
         items[name] = (evidence.collect(Path(path).expanduser(), enabled=enabled)
                        if isinstance(path, str) and not sample
                        else evidence.unverified("sample" if sample else "repo_not_configured"))
