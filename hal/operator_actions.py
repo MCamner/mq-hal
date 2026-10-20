@@ -25,6 +25,10 @@ from hal.feedback import (  # noqa: E402
 from hal import dashboard as dashboard_control  # noqa: E402
 from hal import release as release_control  # noqa: E402
 
+# Appended, not prepended: scripts/hal.py must not shadow the hal package.
+sys.path.append(str(BASE_DIR / "scripts"))
+from action_log import record_action  # noqa: E402
+
 CONFIG_PATH = BASE_DIR / "config" / "repos.json"
 
 SAMPLE: dict[str, Any] = {
@@ -261,8 +265,15 @@ def run_open(target: str, repo: str | None, confirm: bool, json_out: bool) -> in
         print()
         print("Preview only. Re-run with --confirm to open; omit it to cancel.")
         return 0
-    result = subprocess.run(command, cwd=str(repo_path), check=False)
-    code = int(result.returncode)
+    try:
+        code = int(subprocess.run(command, cwd=str(repo_path), check=False).returncode)
+    except FileNotFoundError:
+        print(f"ERROR: editor not found: {command[0]}", file=sys.stderr)
+        code = 127
+    record_action(
+        source="open", outcome="executed", exit_code=code, command=command,
+        cwd=str(repo_path), confirmation="accepted", repo=repo_name,
+    )
     if code == 0:
         print(f"DONE: opened {target} in {repo_name}")
     else:
@@ -317,9 +328,17 @@ def run_fix(blocker: str | None, sample: bool, confirm: bool, json_out: bool) ->
         return 0
     if not shutil.which("mqlaunch"):
         print("ERROR: mqlaunch not found", file=sys.stderr)
+        record_action(
+            source="fix", outcome="error", exit_code=127, command=command,
+            confirmation="accepted",
+        )
         return 127
     result = subprocess.run(command, check=False)
     code = int(result.returncode)
+    record_action(
+        source="fix", outcome="executed", exit_code=code, command=command,
+        confirmation="accepted",
+    )
     if code == 0:
         print("DONE: routed fix through mqlaunch")
     else:

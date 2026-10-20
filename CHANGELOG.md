@@ -6,6 +6,14 @@
 
 ### Added
 
+- `mq-hal actions` shows a local, append-only ledger of what HAL ran,
+  cancelled or refused. The router, `execute` steps and confirmed
+  `open`/`fix` each write one `mq_hal.action.v1` entry to
+  `$MQ_HAL_STATE_DIR/actions.jsonl` with intent, repo, routing, command,
+  confirmation, outcome, exit code and duration (newest 1000 kept). Prompts
+  and arguments are secret-redacted before write. A failed ledger write only
+  warns; it never blocks the command.
+
 - `audit --verification` and `stack-status --verification` present repo-signal's
   existing changed-file evidence as PASS, FAIL, STALE or NOT_VERIFIED, separately
   from structural/runtime status. Shared bounded read-only collection supports
@@ -65,6 +73,15 @@
   hints in README and guides pull `qwen3.5:9b`.
 
 ### Fixed
+
+- Router `grep_repo` passes `.` to `rg`, so it no longer waits on stdin when
+  stdin is not a terminal (pipes, scripts, CI).
+- `mq-hal open --confirm` with a missing editor reports exit 127 instead of
+  raising `FileNotFoundError`, and the attempt is recorded in the action ledger.
+- Router output on a pipe: HAL's own line now comes before the command's
+  output, and `mq-hal "..." | head` no longer ends with `BrokenPipeError`.
+- `release-check.sh` no longer prints "all smoke tests passed" when a smoke
+  test fails after an earlier gate has already failed.
 
 - Stack verification resolves the cockpit label `mqlaunch` to the configured
   `macos-scripts` repo, preserving an explicit mqlaunch override. Register

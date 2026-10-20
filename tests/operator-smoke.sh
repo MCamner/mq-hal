@@ -7,6 +7,7 @@ export PYTHONPYCACHEPREFIX="${TMPDIR:-/tmp}/mq-hal-pycache"
 
 TMPBIN="$(mktemp -d)"
 trap 'rm -rf "$TMPBIN"' EXIT
+export MQ_HAL_STATE_DIR="$TMPBIN/state"
 
 cat >"$TMPBIN/editor" <<'SH'
 #!/usr/bin/env bash

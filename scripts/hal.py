@@ -8,11 +8,13 @@ import re
 import shutil
 import subprocess
 import sys
+import time
 import urllib.error
 import urllib.request
 from pathlib import Path
 from typing import Any
 
+from action_log import record_action
 from model_profiles import model_for_profile
 
 BASE_DIR = Path(__file__).resolve().parents[1]
@@ -401,6 +403,9 @@ def ensure_repo_exists(repo_name: str, repo_path: Path) -> None:
 
 
 def run_command(command: list[str], cwd: Path | None = None) -> int:
+    # Flush HAL's own lines first: on a pipe they would otherwise land after
+    # the child's output, and flushing at exit fails once the reader is gone.
+    sys.stdout.flush()
     try:
         completed = subprocess.run(command, cwd=str(cwd) if cwd else None)
     except FileNotFoundError:
@@ -425,11 +430,47 @@ def confirm_command(command: list[str], cwd: Path | None) -> bool:
     return answer in {"y", "yes", "j", "ja"}
 
 
+# Set by run_planned_command so main() can record what the routed intent ran.
+_LAST_RUN: dict[str, Any] | None = None
+
+
 def run_planned_command(command: list[str], cwd: Path | None = None, confirm: bool = False) -> int:
+    global _LAST_RUN
+    _LAST_RUN = {"command": command, "cwd": str(cwd) if cwd else None}
     if confirm and not confirm_command(command, cwd):
+        _LAST_RUN["confirmation"] = "cancelled"
         print("Cancelled.")
         return 130
-    return run_command(command, cwd=cwd)
+    _LAST_RUN["confirmation"] = "accepted" if confirm else "not_required"
+    started = time.monotonic()
+    code = run_command(command, cwd=cwd)
+    _LAST_RUN["duration_ms"] = int((time.monotonic() - started) * 1000)
+    return code
+
+
+def record_routed_action(prompt: str, intent: dict[str, Any], routing: str, exit_code: int) -> None:
+    run = _LAST_RUN or {}
+    if run.get("confirmation") == "cancelled":
+        outcome = "cancelled"
+    elif "duration_ms" in run:
+        outcome = "executed"
+    elif exit_code == 0:
+        outcome = "internal"
+    else:
+        outcome = "refused"
+    record_action(
+        source="router",
+        outcome=outcome,
+        exit_code=exit_code,
+        command=run.get("command"),
+        cwd=run.get("cwd"),
+        confirmation=run.get("confirmation", "not_required"),
+        duration_ms=run.get("duration_ms"),
+        intent=intent.get("intent"),
+        repo=intent.get("repo"),
+        routing=routing,
+        prompt=prompt,
+    )
 
 
 def is_within(base: Path, candidate: Path) -> bool:
@@ -650,7 +691,7 @@ mq-hal commands:
         if not query:
             print("ERROR: missing search query", file=sys.stderr)
             return 2
-        return run_planned_command(["rg", "-n", "--", query], cwd=repo_path, confirm=confirm)
+        return run_planned_command(["rg", "-n", "--", query, "."], cwd=repo_path, confirm=confirm)
 
     if action == "run_test":
         command = test_command_for_repo(repo_path)
@@ -772,6 +813,7 @@ def main(argv: list[str]) -> int:
         die(str(exc))
 
     raw = None if args.no_ai else call_ollama(prompt, model=model)
+    routing = "deterministic" if raw is None else "ai"
     if raw is None:
         intent = deterministic_intent(prompt)
         if intent is None:
@@ -787,6 +829,7 @@ def main(argv: list[str]) -> int:
             fallback = deterministic_intent(prompt)
             if fallback is not None:
                 intent = fallback
+                routing = "deterministic"
 
     if args.raw_intent:
         print(json.dumps(intent, indent=2, ensure_ascii=False))
@@ -797,7 +840,15 @@ def main(argv: list[str]) -> int:
         return 0
 
     remember_prompt(prompt, intent)
-    return handle_intent(intent, confirm=args.confirm)
+    exit_code = 1
+    try:
+        exit_code = handle_intent(intent, confirm=args.confirm)
+        return exit_code
+    except SystemExit as exc:
+        exit_code = exc.code if isinstance(exc.code, int) else 1
+        raise
+    finally:
+        record_routed_action(prompt, intent, routing, exit_code)
 
 
 if __name__ == "__main__":
