@@ -4,6 +4,8 @@
 
 ## [Unreleased]
 
+## [2.6.0] - 2026-10-24
+
 ### Added
 
 - `mq-hal actions` shows a local, append-only ledger of what HAL ran,

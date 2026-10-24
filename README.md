@@ -3,7 +3,7 @@
 Local operator layer for the MQ stack.
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
-[![Version](https://img.shields.io/badge/version-2.5.0-blue)](VERSION)
+[![Version](https://img.shields.io/badge/version-2.6.0-blue)](VERSION)
 
 `mq-hal` gives a human-friendly command surface for local repo status, stack
 status, release status, runtime health, model-routing evidence, mqobsidian context readiness, and safe
@@ -199,9 +199,9 @@ Do not put HAL business logic in `macos-scripts`; expose it through a thin
 
 ## Roadmap
 
-Current release is v2.5.0 (Explicit Cloud Code Planning): cloud code planning
-through `mq-hal code-plan`, while existing planning and routing commands stay
-local-first. Full release map: [ROADMAP.md](ROADMAP.md).
+Current release is v2.6.0 (Stack Evidence Views): read-only views over the
+action ledger, changed-file verification, stack compatibility, route
+readiness and feedback, with routing still local-first. Full release map: [ROADMAP.md](ROADMAP.md).
 
 ## Docs
 
