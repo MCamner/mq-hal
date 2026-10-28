@@ -200,6 +200,21 @@ _smoke compatibility-smoke.sh
 _smoke docs-smoke.sh
 [[ "${#BLOCKERS[@]}" -eq "$_smoke_start" ]] && pass "all smoke tests passed"
 
+# One process per file: test_verification_status.py puts scripts/ first on
+# sys.path, so scripts/hal.py shadows the hal/ package for any test collected
+# after it in the same interpreter.
+step "Python unit tests"
+_unit_start=${#BLOCKERS[@]}
+for t in tests/test_*.py; do
+  if out="$(python3 -m unittest "$t" 2>&1)"; then
+    :
+  else
+    fail "$(basename "$t")"
+    [[ "$JSON" -eq 1 ]] || printf '%s\n' "$out" >&2
+  fi
+done
+[[ "${#BLOCKERS[@]}" -eq "$_unit_start" ]] && pass "all unit tests passed"
+
 step "Command surface consistency"
 if ./tools/check-command-docs.sh >/dev/null 2>&1; then
   pass "command surface consistent"
