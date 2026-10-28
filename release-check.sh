@@ -200,13 +200,14 @@ _smoke compatibility-smoke.sh
 _smoke docs-smoke.sh
 [[ "${#BLOCKERS[@]}" -eq "$_smoke_start" ]] && pass "all smoke tests passed"
 
-# One process per file: test_verification_status.py puts scripts/ first on
-# sys.path, so scripts/hal.py shadows the hal/ package for any test collected
-# after it in the same interpreter.
+# pytest, not unittest: most of these are plain test functions that unittest
+# silently skips. One process per file: test_verification_status.py puts
+# scripts/ first on sys.path, so scripts/hal.py shadows the hal/ package for
+# any test collected after it in the same interpreter.
 step "Python unit tests"
 _unit_start=${#BLOCKERS[@]}
 for t in tests/test_*.py; do
-  if out="$(python3 -m unittest "$t" 2>&1)"; then
+  if out="$(python3 -m pytest -q -p no:cacheprovider "$t" 2>&1)"; then
     :
   else
     fail "$(basename "$t")"

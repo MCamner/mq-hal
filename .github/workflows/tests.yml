@@ -22,8 +22,9 @@ jobs:
       # runner's own Python so the release gate keeps running under the same
       # interpreter as before. It is externally managed, hence the flag; the
       # runner is discarded after the job.
+      # pytest runs tests/test_*.py in release-check.sh.
       - name: Install test dependencies
-        run: python3 -m pip install --break-system-packages jsonschema
+        run: python3 -m pip install --break-system-packages jsonschema pytest
 
       - name: Show Python version
         run: python3 --version
