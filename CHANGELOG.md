@@ -6,6 +6,10 @@
 
 ### Fixed
 
+- CI and Brief now report local HEAD with the latest run per workflow/event; no runs is unknown.
+- Complete repo-status-json command documentation and syntax gate; failed collectors always return a nonempty error.
+- Ignore machine-specific Claude settings.
+
 - `mq-hal repo-status-json --repo <name>` is now a real subcommand. It
   was only a prompt intent, so mq-mcp's `hal_repo_report` mode
   `repo-status-json`, which passes `--repo`, exited 2 with

@@ -59,10 +59,15 @@ def run_cmd(command: list[str], cwd: Path) -> tuple[int, str, str]:
 
 
 def build_ci(repo_name: str, repo_path: Path, limit: int) -> dict[str, Any]:
+    code, head_sha, err = run_cmd(["git", "rev-parse", "HEAD"], repo_path)
+    if code != 0 or not head_sha:
+        return {"repo": repo_name, "status": "unknown", "runs": [],
+                "head_sha": "", "recommendation": "Could not resolve local HEAD."}
     command = [
         "gh", "run", "list",
-        "--limit", str(limit),
-        "--json", "status,conclusion,workflowName,displayTitle,createdAt",
+        "--commit", head_sha,
+        "--limit", str(max(1, limit)),
+        "--json", "status,conclusion,workflowName,workflowDatabaseId,displayTitle,createdAt,headSha,databaseId,event,attempt",
     ]
 
     code, out, err = run_cmd(command, repo_path)
@@ -71,6 +76,7 @@ def build_ci(repo_name: str, repo_path: Path, limit: int) -> dict[str, Any]:
         return {
             "repo": repo_name,
             "status": "unknown",
+            "head_sha": head_sha,
             "runs": [],
             "recommendation": f"Could not read GitHub Actions: {err or 'gh failed'}",
         }
@@ -81,6 +87,7 @@ def build_ci(repo_name: str, repo_path: Path, limit: int) -> dict[str, Any]:
         return {
             "repo": repo_name,
             "status": "unknown",
+            "head_sha": head_sha,
             "runs": [],
             "recommendation": "Could not parse gh run list JSON.",
         }
@@ -89,9 +96,20 @@ def build_ci(repo_name: str, repo_path: Path, limit: int) -> dict[str, Any]:
     has_failure = False
     has_running = False
 
-    for item in raw if isinstance(raw, list) else []:
-        if not isinstance(item, dict):
+    if not isinstance(raw, list):
+        return {"repo": repo_name, "status": "unknown", "head_sha": head_sha,
+                "runs": [], "recommendation": "Invalid GitHub Actions run list."}
+    # gh returns newest runs first; sort explicitly for deterministic reruns.
+    latest = {}
+    for item in sorted((r for r in raw if isinstance(r, dict)),
+                       key=lambda r: (str(r.get("createdAt") or ""),
+                                      int(r.get("attempt") or 0),
+                                      int(r.get("databaseId") or 0)), reverse=True):
+        if item.get("headSha") != head_sha:
             continue
+        key = (item.get("workflowDatabaseId") or item.get("workflowName"), item.get("event"))
+        latest.setdefault(key, item)
+    for item in latest.values():
         workflow = str(item.get("workflowName") or "workflow")
         status = str(item.get("status") or "unknown")
         conclusion = str(item.get("conclusion") or "unknown")
@@ -102,12 +120,15 @@ def build_ci(repo_name: str, repo_path: Path, limit: int) -> dict[str, Any]:
             "created_at": str(item.get("createdAt") or ""),
             "title": str(item.get("displayTitle") or ""),
         })
-        if conclusion in {"failure", "cancelled", "timed_out"}:
+        if conclusion in {"failure", "cancelled", "timed_out", "action_required", "startup_failure", "stale"}:
             has_failure = True
-        if status in {"in_progress", "queued", "waiting"}:
+        if status != "completed":
             has_running = True
 
-    if has_failure:
+    if not runs:
+        overall = "unknown"
+        rec = "No CI runs found for local HEAD."
+    elif has_failure:
         overall = "red"
         rec = "CI has failures. Run gh run view --log-failed."
     elif has_running:
@@ -119,6 +140,7 @@ def build_ci(repo_name: str, repo_path: Path, limit: int) -> dict[str, Any]:
 
     return {
         "repo": repo_name,
+        "head_sha": head_sha,
         "status": overall,
         "runs": runs,
         "recommendation": rec,
@@ -135,7 +157,7 @@ def render(data: dict[str, Any]) -> None:
 
     runs = data.get("runs", [])
     if isinstance(runs, list) and runs:
-        print("Recent runs")
+        print("HEAD runs (latest per workflow/event)")
         print("-----------")
         for item in runs:
             if not isinstance(item, dict):
@@ -153,7 +175,7 @@ def main(argv: list[str]) -> int:
     parser.add_argument("--repo")
     parser.add_argument("--json", action="store_true")
     parser.add_argument("--sample", action="store_true")
-    parser.add_argument("--limit", type=int, default=5)
+    parser.add_argument("--limit", type=int, default=100)
     args = parser.parse_args(argv)
 
     if args.sample:

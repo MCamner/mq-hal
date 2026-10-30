@@ -135,22 +135,18 @@ def collect_doctor(repo_path: Path) -> dict[str, Any]:
 
 
 def collect_ci(repo_path: Path) -> dict[str, Any]:
-    out = _run(
-        ["gh", "run", "list", "--limit", "5",
-         "--json", "name,status,conclusion,databaseId"],
-        cwd=repo_path, timeout=20,
-    )
-    if not out:
-        return {"available": False, "runs": []}
-    try:
-        runs = json.loads(out)
-        simplified = []
-        for r in runs:
-            conclusion = r.get("conclusion") or r.get("status") or "unknown"
-            simplified.append({"name": r.get("name", "?"), "conclusion": conclusion})
-        return {"available": True, "runs": simplified}
-    except (json.JSONDecodeError, AttributeError):
-        return {"available": False, "runs": []}
+    from ci_status import build_ci
+
+    data = build_ci(repo_path.name, repo_path, limit=100)
+    return {
+        "available": bool(data.get("head_sha")) and not data["recommendation"].startswith("Could not"),
+        "head_sha": data.get("head_sha", ""),
+        "status": data["status"],
+        "recommendation": data["recommendation"],
+        "runs": [{"name": r["workflow"],
+                  "conclusion": r["conclusion"] if r["status"] == "completed" else r["status"]}
+                 for r in data["runs"]],
+    }
 
 
 def collect_release(repo_path: Path) -> dict[str, Any]:
@@ -271,6 +267,10 @@ def render_text(data: dict[str, Any]) -> None:
         print()
     elif not ci["available"]:
         print("CI:      unavailable (gh not configured or no remote)")
+        print()
+
+    elif not ci["runs"]:
+        print("CI:      unknown (no runs for local HEAD)")
         print()
 
     # Release
