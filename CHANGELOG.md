@@ -12,6 +12,9 @@
   `unrecognized arguments`. An unknown repo now exits 2 instead of
   the intent's silent fallback to the default repo, and stdout is pure
   JSON. The prompt intent shares the same builder.
+- `release-check.sh` now runs the Python unit tests in `tests/test_*.py`
+  with pytest, one process per file. CI and the release gate never ran
+  them before. CI installs pytest alongside jsonschema.
 
 ## [2.6.0] - 2026-10-24
 
