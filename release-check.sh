@@ -154,6 +154,7 @@ _smoke session-memory-smoke.sh
 _smoke timeline-smoke.sh
 _smoke brief-smoke.sh
 _smoke repo-status-smoke.sh
+_smoke repo-status-json-smoke.sh
 _smoke ci-status-smoke.sh
 _smoke release-brief-smoke.sh
 _smoke release-control-smoke.sh

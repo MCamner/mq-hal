@@ -80,6 +80,11 @@ case "${1:-}" in
     exec python3 "$ROOT/scripts/repo_status.py" "$@"
     ;;
 
+  repo-status-json)
+    shift || true
+    exec python3 "$ROOT/scripts/repo_status_json.py" "$@"
+    ;;
+
   ci|ci-status)
     shift || true
     exec python3 "$ROOT/scripts/ci_status.py" "$@"

@@ -4,6 +4,15 @@
 
 ## [Unreleased]
 
+### Fixed
+
+- `mq-hal repo-status-json --repo <name>` is now a real subcommand. It
+  was only a prompt intent, so mq-mcp's `hal_repo_report` mode
+  `repo-status-json`, which passes `--repo`, exited 2 with
+  `unrecognized arguments`. An unknown repo now exits 2 instead of
+  the intent's silent fallback to the default repo, and stdout is pure
+  JSON. The prompt intent shares the same builder.
+
 ## [2.6.0] - 2026-10-24
 
 ### Added

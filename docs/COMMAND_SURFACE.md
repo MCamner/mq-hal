@@ -29,6 +29,7 @@ The detailed reference with flags, examples, and backend notes is in
 | `feedback` | — | No | No | No | `feedback` |
 | `dashboard` | no-argument `mq-hal` | No | No | No | — |
 | `repo-status` | `repo` | No | No | No | `hal repo-status` |
+| `repo-status-json` | — | No | No | No | — |
 | `ci` | `ci-status` | No | No | No | `hal ci` |
 | `doctor-summary` | `doctor` | Yes | Yes | No | `hal doctor` |
 | `fix-doctor` | `doctor-fix`, `fix-planner`, `plan-fix` | Yes | Yes | No | `hal fix-doctor` |
