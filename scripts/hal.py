@@ -715,25 +715,9 @@ mq-hal commands:
         return run_planned_command(["git", "checkout", "-b", branch], cwd=repo_path, confirm=True if not confirm else confirm)
 
     if action == "repo_status_json":
-        import json as _json
-        output: dict = {"repo": repo_name, "path": str(repo_path)}
-        try:
-            inspect_result = subprocess.run(
-                ["repo-signal", "inspect", "--json", str(repo_path)],
-                capture_output=True, text=True, timeout=30,
-            )
-            output["inspect"] = _json.loads(inspect_result.stdout) if inspect_result.returncode == 0 else {"error": inspect_result.stderr.strip()}
-        except Exception as exc:
-            output["inspect"] = {"error": str(exc)}
-        try:
-            doctor_result = subprocess.run(
-                ["repo-signal", "doctor", "--json", str(repo_path)],
-                capture_output=True, text=True, timeout=30,
-            )
-            output["doctor"] = _json.loads(doctor_result.stdout) if doctor_result.returncode == 0 else {"error": doctor_result.stderr.strip()}
-        except Exception as exc:
-            output["doctor"] = {"error": str(exc)}
-        print(_json.dumps(output, indent=2, ensure_ascii=False))
+        from repo_status_json import build_repo_status_json
+        output = build_repo_status_json(str(repo_name), repo_path)
+        print(json.dumps(output, indent=2, ensure_ascii=False))
         return 0
 
     if action == "run_mqlaunch":
