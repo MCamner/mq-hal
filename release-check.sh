@@ -58,7 +58,7 @@ step "Python syntax check"
 _pyfiles=(
   scripts/hal.py mq_hal/tools/registry.py scripts/doctor_summary.py
   scripts/fix_planner.py scripts/session_memory.py scripts/timeline.py
-  scripts/repo_status.py scripts/ci_status.py scripts/brief.py
+  scripts/repo_status.py scripts/repo_status_json.py scripts/ci_status.py scripts/brief.py
   scripts/release_brief.py scripts/audit.py scripts/stack_status.py
   hal/stack.py hal/status.py hal/doctor.py hal/brain.py hal/context.py hal/route.py
   hal/feedback_view.py hal/changes.py

@@ -16,3 +16,6 @@ build/
 # Local editor/agent MCP config: machine-specific paths
 .mcp.json
 .cursor/
+
+# Machine-specific Claude settings
+.claude/settings.local.json

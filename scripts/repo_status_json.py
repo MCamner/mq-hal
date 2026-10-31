@@ -21,7 +21,7 @@ def repo_signal_json(subcommand: str, repo_path: Path) -> dict[str, Any]:
             capture_output=True, text=True, timeout=30,
         )
         if result.returncode != 0:
-            return {"error": result.stderr.strip()}
+            return {"error": result.stderr.strip() or f"repo-signal {subcommand} failed (exit {result.returncode})"}
         return json.loads(result.stdout)
     except Exception as exc:
         return {"error": str(exc)}

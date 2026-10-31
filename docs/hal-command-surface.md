@@ -1103,6 +1103,28 @@ List all configured repos.
 
 ---
 
+### `repo-status-json`
+
+Structured repo state from `repo-signal inspect --json` and `doctor --json`.
+
+| Property | Value |
+|---|---|
+| `mq-hal` | `mq-hal repo-status-json --repo <name>` |
+| Backend | `scripts/repo_status_json.py` |
+| Read-only | Yes |
+| Memory write | No |
+| Flags | `--repo`, `--sample` |
+
+Stdout is JSON with `repo`, `path`, `inspect`, and `doctor`. Each collector
+returns an `error` on failure, including an exit-code fallback when stderr is empty.
+Unknown repositories exit 2. Sample mode does not run collectors.
+
+CI in `brief` and `ci` is scoped to local HEAD, keeping the newest run per
+workflow/event. No matching runs means unknown status, never green.
+`ci --limit` bounds the number of HEAD runs queried (default 100).
+
+---
+
 ## Memory behaviour summary
 
 | Command | Writes memory |
@@ -1112,6 +1134,7 @@ List all configured repos.
 | `stack-status` | No |
 | `release-brief` | Yes — `release_brief` event |
 | `repo-status` | No |
+| `repo-status-json` | No |
 | `ci` | No |
 | `doctor-summary` | Yes — `doctor_summary` event |
 | `timeline` | No |
