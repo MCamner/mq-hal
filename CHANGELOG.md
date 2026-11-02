@@ -16,6 +16,12 @@
   `unrecognized arguments`. An unknown repo now exits 2 instead of
   the intent's silent fallback to the default repo, and stdout is pure
   JSON. The prompt intent shares the same builder.
+- `mq-hal release-brief` now fails the release check when the target tag
+  already has a GitHub release, and says how many commits have landed
+  since. It compared the target with the latest release and called a
+  match OK, so a repo whose VERSION was already out read `ready` and was
+  told to publish that tag again. "release not found" is OK; any other
+  `gh` error stays a warning.
 - `release-check.sh` now runs the Python unit tests in `tests/test_*.py`
   with pytest, one process per file. CI and the release gate never ran
   them before. CI installs pytest alongside jsonschema.

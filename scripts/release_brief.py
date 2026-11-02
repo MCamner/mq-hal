@@ -31,7 +31,7 @@ SAMPLE: dict[str, Any] = {
         {"name": "README badge", "status": "ok", "message": "README appears to reference 0.3.9"},
         {"name": "Git tree", "status": "ok", "message": "Working tree is clean"},
         {"name": "CI", "status": "ok", "message": "Recent GitHub Actions look green"},
-        {"name": "Latest release", "status": "ok", "message": "Latest release matches target tag: v0.3.9"},
+        {"name": "Latest release", "status": "ok", "message": "v0.3.9 is not yet published"},
         {"name": "Doctor", "status": "ok", "message": "Doctor status: healthy"},
         {"name": "Release check", "status": "ok", "message": "release-check passed"},
     ],
@@ -217,26 +217,27 @@ def check_ci(repo_path: Path, skip_gh: bool) -> dict[str, Any]:
 def check_latest_release(repo_path: Path, target_tag: str, skip_gh: bool) -> dict[str, str]:
     if skip_gh:
         return {"name": "Latest release", "status": "skip", "message": "GitHub CLI release check skipped"}
+    if not target_tag:
+        return {"name": "Latest release", "status": "warn", "message": "No target tag without VERSION"}
 
-    code, out, err = run(
-        ["gh", "release", "view", "--json", "tagName,name,publishedAt"],
+    # Ask for the target tag itself, not the latest release: a target that
+    # already has a release is not releasable, whether or not it is the latest.
+    code, _, err = run(
+        ["gh", "release", "view", target_tag, "--json", "tagName,publishedAt"],
         repo_path,
     )
 
     if code != 0:
-        return {"name": "Latest release", "status": "warn", "message": err or "Could not read latest GitHub release"}
+        if "release not found" in err:
+            return {"name": "Latest release", "status": "ok", "message": f"{target_tag} is not yet published"}
+        # Auth or network errors say nothing about publication.
+        return {"name": "Latest release", "status": "warn", "message": err or "Could not read GitHub release"}
 
-    try:
-        data = json.loads(out)
-    except json.JSONDecodeError:
-        return {"name": "Latest release", "status": "warn", "message": "Could not parse gh release JSON"}
-
-    tag = str(data.get("tagName") or "unknown")
-    name = str(data.get("name") or "")
-
-    if target_tag and tag == target_tag:
-        return {"name": "Latest release", "status": "ok", "message": f"Latest release matches target tag: {tag}"}
-    return {"name": "Latest release", "status": "warn", "message": f"Latest release is {tag} {name}".strip()}
+    message = f"{target_tag} is already published"
+    count_code, count, _ = run(["git", "rev-list", "--count", f"{target_tag}..HEAD"], repo_path)
+    if count_code == 0 and count.isdigit():
+        message += f"; {count} commit(s) since {target_tag}"
+    return {"name": "Latest release", "status": "fail", "message": message + " — bump VERSION before releasing"}
 
 
 def check_doctor(repo_name: str, repo_path: Path, skip_doctor: bool) -> dict[str, str]:
