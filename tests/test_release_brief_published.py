@@ -4,7 +4,7 @@ from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'scripts'))
-import release_brief
+import release_brief  # type: ignore[import-not-found]  # on sys.path at runtime
 
 
 def check(gh, commits=(0, '3', '')):
